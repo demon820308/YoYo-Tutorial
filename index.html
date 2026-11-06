@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 创作教程站 — 三门提示词写作课</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans SC',sans-serif; background:#f6f6fb; color:#23233f; }
+  .hero { background:#1b1b30; color:#fff; padding:64px 24px 88px; }
+  .hero-in { max-width:1020px; margin:0 auto; }
+  .pill { display:inline-block; background:#6c63ff; color:#fff; font-size:13px; font-weight:700; padding:6px 14px; border-radius:999px; letter-spacing:.04em; }
+  h1 { font-family:'Noto Serif SC',serif; font-size:52px; line-height:1.15; margin:22px 0 10px; }
+  .sub { color:#c9cbee; font-size:20px; font-weight:500; }
+  .lead { color:#a9abd0; font-size:16px; line-height:1.8; margin-top:16px; max-width:720px; }
+  .cards { max-width:1020px; margin:-52px auto 0; padding:0 24px; display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .card { background:#fff; border:1px solid #e3e3f2; border-radius:16px; padding:26px 24px 24px; display:flex; flex-direction:column; box-shadow:0 10px 30px rgba(27,27,64,.07); }
+  .tag { font-size:12px; font-weight:700; letter-spacing:.08em; color:#6c63ff; }
+  .card h2 { font-family:'Noto Serif SC',serif; font-size:25px; margin:8px 0 6px; color:#23235f; }
+  .card .slogan { color:#55557a; font-size:14px; margin-bottom:14px; }
+  .card ul { list-style:none; margin-bottom:20px; }
+  .card li { font-size:14px; line-height:1.75; color:#3c3c5e; padding-left:16px; position:relative; }
+  .card li::before { content:''; position:absolute; left:0; top:11px; width:6px; height:6px; border-radius:50%; background:#6c63ff; }
+  .btn { margin-top:auto; display:block; text-align:center; background:#23235f; color:#fff; text-decoration:none; font-weight:700; font-size:15px; padding:12px 0; border-radius:10px; }
+  .btn:hover { background:#6c63ff; }
+  .how { max-width:1020px; margin:44px auto 0; padding:0 24px 56px; }
+  .how h3 { font-family:'Noto Serif SC',serif; font-size:22px; color:#23235f; margin-bottom:12px; }
+  .how p { font-size:15px; line-height:1.9; color:#4a4a6b; max-width:820px; }
+  footer { border-top:1px solid #e3e3f2; padding:18px 24px; text-align:center; color:#8a8ab0; font-size:13px; }
+  @media (max-width:860px){ .cards{ grid-template-columns:1fr; } h1{ font-size:38px; } }
+</style>
+</head>
+<body>
+  <div class="hero">
+    <div class="hero-in">
+      <span class="pill">提示词写作课 · 三门合集</span>
+      <h1>AI 创作教程站</h1>
+      <div class="sub">不背参数，不学软件说明书——只学把想法写成提示词。</div>
+      <p class="lead">三门课同一种学法：先解剖一条成品，再一步步跟着写，中间稿、改稿、练习一应俱全。做图去 Midjourney，做视频先在 Higgsfield 与 MiniMax H3 之间选好引擎，再按那台引擎的方言落笔。</p>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="tag">视频 · MiniMax H3</div>
+      <h2>MiniMax H3 教程</h2>
+      <div class="slogan">学会写 MiniMax H3 提示词</div>
+      <ul>
+        <li>五种模式：T2VA / I2VA / FL2VA / L2VA / Ref2VA</li>
+        <li>基础三段与 Ref2VA 六段，逐步成稿演示</li>
+        <li>运镜、台词、声音的写法与改稿课</li>
+        <li>11 课 + 练习区，英文成稿带中文对照</li>
+      </ul>
+      <a class="btn" href="minimax-h3/">进入课程 →</a>
+    </div>
+    <div class="card">
+      <div class="tag">视频 · Higgsfield</div>
+      <h2>Higgsfield 提示词教程</h2>
+      <div class="slogan">把想法，写成镜头</div>
+      <ul>
+        <li>先选引擎：Seedance、Kling、Cinema Studio 与 H3</li>
+        <li>MCSLA 五层公式与只写能看见的</li>
+        <li>运镜、视场、表演五支柱与因果链</li>
+        <li>15 课 + 练习区，导读先解剖一条差稿</li>
+      </ul>
+      <a class="btn" href="higgsfield/">进入课程 →</a>
+    </div>
+    <div class="card">
+      <div class="tag">图像 · Midjourney</div>
+      <h2>Midjourney 教程</h2>
+      <div class="slogan">从第一张图到稳定出好图</div>
+      <ul>
+        <li>先跑通一张图，再学六段公式</li>
+        <li>参数大全、五套配方与参考图系统</li>
+        <li>角色一致性、精修流水线与 V1 视频</li>
+        <li>12 课 + 实战工作流与排错表</li>
+      </ul>
+      <a class="btn" href="midjourney/">进入课程 →</a>
+    </div>
+  </div>
+
+  <div class="how">
+    <h3>怎么用这个站</h3>
+    <p>每门课都有自己的侧边目录，按课往下学即可；页面顶部的深色条可以在三门课之间随时切换。提示词代码块都带一键复制，检查清单可以勾选，练习题先自己做、再展开看参考答案。第一次来建议按「先看成品解剖 → 跟着写一遍 → 做练习」的顺序走完一门课，再换下一门。</p>
+  </div>
+
+  <footer>AI 创作教程站 · MiniMax H3 / Higgsfield / Midjourney 三门提示词写作课</footer>
+</body>
+</html>

@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>学会用 Midjourney — 从第一张图到稳定出好图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f5f0; --panel:#fffdf8; --panel2:#efece3; --ink:#1c1a15; --ink2:#57534a; --line:#ddd6c6;
+  --accent:#b45309; --accent2:#0f766e; --accent-soft:#fdf0dc; --teal-soft:#e2f2ef;
+  --code-bg:#17150f; --code-ink:#f2ead8; --code-dim:#a89f88;
+  --good:#15803d; --bad:#b91c1c;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#121110; --panel:#1b1a17; --panel2:#24231f; --ink:#ece7da; --ink2:#a8a294; --line:#38362e;
+    --accent:#f0a832; --accent2:#2dd4bf; --accent-soft:#2c2313; --teal-soft:#12302b;
+    --code-bg:#0b0a08; --code-ink:#f2ead8; --code-dim:#8f8772;
+    color-scheme: dark;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans SC",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.75;font-size:16px}
+code,kbd,.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+a{color:var(--accent2)}
+.topbar{position:sticky;top:0;z-index:60;background:var(--bg);border-bottom:2px solid var(--ink);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.topbar h1{font-family:"Noto Serif SC",serif;font-size:clamp(20px,3.4vw,30px);margin:0;letter-spacing:.02em}
+.topbar .sub{color:var(--ink2);font-size:14px}
+.topbar .tag{margin-left:auto;font-size:12px;border:1px solid var(--line);background:var(--panel);padding:4px 10px;border-radius:999px;color:var(--ink2)}
+#tocToggle{display:none;border:1px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 12px;font-size:14px;cursor:pointer;font-family:inherit}
+.layout{display:grid;grid-template-columns:272px minmax(0,1fr);max-width:1440px;margin:0 auto;align-items:start}
+aside.toc{position:sticky;top:73px;height:calc(100vh - 73px);overflow-y:auto;padding:18px 14px 40px;border-right:1px solid var(--line)}
+aside.toc .toc-title{font-size:12px;letter-spacing:.18em;color:var(--ink2);margin:0 4px 10px}
+aside.toc a{display:block;color:var(--ink2);text-decoration:none;font-size:13.5px;padding:6px 10px;border-radius:8px;border-left:3px solid transparent;line-height:1.45}
+aside.toc a:hover{background:var(--panel2);color:var(--ink)}
+aside.toc a.active{background:var(--accent-soft);color:var(--ink);border-left-color:var(--accent);font-weight:700}
+aside.toc .grp{margin-top:14px;font-size:11px;letter-spacing:.14em;color:var(--ink2);padding:0 10px}
+main{padding:28px clamp(16px,4vw,52px) 90px;min-width:0}
+section.ch{padding:26px 0 10px;border-bottom:1px dashed var(--line);scroll-margin-top:88px}
+section.ch:last-of-type{border-bottom:none}
+.ch-num{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;background:var(--ink);color:var(--bg);padding:2px 9px;border-radius:5px;letter-spacing:.06em}
+h2{font-family:"Noto Serif SC",serif;font-size:clamp(23px,3vw,30px);margin:10px 0 8px;line-height:1.3}
+h3{font-size:19px;margin:26px 0 8px}
+h4{font-size:16px;margin:20px 0 6px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:4px 0}
+.lede{font-size:17px;color:var(--ink2)}
+.small{font-size:13.5px;color:var(--ink2)}
+strong{font-weight:700}
+.en{font-family:"JetBrains Mono",monospace;font-size:.92em;background:var(--panel2);padding:1px 6px;border-radius:5px;overflow-wrap:anywhere}
+.tagchip{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12.5px;background:var(--teal-soft);color:var(--ink);border:1px solid var(--line);padding:1px 8px;border-radius:999px;margin:1px 2px;white-space:nowrap}
+.srcchip{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:1px 10px;margin:2px 4px 2px 0;white-space:nowrap}
+.src-off{background:var(--teal-soft);border:1px solid var(--accent2);color:var(--ink)}
+.src-teach{background:var(--accent-soft);border:1px solid var(--accent);color:var(--ink)}
+.note,.warn,.rule{border-radius:10px;padding:12px 16px;margin:14px 0;font-size:15px}
+.note{background:var(--teal-soft);border:1px solid var(--line)}
+.warn{background:#fbe9e7;border:1px solid #e5b4ae;color:#5f1d16}
+@media (prefers-color-scheme: dark){.warn{background:#331a16;color:#f3c6bf;border-color:#5c322a}}
+.rule{background:var(--accent-soft);border:1px solid var(--line)}
+.note b,.warn b,.rule b{display:block;margin-bottom:2px}
+.tbl{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+th,td{padding:9px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{background:var(--panel2);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+td .en{white-space:normal}
+.cb{position:relative;margin:14px 0;border-radius:10px;overflow:hidden;border:1px solid #000}
+.cb .cb-head{display:flex;align-items:center;gap:8px;background:#26231b;color:#cfc6ad;font-size:12px;padding:7px 12px;font-family:"JetBrains Mono",monospace}
+.cb .cb-head .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.cb pre{margin:0;background:var(--code-bg);color:var(--code-ink);padding:16px;overflow-x:auto;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+.cb pre b{color:#ffc964;font-weight:600}
+.copybtn{margin-left:auto;background:#3a362a;color:#f2ead8;border:1px solid #57503c;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit;flex:none}
+.copybtn:hover{background:#4a4636}
+.copybtn.done{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.card h4{margin-top:0}
+.card .k{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--accent);letter-spacing:.05em}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0;font-size:14px}
+.flow .step{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 12px}
+.flow .arr{color:var(--accent);font-weight:900}
+.stepbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0}
+.stepbox h4{margin-top:0}
+.stepbox .snum{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;background:var(--accent);color:#fff;padding:2px 9px;border-radius:5px;margin-right:8px}
+.badbox{background:#fbe9e7;border:1px solid #e5b4ae;border-radius:10px;padding:6px 18px 12px;margin:12px 0;color:#5f1d16;font-size:15px}
+@media (prefers-color-scheme: dark){.badbox{background:#331a16;color:#f3c6bf;border-color:#5c322a}}
+.badbox .badlabel{font-weight:900;font-size:13px;letter-spacing:.08em}
+details.ans{border:1px solid var(--line);border-radius:10px;background:var(--panel);margin:12px 0}
+details.ans summary{cursor:pointer;padding:12px 16px;font-weight:700;color:var(--accent2);font-size:15px}
+details.ans summary:hover{background:var(--panel2);border-radius:10px}
+details.ans .ans-body{padding:4px 16px 14px;border-top:1px dashed var(--line)}
+.wizard{background:var(--panel);border:2px solid var(--ink);border-radius:14px;padding:20px;margin:18px 0}
+.wizard h3{margin-top:0}
+.wiz-q{font-weight:700;font-size:17px;margin:6px 0 10px}
+.wiz-opts{display:flex;flex-direction:column;gap:8px}
+.wiz-opt{text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:11px 14px;font-size:15px;cursor:pointer;font-family:inherit;line-height:1.5}
+.wiz-opt:hover{border-color:var(--accent);background:var(--accent-soft)}
+.wiz-progress{font-size:12.5px;color:var(--ink2);margin-bottom:8px;font-family:"JetBrains Mono",monospace}
+.wiz-result{border:1.5px dashed var(--accent2);background:var(--teal-soft);border-radius:10px;padding:16px;margin-top:6px}
+.wiz-result .mode{font-family:"JetBrains Mono",monospace;font-size:22px;font-weight:600;overflow-wrap:anywhere}
+.wiz-restart{margin-top:12px;border:1px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:14px}
+.checkwrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;margin:16px 0}
+.progressbar{height:12px;background:var(--panel2);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.progressbar i{display:block;height:100%;width:0;background:var(--accent2);transition:width .3s}
+.checkitem{display:flex;gap:10px;align-items:flex-start;padding:8px 6px;border-bottom:1px dashed var(--line);cursor:pointer;font-size:15px}
+.checkitem:last-child{border-bottom:none}
+.checkitem input{width:19px;height:19px;margin-top:3px;accent-color:var(--accent2);flex:none;cursor:pointer}
+.checkitem.done span{color:var(--ink2);text-decoration:line-through}
+.cheat{background:var(--ink);color:var(--bg);border-radius:14px;padding:22px;margin:18px 0}
+.cheat h3{color:var(--bg);margin-top:0}
+.cheat .row{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(128,120,100,.5);font-size:14.5px}
+.cheat .row:last-child{border-bottom:none}
+.cheat .k{font-weight:700;color:#ffc964}
+.cheat .en{background:rgba(255,255,255,.12);color:inherit}
+.tpl{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.tpl .n{font-family:"JetBrains Mono",monospace;font-weight:600;color:var(--accent);flex:none;min-width:26px;text-align:right}
+.tpl .t{font-family:"JetBrains Mono",monospace;font-size:13px;line-height:1.6;overflow-wrap:anywhere;flex:1}
+.tpl .copybtn{background:var(--panel2);color:var(--ink);border-color:var(--line)}
+.tpl .copybtn:hover{background:var(--accent-soft)}
+.tpl .copybtn.done{background:var(--accent2);border-color:var(--accent2);color:#fff}
+footer{color:var(--ink2);font-size:13px;padding:10px 0 0}
+.anno{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent2);border-radius:0 10px 10px 0;padding:12px 16px;margin:10px 0 18px;font-size:14.5px}
+.anno b{color:var(--accent2)}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  aside.toc{display:none}
+  aside.toc.show{display:block;position:fixed;inset:0 auto 0 0;width:280px;background:var(--bg);z-index:80;height:100vh;top:0;box-shadow:4px 0 24px rgba(0,0,0,.18)}
+  #tocToggle{display:inline-block}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .cheat .row{grid-template-columns:1fr}
+  table{min-width:520px}
+}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.progressbar i{transition:none}}
+</style>
+</head>
+<body><nav id="sitebar" style="position:fixed;top:0;left:0;right:0;height:44px;z-index:99999;background:rgba(24,24,46,.96);display:flex;align-items:center;gap:2px;padding:0 12px;font:14px/1.4 'Noto Sans SC',sans-serif;overflow-x:auto;white-space:nowrap;"><a href="../" style="color:#b9bce0;text-decoration:none;padding:4px 10px;border-radius:999px;">教程站首页</a><a href="../minimax-h3/" style="color:#b9bce0;text-decoration:none;padding:4px 10px;border-radius:999px;">MiniMax H3 教程</a><a href="../higgsfield/" style="color:#b9bce0;text-decoration:none;padding:4px 10px;border-radius:999px;">Higgsfield 教程</a><a href="../midjourney/" style="color:#fff;text-decoration:none;padding:4px 10px;border-radius:999px;background:#6c63ff;font-weight:700;">Midjourney 教程</a></nav><style>body{padding-top:44px !important}</style>
+
+<header class="topbar">
+  <button id="tocToggle" aria-label="打开目录">☰ 目录</button>
+  <div>
+    <h1>学会用 Midjourney</h1>
+    <div class="sub">从第一张图到稳定出好图：一门按新手路径编排的实操课（V8.2 / V7 / Niji 7 / 视频 V1）</div>
+  </div>
+  <span class="tag">内容以 2026 年 10 月官方公开信息为准 · 价格与参数请在官网复核</span>
+</header>
+
+<div class="layout">
+<aside class="toc" id="toc">
+  <p class="toc-title">课程目录 SYLLABUS</p>
+  <a href="#ch0">开篇 · 先解剖一条成品提示词</a>
+  <p class="grp">动手之前</p>
+  <a href="#ch1">第 1 课 · 版本地图：V8.2、V7、Niji 该选哪个</a>
+  <a href="#ch2">第 2 课 · 账号、订阅与界面：先把钱花对</a>
+  <p class="grp">把图写出来</p>
+  <a href="#ch3">第 3 课 · 五分钟第一张图</a>
+  <a href="#ch4">第 4 课 · 提示词六段公式</a>
+  <a href="#ch5">第 5 课 · 参数大全与五套配方</a>
+  <a href="#ch6">第 6 课 · 参考图系统与角色一致性</a>
+  <p class="grp">精修与扩展</p>
+  <a href="#ch7">第 7 课 · 选图之后：放大、变体与编辑器</a>
+  <a href="#ch8">第 8 课 · 视频 V1：让静图动起来</a>
+  <a href="#ch9">第 9 课 · 风格词库：按媒介抄词</a>
+  <p class="grp">实战与收拢</p>
+  <a href="#ch10">第 10 课 · 五个实战工作流</a>
+  <a href="#ch11">第 11 课 · 排错手册：图不好看先改哪一句</a>
+  <a href="#ch12">第 12 课 · 商用、版权与安全红线</a>
+  <p class="grp">随身工具</p>
+  <a href="#ch13">练习区 · 动手练一练</a>
+  <a href="#ch14">工具页 · 30 条模板 / 检查清单 / 速查卡</a>
+  <a href="#ch15">附录 · 术语表与常见问题</a>
+</aside>
+
+<main>
+
+<!-- ================= 开篇 ================= -->
+<section class="ch" id="ch0">
+  <span class="ch-num">PROLOGUE</span>
+  <h2>开篇：先解剖一条成品，再带着问题往下学</h2>
+  <p class="lede">这门课只教一件事：<strong>怎么用 Midjourney 稳定地出好图</strong>。不用先背几十个参数——先跑通一张图，再按公式写提示词，最后用参数和参考图把结果变可控。课程顺序就是这个顺序。</p>
+  <p>先别急着学规则。下面这条是第 3 课要带你亲手跑的第一张图，先通读一遍，看它的形状：</p>
+
+  <div class="cb"><div class="cb-head"><span class="dot"></span>第一张图 · 完整提示词（网页端直接粘贴；Discord 前面加 /imagine prompt:）<button class="copybtn" type="button">复制</button></div><pre>a small wooden cabin by a lake at sunrise, mist over the water, warm light in the windows, cinematic photography <b>--ar 16:9</b></pre></div>
+
+  <h3>解剖图：这一句里每段各是什么</h3>
+  <div class="tbl"><table>
+    <tr><th>片段</th><th>它是哪一段</th><th>它在干什么</th></tr>
+    <tr><td><span class="en">a small wooden cabin</span></td><td><strong>主体</strong></td><td>名词开头，先告诉模型「画什么」——越靠前，模型越当真</td></tr>
+    <tr><td><span class="en">by a lake at sunrise, mist over the water</span></td><td><strong>场景</strong></td><td>地点＋时间＋一两个环境细节，给主体一个成立的世界</td></tr>
+    <tr><td><span class="en">warm light in the windows</span></td><td><strong>细节 / 光线</strong></td><td>一个能被看见的具体细节，比十个形容词都管用</td></tr>
+    <tr><td><span class="en">cinematic photography</span></td><td><strong>风格</strong></td><td>一个主风格词定调整张图的媒介与气质</td></tr>
+    <tr><td><span class="en">--ar 16:9</span></td><td><strong>参数</strong></td><td>永远写在整句最后、前面留空格；这里把默认方形改成横版</td></tr>
+  </table></div>
+  <p>读这条成品时值得注意的三件事，学到对应课时再回来看：① 一次生成返回 <strong>4 张候选图</strong>（四宫格），4 张不一样是正常的——Midjourney 先给方向，你负责选；② 不满意时<strong>改一个词重跑</strong>，而不是推倒整句重写，这套「先广撒网、再收敛」的流程就是它的核心手感；③ 英文逗号分隔的短语依次推进，顺序就是权重。</p>
+
+  <h3>学习路线图</h3>
+  <div class="flow">
+    <span class="step"><strong>选版本</strong>（第 1 课）</span><span class="arr">→</span>
+    <span class="step"><strong>开账号</strong>（第 2 课）</span><span class="arr">→</span>
+    <span class="step"><strong>跑通第一张图</strong>（第 3 课）</span><span class="arr">→</span>
+    <span class="step"><strong>学六段公式</strong>（第 4 课）</span><span class="arr">→</span>
+    <span class="step"><strong>查参数</strong>（第 5 课）</span><span class="arr">→</span>
+    <span class="step"><strong>用参考图</strong>（第 6 课）</span><span class="arr">→</span>
+    <span class="step"><strong>精修</strong>（第 7 课）</span><span class="arr">→</span>
+    <span class="step"><strong>做视频</strong>（第 8 课）</span><span class="arr">→</span>
+    <span class="step"><strong>实战</strong>（第 10 课）</span><span class="arr">→</span>
+    <span class="step"><strong>排错</strong>（第 11 课）</span>
+  </div>
+  <p class="small">赶时间就走「新手快线」：第 3、4、5 课＋最后一页速查卡，约 30 分钟就能独立出图；其余章节按需查阅。想系统学完（约 2–3 小时），按目录顺序读，每课的「动手练一练」都实际生成一次。</p>
+
+  <h3>它最擅长的五类活，与要留个心眼的地方</h3>
+  <div class="tbl"><table>
+    <tr><th>类型</th><th>为什么强</th><th>典型用途</th></tr>
+    <tr><td>氛围与概念图</td><td>光影、材质、电影感是默认强项</td><td>概念设计、情绪板、分镜</td></tr>
+    <tr><td>摄影风格图</td><td>镜头、胶片、光线词响应好</td><td>人像、产品、街景、美食</td></tr>
+    <tr><td>插画与海报</td><td>风格词库丰富，配色大胆</td><td>封面、海报、绘本、壁纸</td></tr>
+    <tr><td>风格 / 角色系列图</td><td>参考图系统成熟</td><td>IP 角色、品牌视觉、漫画</td></tr>
+    <tr><td>图案与纹理</td><td><span class="en">--tile</span> 可做无缝平铺</td><td>包装、壁纸、织物图案</td></tr>
+  </table></div>
+  <div class="warn"><b>先说清四个短板</b>
+  <strong>精确排版</strong>：图中文字已明显进步，短英文单词较可靠；长句、中文文字、复杂版式仍建议后期用设计软件补字。<strong>精确结构</strong>：手指、复杂机械结构、建筑施工图级别的准确性仍会出错，要多生成、多挑选。<strong>完全一致的复刻</strong>：同一提示词每次结果都不同，<span class="en">--seed</span> 只能让构图接近，不能保证像素级复现。<strong>隐私</strong>：默认生成公开可见（社区画廊可看），只有 Pro / Mega 的 Stealth 隐身模式才私密。</div>
+  <div class="rule"><b>新手心态</b>把前 20 次生成当学费。用草稿模式（Draft）快速试方向，方向对了再用正式质量细修，能省下大量 GPU 时长。</div>
+</section>
+
+<!-- ================= 第 1 课 ================= -->
+<section class="ch" id="ch1">
+  <span class="ch-num">LESSON 1</span>
+  <h2>版本地图：V8.2、V7、Niji 该选哪个</h2>
+  <p class="lede">老教程最大的坑，是把旧版本的参数套在新模型上。这一课一张表说清：现在在用的模型有哪些、默认是哪个、参数哪里不一样。</p>
+
+  <div class="tbl"><table>
+    <tr><th>模型</th><th>定位</th><th>怎么选 / 调用</th></tr>
+    <tr><td><strong>V8.2</strong></td><td>2026 年 7 月 24 日起的默认模型，美学与个性化升级；原生高清与新的 Edit 编辑模型</td><td>不写版本参数即默认；显式写 <span class="en">--v 8.2</span></td></tr>
+    <tr><td><strong>V8.1</strong></td><td>V8 家族中速度快的版本，保留草稿模式路径</td><td><span class="en">--v 8.1</span>；需要 Draft 迭代时常用</td></tr>
+    <tr><td><strong>V7</strong></td><td>功能覆盖最全：Omni 参考、多段提示等都在此最完整，手部与物体连贯性强</td><td><span class="en">--v 7</span>；做角色一致性教程大多基于它</td></tr>
+    <tr><td><strong>Niji 7</strong></td><td>动漫 / 漫画专用，连贯性为历代最好</td><td><span class="en">--niji 7</span></td></tr>
+    <tr><td><strong>视频 V1</strong></td><td>图生视频模型，只能在网页端用</td><td>在图片页点 Animate，详见第 8 课</td></tr>
+  </table></div>
+
+  <h3>V7 与 V8 家族最容易用错的三处</h3>
+  <div class="tbl"><table>
+    <tr><th>需求</th><th>V7 写法</th><th>V8.1 / V8.2 写法</th></tr>
+    <tr><td>减少 AI 自作主张、更听提示词</td><td><span class="en">--style raw</span></td><td><span class="en">--raw</span></td></tr>
+    <tr><td>锁定人物 / 物体（参考主体）</td><td><span class="en">--oref 图片链接 --ow 100</span></td><td>改用 Edit 模型：<span class="en">--edit</span> ＋最多 4 张图链接（网页端在输入框附图）</td></tr>
+    <tr><td>高清直出</td><td>先生成再放大</td><td><span class="en">--hd</span> 原生约 2048px；省额度用 <span class="en">--sd</span></td></tr>
+  </table></div>
+  <div class="note"><b>两个版本细节</b>
+  对 V8.2 生成的高清图做平移、缩小或编辑后，结果会降为标清，需要再放大一次恢复。V8.0 已于 2026 年 7 月 24 日退役，不要再照旧教程写 <span class="en">--v 8</span>。</div>
+
+  <h3>新手的选版结论</h3>
+  <ul>
+    <li><strong>日常出图</strong>：什么都不写，用默认 V8.2。</li>
+    <li><strong>跟着网上的角色一致性教程练</strong>：切到 <span class="en">--v 7</span>，教程里的 <span class="en">--oref</span>、<span class="en">--q</span> 等参数才对得上。</li>
+    <li><strong>画动漫</strong>：<span class="en">--niji 7</span>，风格词写法见第 9 课。</li>
+    <li><strong>同一作品里不要混版本</strong>：系列图全程锁同一个版本与同一参考图。</li>
+  </ul>
+
+  <div class="wizard" id="wizVer">
+    <h3>🧭 选版向导</h3>
+    <p class="small">拿不准用哪个版本时用它：依次回答问题，向导给出该用的模型和调用写法。</p>
+    <div class="wizBody"></div>
+  </div>
+</section>
+
+<!-- ================= 第 2 课 ================= -->
+<section class="ch" id="ch2">
+  <span class="ch-num">LESSON 2</span>
+  <h2>账号、订阅与界面：先把钱花对</h2>
+  <p class="lede">Midjourney 目前没有免费版。先选对档位，比多生成一百张图更省钱。下表为 2026 年 9 月公开价格，购买前请在官网再核对一次。</p>
+
+  <div class="tbl"><table>
+    <tr><th>套餐</th><th>月付</th><th>年付（约 8 折）</th><th>Fast 时长 / 月</th><th>关键区别</th></tr>
+    <tr><td><strong>Basic 基础</strong></td><td>$10</td><td>$96/年</td><td>3.3 小时</td><td>无 Relax 模式，额度用完只能等下月或加购</td></tr>
+    <tr><td><strong>Standard 标准</strong></td><td>$30</td><td>$288/年</td><td>15 小时</td><td>图片 Relax 无限量（排队慢速生成）</td></tr>
+    <tr><td><strong>Pro 专业</strong></td><td>$60</td><td>$576/年</td><td>30 小时</td><td>Stealth 隐身、视频 Relax、并发更多</td></tr>
+    <tr><td><strong>Mega</strong></td><td>$120</td><td>$1,152/年</td><td>60 小时</td><td>Pro 全部权益，Fast 时长翻倍</td></tr>
+  </table></div>
+
+  <h3>先搞懂计费单位：GPU 时长</h3>
+  <ul>
+    <li><strong>计费按 GPU 运行时间，不按张数。</strong>一张普通图约耗 1 分钟量级，具体随参数与分辨率浮动。</li>
+    <li><strong>Fast 模式</strong>：优先出图，吃 Fast 时长；额外 Fast 时长约 $4/小时可加购，时长不结转。</li>
+    <li><strong>Relax 模式</strong>：排队慢出，不吃 Fast 时长。Standard 以上图片无限，是「不赶时间就用它」的省钱开关；Basic 没有 Relax。</li>
+    <li><strong>Turbo / Draft</strong>：Turbo 更快但更耗；Draft 草稿模式约以一半成本快速出小图试方向（V7、V8.1 支持较完整）。</li>
+    <li><strong>视频最贵</strong>：一段视频的耗费约为一张图的数倍，Basic 只能用 Fast 做视频，Pro / Mega 才能用 Relax 做视频。</li>
+  </ul>
+  <div class="rule"><b>选购结论</b>只想试一个月选 Basic；打算长期用、会大量迭代，Standard 才是真正起点；图不能公开、或公司年营收超过 100 万美元，必须 Pro 以上。先月付验证一个月合用，再转年付省 20%。</div>
+
+  <h3>注册三步</h3>
+  <ol>
+    <li>打开 midjourney.com，用 Google 或 Discord 账号登录。</li>
+    <li>在订阅页选套餐付款（需可用的支付方式）。</li>
+    <li>登录后点 Create，即进入网页创作页。</li>
+  </ol>
+  <p class="small">支付方式与地区可用性会变，以结算页实际显示为准。不要购买来历不明的共享账号或所谓「国内代理版」：官方未授权代理，共享账号的作品归属与账号安全都没有保障。</p>
+
+  <h3>网页端（推荐新手主用）</h3>
+  <div class="tbl"><table>
+    <tr><th>区域</th><th>干什么</th></tr>
+    <tr><td>Imagine 输入框</td><td>页面顶部输入提示词回车生成；可点图片图标附参考图，点滑杆图标调参数</td></tr>
+    <tr><td>Create</td><td>看自己正在生成与已生成的图</td></tr>
+    <tr><td>Explore</td><td>社区画廊：点开任何图能看到它的提示词，是最好的免费教材</td></tr>
+    <tr><td>Organize / Folders</td><td>按文件夹整理作品，做系列图必备</td></tr>
+    <tr><td>Editor 编辑器</td><td>对已生成图或上传图做局部重绘、扩图、改比例</td></tr>
+    <tr><td>Personalize</td><td>给图片评分，训练你的个性化档案，供 <span class="en">--p</span> 调用</td></tr>
+    <tr><td>Tasks / 图库页</td><td>单图页集中了放大、变体、编辑、Animate 做视频等全部后续动作</td></tr>
+  </table></div>
+
+  <h3>Discord 端（老用户与部分工作流在用）</h3>
+  <p>核心命令：<span class="en">/imagine prompt: 你的提示词</span> 生成；<span class="en">/settings</span> 设默认版本、模式与速度；<span class="en">/info</span> 看剩余额度；<span class="en">/describe</span> 反推一张图的提示词；<span class="en">/blend</span> 混合两张图。生成结果下方按钮：U1–U4 放大对应格子，V1–V4 以对应格子做变体，刷新按钮整体重跑。网页端与 Discord 共用同一账号与额度，哪边生成都算同一份时长。</p>
+
+  <h3>第一次进站先改这 4 个默认设置</h3>
+  <ol>
+    <li><strong>默认版本</strong>：保持默认最新版；跟 V7 教程练习时再手动加 <span class="en">--v 7</span>，不要改全局。</li>
+    <li><strong>默认比例</strong>：按你的主用途设，如做手机壁纸设 9:16，做横版封面设 16:9，省得每条都写 <span class="en">--ar</span>。</li>
+    <li><strong>速度模式</strong>：日常设 Fast，闲时批量试错切 Relax。</li>
+    <li><strong>建文件夹</strong>：每开始一个项目先建一个文件夹，后续找图、做系列都靠它。</li>
+  </ol>
+  <div class="note"><b>学提示词的最快方法</b>去 Explore 挑 3 张你喜欢的图，抄下它们的提示词，换掉主体词生成一次，再逐个删词看变化。一小时顶看十篇教程。</div>
+</section>
+
+<!-- ================= 第 3 课 ================= -->
+<section class="ch" id="ch3">
+  <span class="ch-num">LESSON 3</span>
+  <h2>五分钟第一张图：先跑通，再谈技巧</h2>
+  <p class="lede">先什么参数都别想，照着下面四步跑出一张完整的图，建立手感。</p>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 1</span>打开创作页</h4>
+    <p>登录 midjourney.com，进入 Create 页，把光标点进顶部 Imagine 输入框。</p>
+    <h4><span class="snum">STEP 2</span>粘贴这句提示词</h4>
+    <p>网页端直接粘；Discord 前面加 <span class="en">/imagine prompt:</span> ：</p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>第一张图<button class="copybtn" type="button">复制</button></div><pre>a small wooden cabin by a lake at sunrise, mist over the water, warm light in the windows, cinematic photography --ar 16:9</pre></div>
+    <h4><span class="snum">STEP 3</span>从四宫格里挑一张</h4>
+    <p>约半分钟后出现 4 张图。挑最喜欢的一张点开，点 Upscale 放大。</p>
+    <h4><span class="snum">STEP 4</span>下载保存</h4>
+    <p>在放大图上点下载图标保存。第一张图完成。</p>
+  </div>
+
+  <h3>刚刚发生了什么</h3>
+  <p>英文逗号分隔的短语依次是：主体（木屋）、场景（湖边、日出、雾气）、细节（窗里的暖光）、风格（电影感摄影）。<span class="en">--ar 16:9</span> 是唯一参数，把方形默认比例改成横版。<strong>参数永远写在整句最后，前面留一个空格。</strong>4 张图不一样是正常的：Midjourney 先给方向，你负责选。</p>
+
+  <h3>接着做三个小实验（每个只改一处）</h3>
+  <div class="tbl"><table>
+    <tr><th>实验</th><th>改动</th><th>你会看到</th></tr>
+    <tr><td>换时间</td><td><span class="en">sunrise</span> 改为 <span class="en">at night, starry sky</span></td><td>光线与氛围整体翻转，其余构图语言不变</td></tr>
+    <tr><td>换比例</td><td><span class="en">--ar 16:9</span> 改 <span class="en">--ar 9:16</span></td><td>同一题材变成竖版壁纸构图</td></tr>
+    <tr><td>加变体</td><td>在喜欢的图上点 Vary (Subtle)</td><td>构图基本不变，细节小幅变化，适合精挑</td></tr>
+  </table></div>
+  <div class="warn"><b>常见卡点</b>输入中文提示词也能出图，但稳定性与风格词响应明显弱于英文。本课所有模板都给英文原句＋中文注释，照抄英文、改中文注释对应的词即可。</div>
+</section>
+
+<!-- ================= 第 4 课 ================= -->
+<section class="ch" id="ch4">
+  <span class="ch-num">LESSON 4</span>
+  <h2>提示词六段公式：从靠运气到可控</h2>
+  <p class="lede">稳定的提示词长一个样：<strong>主体 ＋ 场景 ＋ 风格 ＋ 光线 ＋ 镜头构图 ＋ 参数</strong>。顺序就是权重：越靠前，模型越当真。</p>
+
+  <div class="cb"><div class="cb-head"><span class="dot"></span>六段公式骨架<button class="copybtn" type="button">复制</button></div><pre>[主体: 谁/什么, 外观细节], [场景: 在哪, 在做什么], [风格: 摄影/插画/媒介], [光线与配色], [镜头与构图] --ar 比例 --s 数值 --v 版本</pre></div>
+
+  <h3>逐段怎么写</h3>
+  <div class="tbl"><table>
+    <tr><th>段</th><th>写法要点</th><th>例子</th></tr>
+    <tr><td><strong>主体</strong></td><td>名词开头，具体到年龄、服装、材质；一个画面一个主角</td><td><span class="en">a woman in her 30s in a red coat</span></td></tr>
+    <tr><td><strong>场景</strong></td><td>地点＋动作＋一两个环境细节，别堆满</td><td><span class="en">standing in a rainy Tokyo alley, holding an umbrella</span></td></tr>
+    <tr><td><strong>风格</strong></td><td>选一个主风格词定调（第 9 课词库）</td><td><span class="en">cinematic photography</span> / <span class="en">watercolor illustration</span></td></tr>
+    <tr><td><strong>光线配色</strong></td><td>光源方向与时辰＋主色调</td><td><span class="en">golden hour, soft window light, teal and orange</span></td></tr>
+    <tr><td><strong>镜头构图</strong></td><td>景别与视角；摄影类加镜头与胶片词</td><td><span class="en">close-up, 85mm lens, shallow depth of field</span></td></tr>
+    <tr><td><strong>参数</strong></td><td>只放最后，用双横线开头</td><td><span class="en">--ar 4:5 --s 120</span></td></tr>
+  </table></div>
+
+  <h3>从弱到强的改写示范</h3>
+  <div class="tbl"><table>
+    <tr><th>强度</th><th>写法</th></tr>
+    <tr><td>弱</td><td><span class="en">a cat</span></td></tr>
+    <tr><td>中</td><td><span class="en">a orange cat sitting by a window, sunlight</span></td></tr>
+    <tr><td>强</td><td><span class="en">a fluffy orange cat sitting on a windowsill, morning sunlight through linen curtains, dust in the air, cozy apartment, photorealistic, 50mm lens --ar 3:2 --s 80</span></td></tr>
+  </table></div>
+
+  <div class="rule"><b>三条铁律</b>
+  1) 写你想要的，少写你不想要的（排除交给 <span class="en">--no</span>）；2) 一词一义，避免互相打架的风格词（如同时写极简与繁复巴洛克）；3) 图中要出现文字时，用引号包住原文，如 <span class="en">a sign that says "MORNING BREW"</span>，且只放短词。</div>
+
+  <h3>进阶技巧一：权重与多段提示（V7 更完整）</h3>
+  <ul>
+    <li><strong>双冒号分段</strong>：<span class="en">hot:: dog</span> 这类 <span class="en">::</span> 写法把概念分开理解，避免词义粘连；分段后可加数字调权重，如 <span class="en">space::2 ship::1</span> 表示前者更重要。</li>
+    <li><strong>排列组合</strong>：用花括号一次跑多个版本，如 <span class="en">a {red, blue, gold} sports car</span> 会分别生成三组，适合比配色（会成倍消耗时长，慎用）。</li>
+  </ul>
+
+  <h3>进阶技巧二：反推与拆解</h3>
+  <p>Discord 的 <span class="en">/describe</span> 上传一张图，返回 4 组可套用的描述词；网页端也可把图片拖进输入框参考其风格与构图。拆解别人提示词时按六段归位：哪些是主体词、哪些是光线词、哪些是参数。归位一次，词库就变成你的。</p>
+
+  <h3>提示词的长度与语言</h3>
+  <ul>
+    <li>甜点区约 <strong>15–40 个英文词</strong>。太短靠运气，太长后半段会被稀释，互相矛盾的词还会打架。</li>
+    <li>专有名词（胶片型号、镜头、艺术流派）用英文原名，如 <span class="en">Kodak Portra 400</span>、<span class="en">ukiyo-e</span>、<span class="en">brutalism</span>。</li>
+    <li>数字要写清：<span class="en">two cats</span> 比 <span class="en">cats</span> 更可控；但精确数量与位置仍属概率事件，多生成几轮再挑。</li>
+  </ul>
+  <div class="note"><b>动手练一练</b>选一个你熟悉的题材（如「我家楼下的面馆」），用六段公式写一版；然后只改风格段，分别换成摄影、水彩、动漫、矢量四种各跑一次，把四张图拼在一起看差异——风格段一换，整张图的媒介就换了。</div>
+</section>
+
+<!-- ================= 第 5 课 ================= -->
+<section class="ch" id="ch5">
+  <span class="ch-num">LESSON 5</span>
+  <h2>参数大全：分组速查与组合配方</h2>
+  <p class="lede">参数都写在提示词最后、空格分隔。先学第一组的 8 个，其余按需查第二组。</p>
+
+  <h3>第一组：画面与风格</h3>
+  <div class="tbl"><table>
+    <tr><th>参数</th><th>范围 / 默认</th><th>作用与新手取值</th></tr>
+    <tr><td><span class="en">--ar</span> 比例</td><td>任意比 / 1:1</td><td>16:9 横版视频封面、9:16 手机壁纸、4:5 社交竖图、3:2 经典照片、2:3 海报</td></tr>
+    <tr><td><span class="en">--s / --stylize</span></td><td>0–1000 / 100</td><td>AI 艺术加工强度。0–100 写实听话，100–300 平衡，300 以上奔放易跑偏</td></tr>
+    <tr><td><span class="en">--chaos / --c</span></td><td>0–100 / 0</td><td>四张图之间的差异度。找灵感 30–50，已定方向用 0–15</td></tr>
+    <tr><td><span class="en">--q / --quality</span></td><td>0.5 / 1 / 2</td><td>初始四图细节与耗时。默认 1；定稿试 <span class="en">--q 2</span>（约 2 倍时长）；V8 还可选更高档，以界面为准</td></tr>
+    <tr><td><span class="en">--no</span></td><td>词组</td><td>排除项，如 <span class="en">--no text, watermark, extra fingers</span>。只写短列表，别写成长句</td></tr>
+    <tr><td><span class="en">--seed</span></td><td>0–4294967295</td><td>固定随机种子：同种子＋相近提示词约等于相近构图。复现喜欢的图时记下它的种子</td></tr>
+    <tr><td><span class="en">--raw</span>（V8）<br><span class="en">--style raw</span>（V7）</td><td>开关</td><td>关掉默认美学滤镜，提示词说了算。写实摄影、纪实风必加</td></tr>
+    <tr><td><span class="en">--tile</span></td><td>开关</td><td>无缝平铺图案，做壁纸、包装、纹理时用</td></tr>
+  </table></div>
+
+  <h3>三个最常用旋钮的区别，别再搞混</h3>
+  <div class="tbl"><table>
+    <tr><th>旋钮</th><th>管什么</th><th>类比</th></tr>
+    <tr><td><span class="en">--s</span></td><td>单张图里 AI 自由发挥的程度</td><td>厨师放盐的手重不重</td></tr>
+    <tr><td><span class="en">--chaos</span></td><td>四张图彼此差多远</td><td>一次给你四个多不同的方案</td></tr>
+    <tr><td><span class="en">--weird</span>（0–3000）</td><td>审美往怪诞、实验方向偏多少</td><td>加不加「怪味」；新手从 50–250 试</td></tr>
+  </table></div>
+  <div class="warn"><b>语法红线</b>参数前必须有空格，参数后不能再跟描述词。写成 <span class="en">cat--ar 3:2</span> 或把 <span class="en">--ar</span> 放句中，都会失效或报错。改参数时整句其他部分保持不动，才能看出单个参数的效果。</div>
+
+  <h3>第二组：参考、版本与批量</h3>
+  <div class="tbl"><table>
+    <tr><th>参数</th><th>作用</th></tr>
+    <tr><td><span class="en">--v 8.2 / --v 7</span></td><td>指定模型版本；<span class="en">--niji 7</span> 切动漫模型。系列图全程锁同一版本</td></tr>
+    <tr><td><span class="en">--hd / --sd</span>（V8）</td><td>高清直出（约 2048px，更耗）/ 标清省额度。比例上限约 4:1</td></tr>
+    <tr><td><span class="en">--exp</span> 0–100</td><td>实验性细节增强，10–25 是常用甜点区，过高易出怪纹理</td></tr>
+    <tr><td><span class="en">--draft</span></td><td>草稿模式：快速低成本出组图试方向，一次多张；定方向后去掉它正式生成并放大（V7 / V8.1）</td></tr>
+    <tr><td><span class="en">--p</span></td><td>启用个性化档案（先在 Personalize 里评过足够多的图）；也可跟档案代码指定某套审美</td></tr>
+    <tr><td><span class="en">--sref / --sw</span></td><td>风格参考图 / 风格权重（默认 100，0–1000）。详见第 6 课</td></tr>
+    <tr><td><span class="en">--oref / --ow</span>（V7）</td><td>全能参考：锁定人物 / 物体 / 主体，权重默认 100。详见第 6 课</td></tr>
+    <tr><td><span class="en">--edit</span>（V8）</td><td>Edit 模型：指令＋最多 4 张图，重绘、换装、合成、改图</td></tr>
+    <tr><td><span class="en">--iw</span> 0–2</td><td>普通图片提示的权重，默认 1；越大越像参考图内容</td></tr>
+    <tr><td><span class="en">--repeat / --r</span> 1–40</td><td>同一句重复跑多组，批量抽卡用（吃时长，先小批量验证）</td></tr>
+    <tr><td><span class="en">--stop</span> 10–100</td><td>提前停在某个完成度，低值出草稿感、抽象感效果图</td></tr>
+  </table></div>
+
+  <h3>五套直接套用的参数配方</h3>
+  <div class="tbl"><table>
+    <tr><th>场景</th><th>配方（接在提示词后）</th></tr>
+    <tr><td>写实人像</td><td><span class="en">--ar 4:5 --s 80 --chaos 8</span>，V7 再加 <span class="en">--style raw</span>，V8 改 <span class="en">--raw</span></td></tr>
+    <tr><td>电影感场景</td><td><span class="en">--ar 21:9 --s 220 --chaos 15</span></td></tr>
+    <tr><td>产品图</td><td><span class="en">--ar 4:5 --s 60 --q 2 --no text, watermark</span></td></tr>
+    <tr><td>灵感探索</td><td><span class="en">--chaos 55 --s 450 --weird 120</span>，先 Draft 后定稿</td></tr>
+    <tr><td>无缝图案</td><td><span class="en">--tile --ar 1:1 --s 250</span></td></tr>
+  </table></div>
+</section>
+
+<!-- ================= 第 6 课 ================= -->
+<section class="ch" id="ch6">
+  <span class="ch-num">LESSON 6</span>
+  <h2>参考图系统：四种「参考」别混用</h2>
+  <p class="lede">参考图是 Midjourney 从「抽卡」变「可控生产」的关键。四种参考管四件不同的事，混用是新手最常见的浪费。</p>
+
+  <div class="tbl"><table>
+    <tr><th>类型</th><th>借什么</th><th>写法</th></tr>
+    <tr><td><strong>图片提示</strong> Image Prompt</td><td>构图与内容大方向</td><td>把图片链接放在提示词最前面，权重 <span class="en">--iw</span></td></tr>
+    <tr><td><strong>风格参考</strong> <span class="en">--sref</span></td><td>只借配色、笔触、质感与氛围，不借具体物体</td><td><span class="en">--sref 图片链接 --sw 150</span></td></tr>
+    <tr><td><strong>主体参考</strong> <span class="en">--oref</span>（V7）</td><td>借人物长相、物体或场景主体</td><td><span class="en">--oref 图片链接 --ow 100</span></td></tr>
+    <tr><td><strong>Edit 模型</strong> <span class="en">--edit</span>（V8）</td><td>直接以图为底：改它、换它、组合它</td><td>指令＋最多 4 张图链接；网页端在输入框附图</td></tr>
+  </table></div>
+
+  <h3>风格参考 --sref 进阶</h3>
+  <ul>
+    <li><strong><span class="en">--sw</span> 权重</strong>：50 隐隐有味，100 默认，250–400 风格强势接管；过高会连参考图的题材一起带偏。</li>
+    <li><strong>风格代码</strong>：别人的图下方常带一串 <span class="en">--sref 123456789</span> 形式的数字代码，那是社区共享的风格编号，可直接套用试味；多串代码并列就是混合风格。</li>
+    <li><strong>Moodboard 心情板</strong>（网页端）：把一组图建成一块板，生成时整板生效，比单张参考更稳，适合品牌项目定调。</li>
+  </ul>
+
+  <h3>个性化 --p：让模型记住你的口味</h3>
+  <ol>
+    <li>在网页端 Personalize 里对成对图片做选择题，数量做够后档案生效。</li>
+    <li>生成时加 <span class="en">--p</span>，出图会往你偏好的审美靠。</li>
+    <li>档案可分多个、带代码分享与切换；V7 的全局档案在 V8.1 / V8.2 中同样可用。</li>
+    <li>注意：开了 <span class="en">--p</span> 的图更「像你」，也更难复现给别人——交付客户稿时先确认要不要带。</li>
+  </ol>
+  <div class="rule"><b>判断口诀</b>要像这张图的「样子」用 sref；要还是这个「人 / 物」用 oref 或 Edit；要「我一贯喜欢的那种味」用 --p；只是想抄构图，用图片提示放句首。</div>
+
+  <div class="wizard" id="wizRef">
+    <h3>🧭 参考方式向导</h3>
+    <p class="small">四种参考最容易混。回答一个问题，向导直接给出该用的那种。</p>
+    <div class="wizBody"></div>
+  </div>
+
+  <h3>角色一致性：让同一个人演完整套图</h3>
+  <p>一致性的目标：换场景、换动作，脸与标志性服装不变。</p>
+  <h4>标准流程（以 V7 为例）</h4>
+  <ol>
+    <li><strong>先定妆</strong>：生成一张干净的角色正面图（背景简单、光线均匀、脸部无遮挡），放大后存好链接。</li>
+    <li><strong>锚定生成</strong>：新图提示词正常写场景，末尾加 <span class="en">--oref 定妆图链接 --ow 100</span>。</li>
+    <li><strong>调权重</strong>：不像就升 <span class="en">--ow</span>（150–250）；像到僵硬、场景被参考图绑架就降到 60–80。</li>
+    <li><strong>锁变量</strong>：全系列固定版本、固定 <span class="en">--s</span> 区间、服装描述逐字复用（颜色与款式写进每一句）。</li>
+  </ol>
+  <h4>V8.2 的做法</h4>
+  <p>V8.2 用 Edit 模型接管主体参考：把定妆图（可多张、不同角度）随指令一起提交，描述新场景与要保留的特征。素材角度越全，正侧脸与全身的一致性越稳。</p>
+  <div class="warn"><b>一致性翻车清单</b>
+  定妆图是侧脸或远景小脸：后续图必崩——定妆必须大脸、正面、清晰。每张图改一次发型 / 服装描述：模型只会跟着文字走，描述要当成合同逐字执行。混用版本与参考方式：一套图里一会儿 oref 一会儿 Edit，风格会漂。指望 100% 同一张脸：目前仍是「高度相似」，关键物料（如产品包装上的代言人）要预留挑选与后期修图余量。</div>
+</section>
+
+<!-- ================= 第 7 课 ================= -->
+<section class="ch" id="ch7">
+  <span class="ch-num">LESSON 7</span>
+  <h2>选图之后：放大、变体、局部重绘与编辑器</h2>
+  <p class="lede">四宫格只是毛坯。真正的成品来自选图后的这一组动作，按「先定构图、再抠局部、最后放大」的顺序用。</p>
+
+  <div class="tbl"><table>
+    <tr><th>动作</th><th>干什么 / 何时用</th></tr>
+    <tr><td><strong>Upscale 放大</strong></td><td>Subtle（忠实）与 Creative（加细节）两档；定稿才放大，别对毛坯逐张放大浪费时长</td></tr>
+    <tr><td><strong>Vary (Subtle / Strong)</strong></td><td>以选中图为底做变体：Subtle 微调细节，Strong 换构图换内容。网页端亦有 Vary Region 局部变体</td></tr>
+    <tr><td><strong>Reroll 重跑</strong></td><td>整组不满意、且不是某一张的问题时用；重跑前先想清要改哪一句</td></tr>
+    <tr><td><strong>Remix 混音模式</strong></td><td>开后每次变体可改提示词，适合「构图对、内容差一点」的定点修正</td></tr>
+    <tr><td><strong>Pan 平移扩图</strong></td><td>向上下左右延展画面；延展部分会降分辨率需留意，适合补构图</td></tr>
+    <tr><td><strong>Zoom Out 拉远</strong></td><td>1.5x / 2x 或自定义倍率扩边，给主体留呼吸空间、改海报留白</td></tr>
+    <tr><td><strong>Editor 编辑器</strong></td><td>涂抹选区重绘（Erase / 局部重绘）、改比例、加图层合成；上传的外部图片也能进编辑器</td></tr>
+    <tr><td><strong>Retexture / Edit</strong></td><td>V7 的 Retexture 换表面材质与光线；V8 的 Edit 模型以指令改图（换装、换背景、合成多图）</td></tr>
+  </table></div>
+
+  <h3>一条合格的精修流水线</h3>
+  <div class="flow">
+    <span class="step"><strong>1</strong> Draft 或低 chaos 出 2–3 组，定构图</span><span class="arr">→</span>
+    <span class="step"><strong>2</strong> Vary Subtle 精挑一张，进 Editor 修局部（手、文字、杂物）</span><span class="arr">→</span>
+    <span class="step"><strong>3</strong> 需要更宽 / 更高先 Pan 或 Zoom，别硬裁</span><span class="arr">→</span>
+    <span class="step"><strong>4</strong> 最后 Upscale Creative 出成品，下载 PNG</span>
+  </div>
+  <p class="small">印刷用途再进外部软件做 CMYK 与尺寸处理。</p>
+  <div class="warn"><b>省钱提醒</b>放大、变体、扩图都耗 GPU 时长。顺序反了（先张张放大、再慢慢挑）是 Basic 套餐额度一夜清零的头号原因。</div>
+</section>
+
+<!-- ================= 第 8 课 ================= -->
+<section class="ch" id="ch8">
+  <span class="ch-num">LESSON 8</span>
+  <h2>视频 V1：让静图动起来</h2>
+  <p class="lede">视频模型 V1 做的是图生视频：给一张起始图，生成会动的短片。它只在网页端可用，已包含在图片订阅里，不另收费，但耗 GPU 时长约为图片的数倍。</p>
+
+  <div class="tbl"><table>
+    <tr><th>规格</th><th>内容</th></tr>
+    <tr><td>输入</td><td>仅图片（Midjourney 生成的或你上传的），不支持纯文字生成视频</td></tr>
+    <tr><td>时长</td><td>单段 5 秒，可 Extend 延长，每次约加 4 秒，最多约 21 秒</td></tr>
+    <tr><td>清晰度</td><td>约 480p 标清为主，HD 档视套餐与模式开放情况而定，以界面为准</td></tr>
+    <tr><td>声音</td><td>无音轨，成片是默片；配乐与配音需在剪辑软件里后加</td></tr>
+    <tr><td>运动控制</td><td>Auto 自动 / Manual 手动描述运动；<span class="en">--motion low / high</span> 管幅度</td></tr>
+  </table></div>
+
+  <h3>四步操作</h3>
+  <ol>
+    <li>在网页端打开一张图，点 Animate。</li>
+    <li>选 Auto 直接生成，或选 Manual 写一句运动描述（如 <span class="en">camera slowly pushes in, hair blowing in the wind</span>）。</li>
+    <li>一次出 4 条 5 秒短片，挑一条；满意就点 Extend 继续延长同一次运动。</li>
+    <li>下载 MP4，进剪辑软件拼接、配乐、加字幕。</li>
+  </ol>
+
+  <h3>动得好看的诀窍</h3>
+  <ul>
+    <li><strong>选对起始图</strong>：本身有「将动未动」张力的图效果最好——飘动的头发、水面、云层、烟雾、人群。</li>
+    <li><strong>low 与 high 分工</strong>：low 适合发丝、云、水面等微动与氛围镜头；high 才有奔跑、转身等大动作，但也更容易变形。</li>
+    <li><strong>运镜写一句就够</strong>：<span class="en">slow push in</span>、<span class="en">pan left</span>、<span class="en">orbit</span> 等简单运镜词最稳；别在一句里塞三个互相打架的运动。</li>
+    <li><strong>预期管理</strong>：它擅长氛围短片、社媒动图、片头空镜；不适合有对白、精确动作或长剧情的镜头，那仍是专业视频工具的活。</li>
+  </ul>
+</section>
+
+<!-- ================= 第 9 课 ================= -->
+<section class="ch" id="ch9">
+  <span class="ch-num">LESSON 9</span>
+  <h2>风格词库：按媒介抄词</h2>
+  <p class="lede">风格段只放一个主风格，再加一两个质感词。下表左边是风格名（直接抄进提示词），右边是它适合的活。</p>
+
+  <h3>摄影类</h3>
+  <div class="tbl"><table>
+    <tr><th>风格词</th><th>效果与用途</th></tr>
+    <tr><td><span class="en">cinematic photography, film still</span></td><td>电影剧照感，叙事场景万金油</td></tr>
+    <tr><td><span class="en">shot on Kodak Portra 400, 35mm film</span></td><td>柔和胶片色，人像与街景</td></tr>
+    <tr><td><span class="en">editorial photography, studio lighting</span></td><td>杂志大片感，时尚与产品</td></tr>
+    <tr><td><span class="en">documentary photography --raw</span></td><td>纪实、去滤镜，真实感最强</td></tr>
+    <tr><td><span class="en">macro photography, extreme detail</span></td><td>微距特写，昆虫、材质、食品</td></tr>
+  </table></div>
+
+  <h3>插画与设计类</h3>
+  <div class="tbl"><table>
+    <tr><th>风格词</th><th>效果与用途</th></tr>
+    <tr><td><span class="en">watercolor illustration</span></td><td>水彩，绘本与风景</td></tr>
+    <tr><td><span class="en">flat vector illustration, minimal</span></td><td>扁平矢量，图标与信息图底图</td></tr>
+    <tr><td><span class="en">ukiyo-e woodblock print</span></td><td>浮世绘，东方题材海报</td></tr>
+    <tr><td><span class="en">isometric illustration</span></td><td>等距视角，产品与场景说明图</td></tr>
+    <tr><td><span class="en">paper cut craft, layered</span></td><td>剪纸层叠，节日与儿童题材</td></tr>
+  </table></div>
+
+  <h3>动漫类（配 --niji 7）</h3>
+  <div class="tbl"><table>
+    <tr><th>风格词</th><th>效果与用途</th></tr>
+    <tr><td><span class="en">anime key visual, cel shading</span></td><td>标准动画主视觉</td></tr>
+    <tr><td><span class="en">shojo manga style, soft pastel</span></td><td>少女漫，柔和 pastel</td></tr>
+    <tr><td><span class="en">chibi, sticker style, white background</span></td><td>Q 版贴纸与表情包底图</td></tr>
+  </table></div>
+  <p>质感补充词（任选一两个）：<span class="en">rim light</span> 轮廓光 / <span class="en">volumetric light</span> 体积光 / <span class="en">film grain</span> 胶片颗粒 / <span class="en">bokeh</span> 虚化。</p>
+</section>
+
+<!-- ================= 第 10 课 ================= -->
+<section class="ch" id="ch10">
+  <span class="ch-num">LESSON 10</span>
+  <h2>五个实战工作流</h2>
+  <p class="lede">前面学的公式、参数、参考图，在真实任务里是这样组合的。每个工作流都是一条可照抄的流水线。</p>
+
+  <div class="stepbox">
+    <h4>工作流 1 · 社交封面图（9:16 / 4:5）</h4>
+    <p>公式出图 <span class="en">--ar 9:16 --s 180</span> → 主体放画面中上部、下部留字区（提示词加 <span class="en">negative space at the bottom</span>）→ 定稿放大 → 在设计软件里加标题字，别让 AI 写长标题。</p>
+  </div>
+
+  <div class="stepbox">
+    <h4>工作流 2 · 产品图</h4>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>产品图起手式<button class="copybtn" type="button">复制</button></div><pre>minimalist product photography, glass perfume bottle on wet stone, soft diffused light, mist, luxury ad style --ar 4:5 --s 60 --q 2 --no text, watermark, hands</pre></div>
+    <p>有实物照片时改走参考路线：实物图作主体参考（V7 <span class="en">--oref</span> / V8 Edit），文字只描述场景与光线，产品本体交给参考图。</p>
+  </div>
+
+  <div class="stepbox">
+    <h4>工作流 3 · 系列绘本 / 漫画</h4>
+    <p>先定妆（第 6 课）→ 每页复用角色描述＋参考参数，只换场景句 → 统一 <span class="en">--s</span> 与版本 → 按页建子文件夹归档，出齐后统一放大，避免画风中途漂移。</p>
+  </div>
+
+  <div class="stepbox">
+    <h4>工作流 4 · 品牌视觉定调</h4>
+    <p>挑 6–10 张目标氛围图建 Moodboard → 以它为基底出 3 个方向各一组 → 选定方向后沉淀成一组 <span class="en">--sref</span> 代码与参数配方，写进项目文档，后续所有物料按配方出图。</p>
+  </div>
+
+  <div class="stepbox">
+    <h4>工作流 5 · 静图转短视频</h4>
+    <p>按第 8 课 Animate 出 5 秒氛围镜头 → Extend 到需要的长度 → 多镜头在剪辑软件里按音乐节拍拼接 → 统一调色与字幕。单镜头别贪长，3 条 5 秒好镜头胜过 1 条 21 秒变形镜头。</p>
+  </div>
+
+  <div class="rule"><b>通用收尾检查</b>放大后再看一遍手、眼睛、文字、Logo 四处；这四处没问题，图才算交付级。</div>
+</section>
+
+<!-- ================= 第 11 课 ================= -->
+<section class="ch" id="ch11">
+  <span class="ch-num">LESSON 11</span>
+  <h2>排错手册：图不好看，先改哪一句</h2>
+  <p class="lede">出图翻车时别整句推倒重写。先在下表定位症状，多数情况改一处就够。</p>
+
+  <div class="tbl"><table>
+    <tr><th>症状</th><th>多半的原因</th><th>改法</th></tr>
+    <tr><td>四张全跑偏</td><td>主体句太虚或风格词打架</td><td>主体写具体（年龄 / 服装 / 材质），风格只留一个，删掉后半段再跑</td></tr>
+    <tr><td>太「AI 味」、塑料感</td><td><span class="en">--s</span> 太高、缺光线与质感词</td><td><span class="en">--s</span> 降到 50–100，加胶片 / 镜头词，V8 加 <span class="en">--raw</span></td></tr>
+    <tr><td>手崩、脸崩</td><td>手部动作复杂、人脸太小</td><td>改景别让脸更大；手部简化动作；<span class="en">--no distorted hands</span>；多跑几组挑，或 Editor 局部重绘</td></tr>
+    <tr><td>图里乱入文字</td><td>场景含招牌 / 海报元素</td><td><span class="en">--no text, letters, watermark</span>；或明确写 <span class="en">blank sign</span></td></tr>
+    <tr><td>要的文字写错</td><td>词太长或生僻</td><td>只留 1–3 个短词、引号包住；仍错就后期排字</td></tr>
+    <tr><td>构图挤、无留白</td><td>元素堆太满</td><td>加 <span class="en">negative space, minimal composition</span>；或 Zoom Out 扩边</td></tr>
+    <tr><td>系列图画风漂移</td><td>换了版本 / 参数 / 参考方式</td><td>锁版本、锁 <span class="en">--s</span>、锁参考图，描述逐字复用</td></tr>
+    <tr><td>额度掉得飞快</td><td>张张放大、高 <span class="en">--q</span>、反复整组重跑</td><td>先 Draft 定方向，定稿才放大上 <span class="en">--q</span>；闲时切 Relax</td></tr>
+    <tr><td>提示词被拦截</td><td>触及内容规范（名人、暴力、未成年等）</td><td>改写为中性描述，不写真实人物姓名与敏感场景</td></tr>
+  </table></div>
+
+  <div class="rule"><b>调试纪律：一次只动一个变量</b>同一问题连改三处，重跑后你不知道是哪一处起的作用，也学不到东西。正确做法：复制原句，只改一处，生成，对比，记录结论。把结论记成自己的小抄，三周后那就是你的参数直觉。</div>
+  <div class="note"><b>动手练一练</b>翻出一张你以前不满意的图，按上表定位症状，只做一处修改重跑。多数情况，一处就够。</div>
+</section>
+
+<!-- ================= 第 12 课 ================= -->
+<section class="ch" id="ch12">
+  <span class="ch-num">LESSON 12</span>
+  <h2>商用、版权与安全红线</h2>
+
+  <h3>商用权利：记住三条</h3>
+  <ol>
+    <li>付费订阅期间生成的图，按官方条款授予商用使用权；免费 / 试用来源的图不在此列（当前已无免费版）。</li>
+    <li>公司年营收超过 100 万美元的，必须使用 Pro 或 Mega 套餐才在授权范围内。</li>
+    <li>「能商用」不等于「拥有版权」：AI 生成内容的版权归属在多国仍不明确，平台条款解决的是你与平台之间的授权，不保证你对图享有排他性版权。重要品牌资产请咨询专业律师，并保留生成记录。</li>
+  </ol>
+
+  <h3>别碰的红线</h3>
+  <ul>
+    <li>不要用真人姓名（尤其公众人物与未成年人）生成肖像，不要做误导性的「假新闻图」。</li>
+    <li>不要仿冒在世艺术家的标志性风格去卖货，不要生成带有他人商标 Logo 的商品图用于销售。</li>
+    <li>参考图要用自己有权使用的素材；把他人摄影作品当参考生成的高度近似图，同样有侵权风险。</li>
+    <li>遵守平台社区规范：暴力、色情、仇恨等内容会被拦截，违规可能封号且时长不退。</li>
+  </ul>
+
+  <div class="warn"><b>隐私提醒</b>默认模式下你的图与提示词在社区可见、可被他人参考。未发布的产品图、客户稿、个人照片类素材，先开 Stealth（Pro / Mega）再生成；上传真人照片做参考前，想清授权与用途。本课为使用常识整理，不构成法律意见；条款细节以 Midjourney 官网 Terms of Service 与你所在地区的现行法律为准。</div>
+</section>
+
+<!-- ================= 练习区 ================= -->
+<section class="ch" id="ch13">
+  <span class="ch-num">PRACTICE</span>
+  <h2>练习区：先自己动手，再展开参考答案</h2>
+  <p class="lede">每道题都对应前面某一课的核心动作。先在 Midjourney 里实际生成一次，再展开答案对照——只看不练，等于没学。</p>
+
+  <h3>练习 1 · 给三个需求选对版本</h3>
+  <ol>
+    <li>「日常随手出图，什么特殊要求都没有。」</li>
+    <li>「照着网上一份角色一致性教程练，教程里全是 <span class="en">--oref</span> 和 <span class="en">--q</span>。」</li>
+    <li>「画一张动漫主视觉图。」</li>
+  </ol>
+  <details class="ans"><summary>展开参考答案</summary><div class="ans-body">
+    <div class="tbl"><table>
+      <tr><th>题号</th><th>答案</th><th>理由</th></tr>
+      <tr><td>1</td><td><strong>默认 V8.2</strong>（什么都不写）</td><td>默认即最新版，美学与个性化最好</td></tr>
+      <tr><td>2</td><td><strong><span class="en">--v 7</span></strong></td><td><span class="en">--oref</span> 是 V7 专属；版本不对，教程参数全部对不上</td></tr>
+      <tr><td>3</td><td><strong><span class="en">--niji 7</span></strong></td><td>动漫专用模型，连贯性为历代最好</td></tr>
+    </table></div>
+  </div></details>
+
+  <h3>练习 2 · 把一句话需求扩写成六段公式</h3>
+  <p>需求：「一张咖啡馆的图，温馨一点。」要求：六段齐全；参数只放句尾；风格只留一个主风格。</p>
+  <details class="ans"><summary>展开参考答案</summary><div class="ans-body">
+    <div class="cb"><div class="cb-head"><span class="dot"></span>参考答案（教学示范）<button class="copybtn" type="button">复制</button></div><pre>a cozy corner cafe interior with wooden tables and hanging plants, a barista pouring latte art behind the counter, cinematic photography, warm afternoon window light, amber and cream tones, wide shot, shallow depth of field --ar 16:9 --s 150</pre></div>
+    <p>自查点：主体（咖啡馆内景＋吧台师）具体可指；场景有动作（拉花）；风格只留 cinematic photography 一个；光线段写了光源（午后窗光）与色调（琥珀＋奶油）；镜头段有景别与景深；参数全在句尾。</p>
+  </div></details>
+
+  <h3>练习 3 · 给四个需求各选一种参考方式</h3>
+  <ol>
+    <li>「这张图的配色和笔触真好，我的新图也要这个味，但内容完全不同。」</li>
+    <li>「让这个角色换个场景继续出场，脸不能变。」（在 V7 上做）</li>
+    <li>「把我这张产品照的背景换成海滩，其他不动。」（在 V8.2 上做）</li>
+    <li>「以后出的图都往我喜欢的那种审美靠。」</li>
+  </ol>
+  <details class="ans"><summary>展开参考答案</summary><div class="ans-body">
+    <div class="tbl"><table>
+      <tr><th>题号</th><th>答案</th><th>写法</th></tr>
+      <tr><td>1</td><td><strong>风格参考 sref</strong></td><td><span class="en">--sref 图链接 --sw 150</span>，只借味不借物</td></tr>
+      <tr><td>2</td><td><strong>主体参考 oref</strong></td><td><span class="en">--oref 定妆图链接 --ow 100</span>，不像升权重、僵硬降权重</td></tr>
+      <tr><td>3</td><td><strong>Edit 模型</strong></td><td>附产品图＋指令描述换背景，图为底直接改</td></tr>
+      <tr><td>4</td><td><strong>个性化 --p</strong></td><td>先在 Personalize 评够图建档，生成时加 <span class="en">--p</span></td></tr>
+    </table></div>
+  </div></details>
+
+  <h3>练习 4 · 诊断一张翻车图</h3>
+  <p>一张人像图：塑料感很强、手有六根手指、构图挤得满满当当。提示词里 <span class="en">--s 600</span>，没有光线词，人物在画面里占了九成。要求：按排错表给出三处修改，每处说清对应哪个症状。</p>
+  <details class="ans"><summary>展开参考答案</summary><div class="ans-body">
+    <ul>
+      <li><strong>塑料感</strong> → <span class="en">--s</span> 从 600 降到 80 左右，并补光线与质感词（如 <span class="en">soft window light, film grain</span>），V8 再加 <span class="en">--raw</span>。</li>
+      <li><strong>六根手指</strong> → 加 <span class="en">--no distorted hands</span> 并简化手部动作；定稿后仍错就进 Editor 局部重绘手部。</li>
+      <li><strong>构图挤</strong> → 加 <span class="en">negative space, minimal composition</span>，或选图后 Zoom Out 扩边留白。</li>
+    </ul>
+    <p>注意调试纪律：三处修改分三轮跑，一次只动一处，才能知道每处各自的效果。</p>
+  </div></details>
+
+  <h3>练习 5 · 给一组参数挑错</h3>
+  <p>下面这句为什么跑不出想要的效果？「<span class="en">cat--ar 3:2 sitting by a window --s 900, beautiful, cinematic, minimal, baroque</span>」</p>
+  <details class="ans"><summary>展开参考答案</summary><div class="ans-body">
+    <ul>
+      <li><span class="en">cat--ar</span> 参数前没空格，且参数被放在句中——参数必须在句尾、前有空格。</li>
+      <li><span class="en">--s 900</span> 接近上限，AI 自由发挥过度，提示词基本说了不算；写实题材用 50–100。</li>
+      <li><span class="en">minimal</span> 与 <span class="en">baroque</span> 互相打架，违反「一词一义」；<span class="en">beautiful</span>、<span class="en">cinematic</span> 是空转的抽象词，换成具体光线与景物。</li>
+    </ul>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>改后（教学示范）<button class="copybtn" type="button">复制</button></div><pre>a cat sitting on a windowsill, morning light through linen curtains, dust in the air, photorealistic, 50mm lens --ar 3:2 --s 80</pre></div>
+  </div></details>
+</section>
+
+<!-- ================= 工具页 ================= -->
+<section class="ch" id="ch14">
+  <span class="ch-num">TOOLKIT</span>
+  <h2>工具页：30 条可复制模板、交付检查清单与速查卡</h2>
+  <p class="lede">出图时从模板起步改词，交付前用清单逐项勾完，最后拿速查卡兜底核对参数。</p>
+
+  <h3>模板库 · 用法</h3>
+  <p>整段复制，把方括号 <span class="en">[ ]</span> 处换成你的内容。每条模板右侧按钮单独复制该条。</p>
+
+  <h4>人像与摄影（1–10）</h4>
+  <div class="tpl"><span class="n">1</span><span class="t">portrait of a [woman in her 30s], natural skin, window light, plain background, 85mm lens --ar 4:5 --s 80</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">2</span><span class="t">elderly craftsman in his workshop, warm lamp light, dust in the air, documentary photography --ar 3:2 --s 60</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">3</span><span class="t">street photo, [man reading newspaper] in rain, neon reflections, Kodak Portra 400 --ar 3:2 --s 120</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">4</span><span class="t">fashion editorial, [model in red coat], studio lighting, bold color background --ar 4:5 --s 200</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">5</span><span class="t">food photography, [bowl of ramen], steam, wooden table, soft daylight --ar 4:5 --s 100</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">6</span><span class="t">travel photo, [mountain village] at golden hour, hiker in distance, cinematic --ar 16:9 --s 180</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">7</span><span class="t">pet portrait, [golden retriever] in autumn leaves, shallow depth of field --ar 4:5 --s 120</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">8</span><span class="t">architecture photo, [minimal concrete house], blue hour, clean lines --ar 16:9 --s 80</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">9</span><span class="t">macro photo of a [butterfly on flower], dew drops, extreme detail --ar 3:2 --s 100 --q 2</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">10</span><span class="t">couple photo, [young couple] in wheat field at sunset, backlit, film grain --ar 16:9 --s 150</span><button class="copybtn" type="button">复制</button></div>
+
+  <h4>场景与概念（11–20）</h4>
+  <div class="tpl"><span class="n">11</span><span class="t">cozy cabin by a lake at sunrise, mist, warm windows, cinematic --ar 16:9 --s 200</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">12</span><span class="t">futuristic city street at night, rain, neon signs, cinematic --ar 21:9 --s 250</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">13</span><span class="t">ancient library interior, towering shelves, shafts of light --ar 16:9 --s 220</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">14</span><span class="t">underwater scene, whale and diver, sun rays through water --ar 16:9 --s 200</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">15</span><span class="t">desert oasis at dusk, palm trees, mirror-like pond --ar 16:9 --s 180</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">16</span><span class="t">steampunk workshop, brass machines, warm glow --ar 3:2 --s 280</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">17</span><span class="t">floating island with waterfall, clouds below, epic scale --ar 16:9 --s 300</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">18</span><span class="t">japanese garden in autumn, red maples, stone lantern, pond --ar 3:2 --s 180</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">19</span><span class="t">snowy mountain cabin at night, starry sky, smoke from chimney --ar 16:9 --s 200</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">20</span><span class="t">abandoned greenhouse, plants reclaiming glass house, soft light --ar 3:2 --s 220</span><button class="copybtn" type="button">复制</button></div>
+
+  <h4>插画、动漫与设计（21–30）</h4>
+  <div class="tpl"><span class="n">21</span><span class="t">watercolor illustration, [fox in forest], soft washes, storybook style --ar 4:5 --s 250</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">22</span><span class="t">flat vector poster, [mountain sunrise], minimal shapes, bold colors --ar 2:3 --s 200</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">23</span><span class="t">anime key visual, [girl with teal hair] under cherry blossoms --niji 7 --ar 16:9</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">24</span><span class="t">chibi sticker, [cat drinking bubble tea], white background --niji 7 --ar 1:1</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">25</span><span class="t">ukiyo-e woodblock print, [wave and fishing boat] --ar 3:2 --s 300</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">26</span><span class="t">isometric illustration, [small bakery storefront], pastel colors --ar 1:1 --s 200</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">27</span><span class="t">seamless pattern of [small flowers and leaves], vintage style --tile --ar 1:1</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">28</span><span class="t">product photo, [perfume bottle] on wet stone, mist, luxury ad --ar 4:5 --s 60 --q 2 --no text</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">29</span><span class="t">book cover, [lone tree on a hill], minimal, lots of negative space --ar 2:3 --s 250</span><button class="copybtn" type="button">复制</button></div>
+  <div class="tpl"><span class="n">30</span><span class="t">phone wallpaper, [gradient nebula with stars], dreamy --ar 9:16 --s 300</span><button class="copybtn" type="button">复制</button></div>
+
+  <h3>交付前检查清单</h3>
+  <p class="small">进度只记在当前页面里，刷新即清零——把它当一次性的出门检查，而不是存档。</p>
+  <div class="checkwrap">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <strong>出图交付检查清单</strong><span class="small" id="checkCount">已完成 0 / 14</span>
+    </div>
+    <div class="progressbar" style="margin:10px 0 8px"><i id="checkBar"></i></div>
+    <div id="checkList">
+      <label class="checkitem"><input type="checkbox"><span>版本选对了：日常默认 V8.2；跟 V7 教程才加 --v 7；动漫用 --niji 7，系列图全程没混版本</span></label>
+      <label class="checkitem"><input type="checkbox"><span>提示词按六段公式写：主体＋场景＋风格＋光线＋镜头构图，参数全在句尾、前有空格</span></label>
+      <label class="checkitem"><input type="checkbox"><span>英文词数在 15–40 的甜点区，没有互相打架的风格词，没有空转的抽象词</span></label>
+      <label class="checkitem"><input type="checkbox"><span>--s 与题材匹配：写实 50–100、平衡 100–250、奔放才上 300+</span></label>
+      <label class="checkitem"><input type="checkbox"><span>参考方式没混用：借味 sref、锁主体 oref / Edit、我的口味 --p、抄构图用图片提示放句首</span></label>
+      <label class="checkitem"><input type="checkbox"><span>角色一致性：定妆图是大脸正面清晰图，服装描述逐字复用，--ow 权重调过了</span></label>
+      <label class="checkitem"><input type="checkbox"><span>图里要出现的文字只有 1–3 个短词、引号包住；不要的文字用 --no 排除了</span></label>
+      <label class="checkitem"><input type="checkbox"><span>精修顺序对：先定构图 → Vary 微调 → Editor 修局部 → 最后才放大，没张张放大</span></label>
+      <label class="checkitem"><input type="checkbox"><span>放大后复查了手、眼睛、文字、Logo 四处</span></label>
+      <label class="checkitem"><input type="checkbox"><span>改图调试一次只动了一个变量，并记下了结论</span></label>
+      <label class="checkitem"><input type="checkbox"><span>喜欢的图记下了 --seed 与完整提示词，方便复现构图</span></label>
+      <label class="checkitem"><input type="checkbox"><span>额度有数：闲时批量试错用了 Relax / Draft，--q 2 与放大只留给定稿</span></label>
+      <label class="checkitem"><input type="checkbox"><span>隐私过关：未公开的客户稿 / 产品图先开了 Stealth（Pro / Mega）再生成</span></label>
+      <label class="checkitem"><input type="checkbox"><span>商用过关：没用真人名、他人商标与无权使用的参考素材；营收超标的公司在 Pro 以上套餐</span></label>
+    </div>
+    <p class="small" id="checkDone" style="display:none;color:var(--accent2);font-weight:700;margin-top:10px">✓ 全部勾完——这张图可以交付了。</p>
+  </div>
+
+  <h3>一页速查卡</h3>
+  <div class="cheat">
+    <h3>Midjourney 速查</h3>
+    <div class="row"><span class="k">公式</span><span>主体 ＋ 场景 ＋ 风格 ＋ 光线配色 ＋ 镜头构图 <span class="en">--ar 比例 --s 风格强度</span>（参数永远在句尾）</span></div>
+    <div class="row"><span class="k">--ar 比例</span><span>16:9 横 / 9:16 竖 / 4:5 社交 / 1:1 方 / 2:3 海报 / 21:9 电影</span></div>
+    <div class="row"><span class="k">--s 风格强度</span><span>写实 50–100 / 平衡 100–250 / 奔放 300+</span></div>
+    <div class="row"><span class="k">--chaos 差异</span><span>定向 0–15 / 找灵感 30–55</span></div>
+    <div class="row"><span class="k">--q 2</span><span>定稿加细节，只在定稿用，约 2 倍时长</span></div>
+    <div class="row"><span class="k">--no 排除</span><span><span class="en">--no text, watermark, extra fingers</span>，只写短列表</span></div>
+    <div class="row"><span class="k">去滤镜</span><span>V8 用 <span class="en">--raw</span>，V7 用 <span class="en">--style raw</span></span></div>
+    <div class="row"><span class="k">借风格</span><span><span class="en">--sref 图 --sw 权重</span>：100 默认，强借 250+</span></div>
+    <div class="row"><span class="k">锁主体</span><span>V7 <span class="en">--oref 图 --ow 100</span>（不像加、僵硬减）；V8 用 Edit 模型附图＋指令</span></div>
+    <div class="row"><span class="k">--p 个性化</span><span>先在 Personalize 评图建档，生成时开启</span></div>
+    <div class="row"><span class="k">--seed 复现</span><span>记下好图的种子号，同种子＋相近提示词约等于相近构图</span></div>
+    <div class="row"><span class="k">动作口诀</span><span>先 Draft 试方向 → 定构图 → Vary 微调 → Editor 修局部 → 最后放大。改图一次只动一处</span></div>
+  </div>
+</section>
+
+<!-- ================= 附录 ================= -->
+<section class="ch" id="ch15">
+  <span class="ch-num">APPENDIX</span>
+  <h2>附录：术语表与常见问题</h2>
+
+  <h3>术语表</h3>
+  <div class="tbl"><table>
+    <tr><th>词</th><th>意思</th></tr>
+    <tr><td><strong>Prompt 提示词</strong></td><td>你输入的描述句＋参数，是唯一的创作指令</td></tr>
+    <tr><td><strong>Upscale 放大</strong></td><td>把选中的小图生成为高清大图</td></tr>
+    <tr><td><strong>Vary 变体</strong></td><td>以一张图为底再生成相似的一组</td></tr>
+    <tr><td><strong>Fast / Relax</strong></td><td>优先快出（吃时长）/ 排队慢出（不吃时长）</td></tr>
+    <tr><td><strong>Stealth 隐身</strong></td><td>Pro 以上专属，作品不进公开画廊</td></tr>
+    <tr><td><strong>GPU 时长</strong></td><td>计费单位；参数越重、图越大耗得越多</td></tr>
+  </table></div>
+
+  <h3>常见问题</h3>
+  <div class="stepbox">
+    <h4>可以用中文写提示词吗？</h4>
+    <p>能出图，但英文在风格词与参数配合上明显更稳，建议抄英文模板改词。</p>
+    <h4>为什么每次结果都不一样？</h4>
+    <p>生成本身带随机性；用 <span class="en">--seed</span> 固定种子、锁版本与参数，可把构图拉回相近。</p>
+    <h4>Basic 的 3.3 小时大概多少张？</h4>
+    <p>普通图约 1 分钟量级一张，粗略数百张级别；一旦频繁放大、上 <span class="en">--q</span>、做视频，会掉得快得多。</p>
+  </div>
+
+  <footer>本课内容整理自《Midjourney 使用手册》（2026），资料来源为 2026 年 10 月查阅的 Midjourney 官方文档 docs.midjourney.com 与官网订阅页；版本节点参考官方 Version 说明（V8.2 于 2026 年 7 月 24 日成为默认）。价格、参数范围与功能开放情况更新很快，以官方实时页面为准。</footer>
+</section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- copy buttons (code blocks + template rows) ---------- */
+  function bindCopy(btn, getText){
+    btn.addEventListener("click", function(){
+      var text = getText();
+      var settled = false;
+      function done(){
+        if(settled) return; settled = true;
+        btn.textContent = "已复制 ✓";
+        btn.classList.add("done");
+        setTimeout(function(){ btn.textContent = "复制"; btn.classList.remove("done"); }, 1600);
+      }
+      function fallback(){
+        var ta = document.createElement("textarea");
+        ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); } catch(e){}
+        document.body.removeChild(ta); done();
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        /* 剪贴板 Promise 在某些内嵌浏览器里可能永不 settle，超时就走兜底路径 */
+        var timer = setTimeout(function(){ if(!settled) fallback(); }, 800);
+        navigator.clipboard.writeText(text).then(function(){ clearTimeout(timer); done(); }).catch(function(){ clearTimeout(timer); fallback(); });
+      } else { fallback(); }
+    });
+  }
+  document.querySelectorAll(".cb").forEach(function(box){
+    var btn = box.querySelector(".copybtn");
+    var pre = box.querySelector("pre");
+    if(!btn || !pre) return;
+    bindCopy(btn, function(){ return pre.innerText; });
+  });
+  document.querySelectorAll(".tpl").forEach(function(row){
+    var btn = row.querySelector(".copybtn");
+    var t = row.querySelector(".t");
+    if(!btn || !t) return;
+    bindCopy(btn, function(){ return t.innerText; });
+  });
+
+  /* ---------- mobile TOC ---------- */
+  var toc = document.getElementById("toc");
+  var toggle = document.getElementById("tocToggle");
+  toggle.addEventListener("click", function(){ toc.classList.toggle("show"); });
+  toc.querySelectorAll("a").forEach(function(a){
+    a.addEventListener("click", function(){ toc.classList.remove("show"); });
+  });
+
+  /* ---------- scroll highlight ---------- */
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute("href").slice(1)] = a; });
+  if("IntersectionObserver" in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          links.forEach(function(a){ a.classList.remove("active"); });
+          var a = map[en.target.id];
+          if(a) a.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-20% 0px -70% 0px" });
+    document.querySelectorAll("section.ch").forEach(function(s){ obs.observe(s); });
+  }
+
+  /* ---------- checklist ---------- */
+  var boxes = Array.prototype.slice.call(document.querySelectorAll("#checkList input[type=checkbox]"));
+  var bar = document.getElementById("checkBar");
+  var count = document.getElementById("checkCount");
+  var doneMsg = document.getElementById("checkDone");
+  function refresh(){
+    var n = boxes.filter(function(b){ return b.checked; }).length;
+    bar.style.width = (boxes.length ? (n / boxes.length * 100) : 0) + "%";
+    count.textContent = "已完成 " + n + " / " + boxes.length;
+    doneMsg.style.display = (n === boxes.length && n > 0) ? "block" : "none";
+    boxes.forEach(function(b){ b.closest(".checkitem").classList.toggle("done", b.checked); });
+  }
+  boxes.forEach(function(b){ b.addEventListener("change", refresh); });
+  refresh();
+
+  /* ---------- generic wizard engine ---------- */
+  function makeWizard(rootId, cfg){
+    var root = document.getElementById(rootId);
+    if(!root) return;
+    var body = root.querySelector(".wizBody");
+    function renderStep(i){
+      var s = cfg.steps[i];
+      var html = '<div class="wiz-progress">' + cfg.name + ' · ' + (i + 1) + ' / ' + cfg.steps.length + '</div>';
+      html += '<div class="wiz-q">' + s.q + '</div><div class="wiz-opts">';
+      s.opts.forEach(function(o, idx){
+        html += '<button type="button" class="wiz-opt" data-idx="' + idx + '">' + o.t + '</button>';
+      });
+      html += '</div>';
+      body.innerHTML = html;
+      body.querySelectorAll(".wiz-opt").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          var o = s.opts[Number(btn.getAttribute("data-idx"))];
+          if(typeof o.next === "number"){ renderStep(o.next); } else { renderResult(o.next); }
+        });
+      });
+    }
+    function renderResult(key){
+      var r = cfg.results[key];
+      body.innerHTML =
+        '<div class="wiz-progress">' + cfg.name + ' · 结论</div>' +
+        '<div class="wiz-result"><div class="small">你应该使用</div><div class="mode">' + r.title + '</div>' +
+        '<p style="margin:8px 0 4px">' + r.why + '</p>' +
+        '<p style="margin:4px 0 0"><strong>调用写法：</strong>' + r.how + '</p></div>' +
+        '<button type="button" class="wiz-restart">重新判断</button>';
+      body.querySelector(".wiz-restart").addEventListener("click", function(){ renderStep(0); });
+    }
+    renderStep(0);
+  }
+
+  /* ---------- wizard 1: version picker ---------- */
+  makeWizard("wizVer", {
+    name: "选版向导",
+    steps: [
+      {
+        q: "第 1 题：你要画的是动漫 / 漫画风吗？",
+        opts: [
+          { t: "是，动漫、漫画、二次元", next: "NIJI" },
+          { t: "不是，摄影、插画、设计等通用题材", next: 1 }
+        ]
+      },
+      {
+        q: "第 2 题：你需要用到 V7 专属功能吗（--oref 锁主体、跟着网上的 V7 角色一致性教程练）？",
+        opts: [
+          { t: "需要，教程和参数都是 V7 的", next: "V7" },
+          { t: "不需要 / 不确定", next: 2 }
+        ]
+      },
+      {
+        q: "第 3 题：你打算以一张现成的图为底做修改吗（换装、换背景、合成多图）？",
+        opts: [
+          { t: "是，想直接改这张图", next: "EDIT" },
+          { t: "不是，从文字出新图", next: "V82" }
+        ]
+      }
+    ],
+    results: {
+      "NIJI": { title: "Niji 7", why: "动漫 / 漫画专用模型，连贯性为历代最好，风格词写法见第 9 课动漫类词库。", how: "提示词末尾加 --niji 7" },
+      "V7": { title: "V7", why: "--oref / --ow、--q、多段提示在 V7 上最完整，网上的角色一致性教程大多基于它；切过去教程参数才对得上。", how: "提示词末尾加 --v 7，锁主体用 --oref 图链接 --ow 100" },
+      "EDIT": { title: "V8.2 + Edit 模型", why: "V8 家族用 Edit 模型接管以图改图：指令＋最多 4 张参考图，重绘、换装、合成、换背景都走它。", how: "默认 V8.2，在输入框附图并写修改指令（或加 --edit）" },
+      "V82": { title: "默认 V8.2", why: "当前默认模型，美学与个性化最强，原生高清直出；日常出图什么版本参数都不用写。", how: "不写版本参数即可；要高清加 --hd，要更听话加 --raw" }
+    }
+  });
+
+  /* ---------- wizard 2: reference picker ---------- */
+  makeWizard("wizRef", {
+    name: "参考方式向导",
+    steps: [
+      {
+        q: "你想从参考图里借的到底是什么？",
+        opts: [
+          { t: "借「味」：配色、笔触、质感、氛围，内容要完全不同", next: "SREF" },
+          { t: "借「人 / 物」：还是这个角色、这个产品，换场景继续出场", next: 1 },
+          { t: "借「构图」：照这张图的构图与内容大方向来一张", next: "IMG" },
+          { t: "不借某一张图——想让以后所有图都往我喜欢的审美靠", next: "P" }
+        ]
+      },
+      {
+        q: "追问：你现在用的是哪个版本？",
+        opts: [
+          { t: "V7", next: "OREF" },
+          { t: "V8.2（默认）", next: "EDIT" }
+        ]
+      }
+    ],
+    results: {
+      "SREF": { title: "风格参考 --sref", why: "只借配色、笔触、质感与氛围，不借具体物体；--sw 管强度，50 隐隐有味、250–400 强势接管。", how: "--sref 图片链接 --sw 150" },
+      "OREF": { title: "主体参考 --oref（V7）", why: "全能参考锁定人物 / 物体主体：先备好大脸正面清晰的定妆图，不像升 --ow（150–250），僵硬降到 60–80。", how: "--oref 定妆图链接 --ow 100" },
+      "EDIT": { title: "Edit 模型（V8）", why: "V8.2 用 Edit 接管主体参考：把定妆图（可多张、多角度）随指令提交，描述新场景与要保留的特征。", how: "输入框附图（最多 4 张）＋文字指令，或加 --edit" },
+      "IMG": { title: "图片提示 Image Prompt", why: "把图片放在提示词最前面借构图与内容大方向，--iw 管像的程度（0–2，默认 1）。", how: "图片链接放在提示词最前面 --iw 1.5" },
+      "P": { title: "个性化 --p", why: "先在网页端 Personalize 里对成对图片做选择题建档，之后出图都会往你的审美偏好靠；档案可多个、可分享代码。", how: "建档后生成时加 --p（或 --p 档案代码）" }
+    }
+  });
+})();
+</script>
+</body>
+</html>

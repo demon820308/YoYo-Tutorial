@@ -1,0 +1,1563 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>学会写 MiniMax H3 提示词 — 一门写作课</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f5f0; --panel:#fffdf8; --panel2:#efece3; --ink:#1c1a15; --ink2:#57534a; --line:#ddd6c6;
+  --accent:#b45309; --accent2:#0f766e; --accent-soft:#fdf0dc; --teal-soft:#e2f2ef;
+  --code-bg:#17150f; --code-ink:#f2ead8; --code-dim:#a89f88;
+  --good:#15803d; --bad:#b91c1c;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#121110; --panel:#1b1a17; --panel2:#24231f; --ink:#ece7da; --ink2:#a8a294; --line:#38362e;
+    --accent:#f0a832; --accent2:#2dd4bf; --accent-soft:#2c2313; --teal-soft:#12302b;
+    --code-bg:#0b0a08; --code-ink:#f2ead8; --code-dim:#8f8772;
+    color-scheme: dark;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans SC",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.75;font-size:16px}
+code,kbd,.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+a{color:var(--accent2)}
+/* ---------- header ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:var(--bg);border-bottom:2px solid var(--ink);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.topbar h1{font-family:"Noto Serif SC",serif;font-size:clamp(20px,3.4vw,30px);margin:0;letter-spacing:.02em}
+.topbar .sub{color:var(--ink2);font-size:14px}
+.topbar .tag{margin-left:auto;font-size:12px;border:1px solid var(--line);background:var(--panel);padding:4px 10px;border-radius:999px;color:var(--ink2)}
+#tocToggle{display:none;border:1px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 12px;font-size:14px;cursor:pointer;font-family:inherit}
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:272px minmax(0,1fr);max-width:1440px;margin:0 auto;align-items:start}
+aside.toc{position:sticky;top:73px;height:calc(100vh - 73px);overflow-y:auto;padding:18px 14px 40px;border-right:1px solid var(--line)}
+aside.toc .toc-title{font-size:12px;letter-spacing:.18em;color:var(--ink2);margin:0 4px 10px}
+aside.toc a{display:block;color:var(--ink2);text-decoration:none;font-size:13.5px;padding:6px 10px;border-radius:8px;border-left:3px solid transparent;line-height:1.45}
+aside.toc a:hover{background:var(--panel2);color:var(--ink)}
+aside.toc a.active{background:var(--accent-soft);color:var(--ink);border-left-color:var(--accent);font-weight:700}
+aside.toc .grp{margin-top:14px;font-size:11px;letter-spacing:.14em;color:var(--ink2);padding:0 10px}
+main{padding:28px clamp(16px,4vw,52px) 90px;min-width:0}
+section.ch{padding:26px 0 10px;border-bottom:1px dashed var(--line);scroll-margin-top:88px}
+section.ch:last-of-type{border-bottom:none}
+.ch-num{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;background:var(--ink);color:var(--bg);padding:2px 9px;border-radius:5px;letter-spacing:.06em}
+h2{font-family:"Noto Serif SC",serif;font-size:clamp(23px,3vw,30px);margin:10px 0 8px;line-height:1.3}
+h3{font-size:19px;margin:26px 0 8px}
+h4{font-size:16px;margin:20px 0 6px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:4px 0}
+.lede{font-size:17px;color:var(--ink2)}
+.small{font-size:13.5px;color:var(--ink2)}
+strong{font-weight:700}
+.en{font-family:"JetBrains Mono",monospace;font-size:.92em;background:var(--panel2);padding:1px 6px;border-radius:5px;overflow-wrap:anywhere}
+.tagchip{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12.5px;background:var(--teal-soft);color:var(--ink);border:1px solid var(--line);padding:1px 8px;border-radius:999px;margin:1px 2px;white-space:nowrap}
+.srcchip{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:1px 10px;margin:2px 4px 2px 0;white-space:nowrap}
+.src-off{background:var(--teal-soft);border:1px solid var(--accent2);color:var(--ink)}
+.src-teach{background:var(--accent-soft);border:1px solid var(--accent);color:var(--ink)}
+/* ---------- callouts ---------- */
+.note,.warn,.rule{border-radius:10px;padding:12px 16px;margin:14px 0;font-size:15px}
+.note{background:var(--teal-soft);border:1px solid var(--line)}
+.warn{background:#fbe9e7;border:1px solid #e5b4ae;color:#5f1d16}
+@media (prefers-color-scheme: dark){.warn{background:#331a16;color:#f3c6bf;border-color:#5c322a}}
+.rule{background:var(--accent-soft);border:1px solid var(--line)}
+.note b,.warn b,.rule b{display:block;margin-bottom:2px}
+/* ---------- tables ---------- */
+.tbl{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+th,td{padding:9px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{background:var(--panel2);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+td .en{white-space:normal}
+/* ---------- code blocks ---------- */
+.cb{position:relative;margin:14px 0;border-radius:10px;overflow:hidden;border:1px solid #000}
+.cb .cb-head{display:flex;align-items:center;gap:8px;background:#26231b;color:#cfc6ad;font-size:12px;padding:7px 12px;font-family:"JetBrains Mono",monospace}
+.cb .cb-head .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.cb pre{margin:0;background:var(--code-bg);color:var(--code-ink);padding:16px;overflow-x:auto;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+.cb pre b{color:#ffc964;font-weight:600}
+.copybtn{margin-left:auto;background:#3a362a;color:#f2ead8;border:1px solid #57503c;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+.copybtn:hover{background:#4a4636}
+.copybtn.done{background:var(--accent2);border-color:var(--accent2);color:#fff}
+/* ---------- 中文对照块 / 行下直译 ---------- */
+.zhd{border:1.5px solid var(--accent2);background:var(--teal-soft);border-radius:10px;padding:12px 16px 14px;margin:-8px 0 18px;font-size:14.5px}
+.zhd .zhd-head{font-size:12px;font-weight:700;color:var(--accent2);letter-spacing:.08em;margin-bottom:6px}
+.zhd pre{margin:0;white-space:pre-wrap;word-break:break-word;font-family:inherit;line-height:1.85;font-size:14.5px;color:var(--ink)}
+.zhd .en{background:rgba(255,255,255,.45)}
+@media (prefers-color-scheme: dark){.zhd .en{background:rgba(255,255,255,.1)}}
+.glossline{background:var(--panel2);border-radius:8px;padding:8px 12px;margin:-8px 0 16px;font-size:13.5px;color:var(--ink2);line-height:1.7}
+.glossline b{color:var(--accent2)}
+/* ---------- cards / grids ---------- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.card h4{margin-top:0}
+.card .k{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--accent);letter-spacing:.05em}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0;font-size:14px}
+.flow .step{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 12px}
+.flow .arr{color:var(--accent);font-weight:900}
+/* ---------- step boxes / drafts ---------- */
+.stepbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0}
+.stepbox h4{margin-top:0}
+.stepbox .snum{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;background:var(--accent);color:#fff;padding:2px 9px;border-radius:5px;margin-right:8px}
+.badbox{background:#fbe9e7;border:1px solid #e5b4ae;border-radius:10px;padding:6px 18px 12px;margin:12px 0;color:#5f1d16;font-size:15px}
+@media (prefers-color-scheme: dark){.badbox{background:#331a16;color:#f3c6bf;border-color:#5c322a}}
+.badbox .badlabel{font-weight:900;font-size:13px;letter-spacing:.08em}
+/* ---------- folded answers ---------- */
+details.ans{border:1px solid var(--line);border-radius:10px;background:var(--panel);margin:12px 0}
+details.ans summary{cursor:pointer;padding:12px 16px;font-weight:700;color:var(--accent2);font-size:15px}
+details.ans summary:hover{background:var(--panel2);border-radius:10px}
+details.ans .ans-body{padding:4px 16px 14px;border-top:1px dashed var(--line)}
+/* ---------- wizard ---------- */
+.wizard{background:var(--panel);border:2px solid var(--ink);border-radius:14px;padding:20px;margin:18px 0}
+.wizard h3{margin-top:0}
+.wiz-q{font-weight:700;font-size:17px;margin:6px 0 10px}
+.wiz-opts{display:flex;flex-direction:column;gap:8px}
+.wiz-opt{text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:11px 14px;font-size:15px;cursor:pointer;font-family:inherit;line-height:1.5}
+.wiz-opt:hover{border-color:var(--accent);background:var(--accent-soft)}
+.wiz-progress{font-size:12.5px;color:var(--ink2);margin-bottom:8px;font-family:"JetBrains Mono",monospace}
+.wiz-result{border:1.5px dashed var(--accent2);background:var(--teal-soft);border-radius:10px;padding:16px;margin-top:6px}
+.wiz-result .mode{font-family:"JetBrains Mono",monospace;font-size:26px;font-weight:600}
+.wiz-restart{margin-top:12px;border:1px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:14px}
+/* ---------- checklist ---------- */
+.checkwrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;margin:16px 0}
+.progressbar{height:12px;background:var(--panel2);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.progressbar i{display:block;height:100%;width:0;background:var(--accent2);transition:width .3s}
+.checkitem{display:flex;gap:10px;align-items:flex-start;padding:8px 6px;border-bottom:1px dashed var(--line);cursor:pointer;font-size:15px}
+.checkitem:last-child{border-bottom:none}
+.checkitem input{width:19px;height:19px;margin-top:3px;accent-color:var(--accent2);flex:none;cursor:pointer}
+.checkitem.done span{color:var(--ink2);text-decoration:line-through}
+/* ---------- cheat sheet ---------- */
+.cheat{background:var(--ink);color:var(--bg);border-radius:14px;padding:22px;margin:18px 0}
+.cheat h3{color:var(--bg);margin-top:0}
+.cheat .row{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(128,120,100,.5);font-size:14.5px}
+.cheat .row:last-child{border-bottom:none}
+.cheat .k{font-weight:700;color:#ffc964}
+.cheat .en{background:rgba(255,255,255,.12);color:inherit}
+footer{color:var(--ink2);font-size:13px;padding:10px 0 0}
+.anno{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent2);border-radius:0 10px 10px 0;padding:12px 16px;margin:10px 0 18px;font-size:14.5px}
+.anno b{color:var(--accent2)}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  aside.toc{display:none}
+  aside.toc.show{display:block;position:fixed;inset:0 auto 0 0;width:280px;background:var(--bg);z-index:80;height:100vh;top:0;box-shadow:4px 0 24px rgba(0,0,0,.18)}
+  #tocToggle{display:inline-block}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .cheat .row{grid-template-columns:1fr}
+  table{min-width:520px}
+}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.progressbar i{transition:none}}
+</style>
+</head>
+<body><nav id="sitebar" style="position:fixed;top:0;left:0;right:0;height:44px;z-index:99999;background:rgba(24,24,46,.96);display:flex;align-items:center;gap:2px;padding:0 12px;font:14px/1.4 'Noto Sans SC',sans-serif;overflow-x:auto;white-space:nowrap;"><a href="../" style="color:#b9bce0;text-decoration:none;padding:4px 10px;border-radius:999px;">教程站首页</a><a href="../minimax-h3/" style="color:#fff;text-decoration:none;padding:4px 10px;border-radius:999px;background:#6c63ff;font-weight:700;">MiniMax H3 教程</a><a href="../higgsfield/" style="color:#b9bce0;text-decoration:none;padding:4px 10px;border-radius:999px;">Higgsfield 教程</a><a href="../midjourney/" style="color:#b9bce0;text-decoration:none;padding:4px 10px;border-radius:999px;">Midjourney 教程</a></nav><style>body{padding-top:44px !important}</style>
+
+<header class="topbar">
+  <button id="tocToggle" aria-label="打开目录">☰ 目录</button>
+  <div>
+    <h1>学会写 MiniMax H3 提示词</h1>
+    <div class="sub">一门写作课：从一句话需求，到结构合规、能直接交付的成稿</div>
+  </div>
+  <span class="tag">官方范例标「原文」 · 教学内容标「教学示范」 · 英文均配中文对照</span>
+</header>
+
+<div class="layout">
+<aside class="toc" id="toc">
+  <p class="toc-title">课程目录 SYLLABUS</p>
+  <a href="#ch0">开篇 · 先看一条成品</a>
+  <p class="grp">动手写之前</p>
+  <a href="#ch1">第 1 课 · 写作前先定模式</a>
+  <a href="#ch2">第 2 课 · 基础模式写作全程演示</a>
+  <p class="grp">把每一部分写好</p>
+  <a href="#ch3">第 3 课 · 把画面写具体</a>
+  <a href="#ch4">第 4 课 · 运镜怎么写</a>
+  <a href="#ch5">第 5 课 · 台词与人声怎么写</a>
+  <a href="#ch6">第 6 课 · 声音怎么写</a>
+  <a href="#ch7">第 7 课 · 关键帧模式的写法差异</a>
+  <p class="grp">进阶与收拢</p>
+  <a href="#ch8">第 8 课 · 给参考素材写：Ref2VA 全程演示</a>
+  <a href="#ch9">第 9 课 · 时长与切镜的算术</a>
+  <a href="#ch10">第 10 课 · 改稿课：三条烂稿的救法</a>
+  <a href="#ch11">第 11 课 · 练习区</a>
+  <p class="grp">随身工具</p>
+  <a href="#ch12">工具页 · 模板 / 检查清单 / 速查卡</a>
+  <a href="#ch13">附录 · 风格技能一句话索引</a>
+</aside>
+
+<main>
+
+<!-- ================= 开篇 ================= -->
+<section class="ch" id="ch0">
+  <span class="ch-num">PROLOGUE</span>
+  <h2>开篇：先看一条成品，再带着问题往下学</h2>
+  <p class="lede">这门课只教一件事：<strong>怎么写 MiniMax H3 提示词</strong>。全部规则与范例出自官方技能 <span class="en">h3-prompt-writing</span> 及其两份指南（<span class="en">references/base-en.txt</span>、<span class="en">references/ref-en.txt</span>）——技能包是知识来源，本课的目标是把「查得到规则」变成「下笔就会写」。</p>
+  <p>先别急着学规则。下面这条是官方指南给出的<strong>完整成稿</strong>（Ref2VA 全参考模式）：需求是「用三张萨摩耶照片、一段咖啡馆环境图、两段人物视频和一段音色音频，写一场咖啡馆里抢饼干的三镜小品」。先通读一遍，看它的形状：</p>
+
+  <p><span class="srcchip src-off">官方原文</span><span class="small">出自 ref-en.txt 第 7 节 Complete Example，英文照原文引用。第 8 课会带你一步步把这条写出来。</span></p>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>Ref2VA 完整成稿（原文）<button class="copybtn" type="button">复制</button></div><pre>subject_definitions:
+&lt;Subject 1&gt; is the coffee-shop environment in &lt;Picture 1&gt;, featuring an exposed brick wall, an orange tufted sofa with patterned pillows, a neon sign, and a wooden coffee table.
+&lt;Subject 2&gt; is the fluffy white Samoyed in &lt;Picture 2&gt;, &lt;Picture 3&gt;, and &lt;Picture 4&gt;, with thick white fur, pointed ears, a dark nose, and a curved tail.
+&lt;Subject 3&gt; is the young blonde woman in &lt;Video 1&gt;, with long blonde hair and a light-pink button-down shirt with rolled-up sleeves.
+&lt;Subject 4&gt; is the young man in &lt;Video 2&gt;, with short wavy brown hair and a dark-grey hoodie with drawstrings.
+&lt;Audio 1&gt; is the voice-timbre reference for &lt;Subject 3&gt; (S1), containing a spoken English vocal layer.
+
+summary:
+[reference generation + audio reference] The target video shows &lt;Subject 3&gt; eating a cookie in &lt;Subject 1&gt;. &lt;Subject 4&gt; enters with &lt;Subject 2&gt;, which lunges toward the cookie. The three-shot exchange uses &lt;Audio 1&gt; as the voice-timbre reference for &lt;Subject 3&gt; and ends with a canned audience laugh.
+
+retention_analysis:
+&lt;Subject 1&gt; (appears in [Shot 1], [Shot 2], [Shot 3]): fully_preserved - the exposed brick wall, orange tufted sofa, patterned pillows, neon sign, and wooden coffee table are retained.
+&lt;Subject 2&gt; (appears in [Shot 1], [Shot 2]): fully_preserved - the Samoyed's thick white fur, pointed ears, dark nose, and curved tail are retained.
+&lt;Subject 3&gt; (appears in [Shot 1], [Shot 2], [Shot 3]): fully_preserved - the blonde woman's identity, long hair, and light-pink shirt are retained.
+&lt;Subject 4&gt; (appears in [Shot 1], [Shot 2]): fully_preserved - the young man's short wavy brown hair and dark-grey hoodie are retained.
+&lt;Audio 1&gt;: reference - its vocal timbre guides the dialogue delivery of &lt;Subject 3&gt; without copying the original signal.
+
+detailed_description:
+The target video uses a realistic multi-camera sitcom style with warm indoor lighting.
+[Shot 1] A medium shot establishes &lt;Subject 1&gt;, the coffee shop with its exposed brick wall, orange tufted sofa, patterned pillows, neon sign, and wooden coffee table. &lt;Subject 3&gt; (S1), the young woman with long blonde hair and a light-pink button-down shirt with rolled-up sleeves, sits on the sofa holding a chocolate-chip cookie. From the left, &lt;Subject 4&gt;, the young man with short wavy brown hair and a dark-grey hoodie with drawstrings, enters holding the leash of &lt;Subject 2&gt;, the thick-furred white Samoyed with pointed ears, a dark nose, and a curved tail. The dog lunges toward the cookie and pulls the leash taut. &lt;Subject 3&gt; (S1) jerks her hand back and, using the clear youthful voice timbre referenced from &lt;Audio 1&gt;, exclaims with light annoyance, &lt;d&gt;[English] Hey! Watch your dog!&lt;/d&gt; She closes her lips and guards the cookie while &lt;Subject 4&gt; pulls the dog back.
+[Shot 2] At 00:03.000, the shot cuts to a close-up of &lt;Subject 4&gt; (S2), the young man in the dark-grey hoodie from Shot 1, sitting beside &lt;Subject 3&gt; on the sofa and holding &lt;Subject 2&gt; securely in his arms. &lt;Subject 4&gt; (S2) says in a casual young male voice with a playful tone and an easy conversational pace, &lt;d&gt;[English] He just likes cookies more than me.&lt;/d&gt; He closes his mouth into an apologetic smile and strokes the dog's thick white fur.
+[Shot 3] At 00:05.000, the shot cuts to a close-up of &lt;Subject 3&gt; (S1), the blonde woman in the light-pink shirt from Shot 1. Her annoyance softens as she looks toward the Samoyed. &lt;Subject 3&gt; (S1) replies in the same clear youthful voice referenced from &lt;Audio 1&gt; with an amused cadence, &lt;d&gt;[English] Well, he has good taste at least.&lt;/d&gt; She smiles and raises the cookie in a small toast-like gesture. A classic canned audience laugh begins immediately after the line and continues through the final frame.
+
+overall_soundscape:
+Soft indoor coffee-shop room tone continues throughout the video.
+
+non_diegetic_music:
+N/A</pre></div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 仅供理解，不要复制、不要粘贴使用</div><pre>subject_definitions（主体定义）:
+&lt;Subject 1&gt; 是 &lt;Picture 1&gt; 中的咖啡馆环境，特征为：裸露的砖墙、带图案抱枕的橙色绒面沙发、霓虹灯牌和一张木质咖啡桌。
+&lt;Subject 2&gt; 是 &lt;Picture 2&gt;、&lt;Picture 3&gt; 和 &lt;Picture 4&gt; 中毛茸茸的白色萨摩耶，特征为：厚厚的白毛、尖耳朵、黑鼻子和卷曲的尾巴。
+&lt;Subject 3&gt; 是 &lt;Video 1&gt; 中的金发年轻女子，特征为：金色长发、浅粉色纽扣衬衫，袖子卷起。
+&lt;Subject 4&gt; 是 &lt;Video 2&gt; 中的年轻男子，特征为：棕色短卷发、带抽绳的深灰色连帽衫。
+&lt;Audio 1&gt; 是 &lt;Subject 3&gt;（S1）的音色参考音频，内含一段英语人声。
+
+summary（任务摘要）:
+[reference generation + audio reference]（参考生成 + 音频参考）目标视频展示 &lt;Subject 3&gt; 在 &lt;Subject 1&gt; 里吃一块饼干。&lt;Subject 4&gt; 带着 &lt;Subject 2&gt; 进入，萨摩耶扑向饼干。这场三镜头对手戏使用 &lt;Audio 1&gt; 作为 &lt;Subject 3&gt; 的音色参考，并以一阵罐头观众笑声收尾。
+
+retention_analysis（保留度分析）:
+&lt;Subject 1&gt;（出现在 [Shot 1]、[Shot 2]、[Shot 3]）：fully_preserved（完整保留）——裸露的砖墙、橙色绒面沙发、图案抱枕、霓虹灯牌和木质咖啡桌全部保留。
+&lt;Subject 2&gt;（出现在 [Shot 1]、[Shot 2]）：fully_preserved（完整保留）——萨摩耶厚厚的白毛、尖耳朵、黑鼻子和卷曲的尾巴全部保留。
+&lt;Subject 3&gt;（出现在 [Shot 1]、[Shot 2]、[Shot 3]）：fully_preserved（完整保留）——金发女子的身份、长发和浅粉色衬衫全部保留。
+&lt;Subject 4&gt;（出现在 [Shot 1]、[Shot 2]）：fully_preserved（完整保留）——年轻男子的棕色短卷发和深灰色连帽衫全部保留。
+&lt;Audio 1&gt;：reference（仅参考）——它的人声音色指导 &lt;Subject 3&gt; 的台词演绎，不复制原始音频信号。
+
+detailed_description（逐镜正文）:
+目标视频采用写实的多机位情景喜剧风格，室内灯光温暖。
+[Shot 1] 一个中景建立 &lt;Subject 1&gt;：这家咖啡馆里有裸露的砖墙、橙色绒面沙发、图案抱枕、霓虹灯牌和木质咖啡桌。&lt;Subject 3&gt;（S1）——金色长发、穿着卷起袖子的浅粉色纽扣衬衫的年轻女子——坐在沙发上，手里拿着一块巧克力豆饼干。从左侧，&lt;Subject 4&gt;——棕色短卷发、穿带抽绳深灰色连帽衫的年轻男子——牵着 &lt;Subject 2&gt;（厚毛的白色萨摩耶，尖耳朵、黑鼻子、卷曲的尾巴）走进来。狗扑向饼干，把牵引绳拉得笔直。&lt;Subject 3&gt;（S1）猛地把手缩回，用参考自 &lt;Audio 1&gt; 的清晰年轻音色、带着轻微恼意喊道：&lt;d&gt;[English] Hey! Watch your dog!&lt;/d&gt;（台词按规则保留英文原文）她闭上嘴唇护住饼干，&lt;Subject 4&gt; 把狗往回拉。
+[Shot 2] 在 00:03.000，镜头切到 &lt;Subject 4&gt;（S2）的特写：穿深灰色连帽衫的年轻男子（来自 Shot 1）坐在沙发上 &lt;Subject 3&gt; 的身边，把 &lt;Subject 2&gt; 稳稳抱在怀里。&lt;Subject 4&gt;（S2）用随意的年轻男声、俏皮的语气和轻松自然的对话节奏说：&lt;d&gt;[English] He just likes cookies more than me.&lt;/d&gt;（台词保留英文原文）他闭上嘴，露出歉意的微笑，抚摸狗厚厚的白毛。
+[Shot 3] 在 00:05.000，镜头切到 &lt;Subject 3&gt;（S1）的特写：穿浅粉色衬衫的金发女子（来自 Shot 1）。她的恼意渐渐消退，望向萨摩耶。&lt;Subject 3&gt;（S1）用同样参考自 &lt;Audio 1&gt; 的清晰年轻嗓音、带着被逗乐的语调回答：&lt;d&gt;[English] Well, he has good taste at least.&lt;/d&gt;（台词保留英文原文）她微笑着把饼干举起，做了一个小小的、像举杯致意一样的动作。一阵经典的罐头观众笑声在台词之后立即响起，一直持续到最后一帧。
+
+overall_soundscape（全片环境声）:
+柔和的室内咖啡馆环境底噪贯穿全片。
+
+non_diegetic_music（非叙事音乐·观众配乐）:
+N/A（无）</pre></div>
+
+  <h3>解剖图：六段各是什么、为什么这样写</h3>
+  <div class="tbl"><table>
+    <tr><th>段落</th><th>它在干什么</th><th>为什么必须有</th></tr>
+    <tr><td><span class="en">subject_definitions</span>（主体定义）</td><td>先给每份素材<strong>立名册</strong>：谁是 <span class="tagchip">&lt;Subject N&gt;</span>、哪段音频绑哪个说话人</td><td>后面所有段落只能用这里定义过的标签。先定义、后引用，模型才知道每个标签指谁</td></tr>
+    <tr><td><span class="en">summary</span>（任务摘要）</td><td>一句话给任务<strong>定性</strong>（方括号前缀）＋概括目标视频与参考关系</td><td>让模型先知道「这是一次参考生成＋音频参考」，再读细节</td></tr>
+    <tr><td><span class="en">retention_analysis</span>（保留度分析）</td><td>逐项声明每个参考内容<strong>保留到什么程度</strong>（固定标记值）</td><td>保真度是写作者的决定，不是让模型猜——全保留就明说 fully_preserved（完整保留）</td></tr>
+    <tr><td><span class="en">detailed_description</span>（逐镜正文）</td><td>正文：风格句在前，然后逐镜写构图、动作、运镜、台词，标签在<strong>生效处</strong>插入</td><td>这是真正被「拍」出来的部分；每个 Subject 首次出现都带全套特征复述，防止形象漂移</td></tr>
+    <tr><td><span class="en">overall_soundscape</span>（全片环境声）</td><td>全片环境声一句带过</td><td>与画面同步的声音已在正文里；这一段只管「整个世界一直在响的底噪」</td></tr>
+    <tr><td><span class="en">non_diegetic_music</span>（非叙事音乐·观众配乐）</td><td>没有观众专属配乐，老实写 <span class="en">N/A</span></td><td>没有就写 N/A，硬编一段配乐反而会污染成片</td></tr>
+  </table></div>
+  <p>读这条成品时值得注意的三个细节，学到对应课时再回来看：① 三张「狗图」和两段「人物视频」都只出现在 Subject 的定义里，没有被立成独立的帧锚——因为它们只提供外观，不充当某一帧（第 8 课）；② 两个说话人的 ID 是 (S1) / (S2)，跨三个镜头不变，台词原文一字未动地待在 <span class="en">&lt;d&gt;</span> 里（第 5 课）；③ 结尾的罐头笑声写在正文里而不是声音段里，因为它要和台词节拍精确同步（第 6 课）。</p>
+
+  <h3>这本教程的语言约定：英文为什么删不掉、中文对照怎么用</h3>
+  <p>你会发现这门课中英混排——这不是排版随意，而是 <strong>H3 本身的语言规则</strong>：官方指南规定，提示词的改写段落（字段正文）<strong>必须用英文写</strong>，只有台词、歌词、画面可见文字保留原文语言。所以英文成稿是<strong>唯一能直接粘贴进 H3 使用</strong>的版本；把英文全译成中文，看着顺眼，却会教错——中文稿粘贴进去并不合规。</p>
+  <p>本课的解法是<strong>分层</strong>：讲解层全用中文；英文原文一个字不动；但每一处英文都配上中文对照或注释，读的时候不需要你自己翻译。页面上三种块这样区分：</p>
+  <ul>
+    <li><strong>深色英文块</strong>＝可用的原文。写稿、交付、粘贴进 H3，用的都是这一份（右上角有「复制」按钮）。</li>
+    <li><strong>浅色「中文对照」块</strong>＝紧跟在成稿英文块之后的逐段翻译，字段名、<span class="tagchip">&lt;Subject N&gt;</span> 标签、(S1) 记号、时间戳都保持英文原样，只译描述文字；台词 <span class="en">&lt;d&gt;</span> 内的原文不译。它<strong>只供看懂，不要复制、不要粘贴使用</strong>。</li>
+    <li><strong>行下「中文直译」行</strong>＝中间稿和短例句不整块对照，英文下方有一行小字直译，方便逐句跟上每一步改了什么。</li>
+    <li><strong>术语小注</strong>＝正文里的英文术语在每课首次出现时，后面跟中文小注，如 <span class="en">overall_soundscape</span>（全片环境声）；全站术语集中收在工具页的「中英术语对照表」里，随时可查。</li>
+  </ul>
+  <p>举个小例子——同一句运镜，两种块长这样：</p>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>英文原文 · 复制这一份<button class="copybtn" type="button">复制</button></div><pre>The camera pushes in with small amplitude at slow speed toward the folded letter in her hands.</pre></div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 仅供理解，不要复制、不要粘贴使用</div><pre>镜头以小幅度、慢速度推近她手中的折好的信。</pre></div>
+  <p class="small">记住一条就够了：<strong>要粘贴，用深色块；看不懂，看它下面的浅色块。</strong></p>
+
+  <h3>学习路线图</h3>
+  <div class="flow">
+    <span class="step"><strong>选模式</strong>（第 1 课）</span><span class="arr">→</span>
+    <span class="step"><strong>搭结构</strong>（第 2 课）</span><span class="arr">→</span>
+    <span class="step"><strong>写画面</strong>（第 3 课）</span><span class="arr">→</span>
+    <span class="step"><strong>写运镜</strong>（第 4 课）</span><span class="arr">→</span>
+    <span class="step"><strong>写台词</strong>（第 5 课）</span><span class="arr">→</span>
+    <span class="step"><strong>写声音</strong>（第 6 课）</span><span class="arr">→</span>
+    <span class="step"><strong>关键帧写法</strong>（第 7 课）</span><span class="arr">→</span>
+    <span class="step"><strong>套参考素材</strong>（第 8 课）</span><span class="arr">→</span>
+    <span class="step"><strong>算时长</strong>（第 9 课）</span><span class="arr">→</span>
+    <span class="step"><strong>改稿</strong>（第 10 课）</span><span class="arr">→</span>
+    <span class="step"><strong>练习</strong>（第 11 课）</span>
+  </div>
+
+  <h3>四条全局硬规则（每课都在执行它们）</h3>
+  <div class="rule"><b>规则 1 · 时长对齐</b>单段视频时长 <strong>4–15 秒</strong>。提示词里描述的总时长必须与目标时长严格对齐——时间戳、末帧时刻都要对得上。</div>
+  <div class="rule"><b>规则 2 · 语言分工</b>改写段落（字段正文）<strong>用英文写</strong>；台词、歌词、画面可见文字<strong>保留原文语言</strong>，逐字不译。</div>
+  <div class="rule"><b>规则 3 · 具体压倒抽象</b>优先写具体可视、可听的细节；不要用 <span class="en">cinematic</span>、<span class="en">beautiful</span> 这类抽象词充数——它们不给模型任何可执行信息。</div>
+  <div class="rule"><b>规则 4 · 格式即契约</b>字段名、段落顺序、标签写法、时间戳记法都照指南原文，不要自创变体。H3 是按这套结构训练与解析的，格式漂移 = 指令失效。</div>
+</section>
+
+<!-- ================= 第 1 课 ================= -->
+<section class="ch" id="ch1">
+  <span class="ch-num">LESSON 1</span>
+  <h2>写作前先定模式：选错模式，后面全错</h2>
+  <p class="lede">动笔之前，先回答一个问题：<strong>你手里的素材（如果有）到底是干什么用的。</strong>五种模式对应五种结构——模式选错，等于作文写错了文体：句子再漂亮，也不是这道题要的答案。</p>
+
+  <div class="tbl"><table>
+    <tr><th>模式</th><th>输入</th><th>一句话定义</th><th>要写的结构</th></tr>
+    <tr><td><strong>T2VA</strong></td><td>纯文本，无参考图</td><td>从文字构建完整的视听时间线</td><td>三核心字段（无对齐指令）</td></tr>
+    <tr><td><strong>I2VA</strong></td><td>一张图 = 首帧</td><td>以首帧为起点，向前发展</td><td>首帧对齐指令 + 三核心字段</td></tr>
+    <tr><td><strong>FL2VA</strong></td><td>两张图 = 首帧 + 尾帧</td><td>在首帧与尾帧之间走一条连续路径</td><td>首尾帧对齐指令 + 三核心字段</td></tr>
+    <tr><td><strong>L2VA</strong></td><td>一张图 = 尾帧</td><td>推断一个合理开场，收束到尾帧</td><td>尾帧对齐指令 + 三核心字段</td></tr>
+    <tr><td><strong>Ref2VA</strong></td><td>图 / 视频 / 音频作参考</td><td>素材只提供角色、场景、风格、动作等参考，<strong>不充当具体帧</strong></td><td>六段结构（第 8 课）</td></tr>
+  </table></div>
+
+  <h3>什么时候用它写：看需求句的长相</h3>
+  <div class="tbl"><table>
+    <tr><th>典型需求句</th><th>模式</th><th>判断依据</th></tr>
+    <tr><td>「写一条 8 秒的视频：橘猫跳上窗台，打翻花瓶，愣住。我没有任何素材。」</td><td><strong>T2VA</strong></td><td>无素材，全部信息来自文字</td></tr>
+    <tr><td>「用这张照片当第一帧，让画里的人慢慢转身走出画面。」</td><td><strong>I2VA</strong></td><td>图被<strong>明确指定</strong>为首帧</td></tr>
+    <tr><td>「第一张图是开始、第二张是结尾，中间 10 秒你补出来。」</td><td><strong>FL2VA</strong></td><td>首尾两帧都已给定</td></tr>
+    <tr><td>「视频最后要停在这张图上，前面的过程帮我推。」</td><td><strong>L2VA</strong></td><td>只有结尾给定，要反推开场</td></tr>
+    <tr><td>「照这张定妆图里的人和这个场景，再参考这段录音的音色，写一场新戏。」</td><td><strong>Ref2VA</strong></td><td>素材只提供参考、不作帧；还涉及参考音频</td></tr>
+  </table></div>
+
+  <h3>选择逻辑：三个判断点</h3>
+  <ul>
+    <li><strong>按「图是干什么用的」选，不是按图的数量。</strong>两张图如果都只是角色外观参考，那是 Ref2VA，不是 FL2VA。</li>
+    <li>图被<strong>明确指定</strong>为首帧 / 尾帧，才走基础模式（I2VA / FL2VA / L2VA）。没被指定为帧的图，默认是参考。</li>
+    <li><strong>混合情况走 Ref2VA</strong>：既有帧锚、又有纯参考素材时，在 Ref2VA 里把帧锚定义为独立的 <span class="tagchip">&lt;Picture N&gt;</span> 条目，把外观参考定义为 <span class="tagchip">&lt;Subject N&gt;</span>（第 8 课详解）。</li>
+    <li>只要涉及<strong>参考视频或参考音频</strong>，就是 Ref2VA——基础模式只处理文本与关键帧图。</li>
+  </ul>
+
+  <div class="wizard" id="wizard">
+    <h3>🧭 模式决策向导</h3>
+    <p class="small">拿不准时用它：依次回答问题，向导给出该用的模式和对应结构。</p>
+    <div id="wizBody"></div>
+  </div>
+</section>
+
+<!-- ================= 第 2 课 ================= -->
+<section class="ch" id="ch2">
+  <span class="ch-num">LESSON 2</span>
+  <h2>基础模式写作全程演示：从一句话到成稿</h2>
+  <p class="lede">基础模式（T2VA / I2VA / FL2VA / L2VA）共用同一套骨架。这一课不先讲规则，先<strong>写一遍给你看</strong>：拿一个一句话需求，分五步从零写到成稿；结构备忘放在两个演示中间，写 I2VA 时正好用上。</p>
+
+  <h3>演示一 · T2VA：面包房清晨（五步成稿）</h3>
+  <p><span class="srcchip src-teach">教学示范</span><span class="small">写作步骤为教学而设；最终成稿出自官方指南 base-en.txt 的 Case 1——下面的五步是把这条成稿逆向拆开，让你看清每一笔是怎么落下去的。</span></p>
+  <div class="note"><b>一句话需求</b>「8 秒，清晨，一位面包师打开小面包房的百叶窗，把第一炉面包放到柜台上，说一句 <span class="en">First batch of the morning.</span>；最后切到刚切开的面包冒热气的特写。」没有素材 → <strong>T2VA</strong>（第 1 课的判断）。</div>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 1</span>拆镜头：先决定切几刀、每镜干什么</h4>
+    <p>落笔写正文之前，先在草稿上把时间线切开。这条需求里有<strong>两个信息单元</strong>：① 人物在柜台前完成动作并说话；② 面包本身的特写。信息变了（从「人做事」变成「物本身」），所以切一刀，两个镜头：</p>
+    <ul>
+      <li><strong>[Shot 1]（0–5 秒）</strong>：中景，面包师开窗、放面包、开口说话。</li>
+      <li><strong>[Shot 2]（5–8 秒，At 00:05.000 切入）</strong>：特写，切开的面包冒蒸汽；上一句台词的尾音跨切延续，给两个镜头之间留声音的桥。</li>
+    </ul>
+    <p class="small">拆镜头的原则在第 4、9 课细讲：切镜要带来新信息；只是想看近一点，那是运镜不是切镜。</p>
+  </div>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 2</span>写 [Shot 1] 的开头：风格 + 初始构图先落位</h4>
+    <p>每个基础模式提示词都从 <span class="en">integrated_multimodal_description:</span>（多模态正文）开始；<span class="en">[Shot 1]</span> 的第一句先交代<strong>全片风格</strong>与<strong>初始构图</strong>，再写别的。中间稿：</p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>中间稿 · 第 2 步<button class="copybtn" type="button">复制</button></div><pre>integrated_multimodal_description: [Shot 1] Live-action, cinematic, a medium-wide shot frames a baker opening the shutters of a small street bakery before sunrise.</pre></div>
+    <p class="glossline"><b>中文直译：</b>integrated_multimodal_description（多模态正文）：[Shot 1] 真人实拍，电影感，一个中远景镜头框住一位面包师在日出前打开一家街边小面包房的百叶窗。</p>
+    <p>这一句里已经有四样东西：风格（Live-action, cinematic）、景别（medium-wide shot）、主体与动作起点（a baker opening the shutters）、场景与时间（small street bakery before sunrise）。常见风格词：<span class="en">Cinematic</span>、<span class="en">live-action</span>、<span class="en">2D-animated</span>、<span class="en">3D CG</span>、<span class="en">claymation</span>、<span class="en">watercolor</span>、<span class="en">vintage film</span>。关键帧模式的风格从参考图推导，T2VA 从用户文本选。</p>
+  </div>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 3</span>逐镜加动作与运镜：让画面动起来</h4>
+    <p>在第 2 步的句子后面续写：先给运镜（写成自然句子，不是标签），再让动作按播放顺序展开；然后落 [Shot 2] 的切镜句。中间稿（新增部分即成稿原文，台词先留空位）：</p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>中间稿 · 第 3 步<button class="copybtn" type="button">复制</button></div><pre>integrated_multimodal_description: [Shot 1] Live-action, cinematic, a medium-wide shot frames a baker opening the shutters of a small street bakery before sunrise. The camera pushes in with small amplitude at slow speed as the middle-aged baker places a fresh loaf on the wooden counter and says: ___ [Shot 2] At 00:05.000, the camera cuts to a close-up of steam rising from the sliced bread while the baker's final words carry over from the previous shot.</pre></div>
+    <p class="glossline"><b>中文直译：</b>（开头与第 2 步相同）镜头以小幅度、慢速度推近，此时中年面包师把一条新鲜面包放到木柜台上，并说道：___（台词先留空）[Shot 2] 在 00:05.000，镜头切到切开的面包升起蒸汽的特写，面包师最后一句话的声音从上一个镜头延续过来。</p>
+    <p>注意三处手法：① 运镜是 <span class="en">pushes in with small amplitude at slow speed</span>——类型＋幅度＋速度三维度齐全（第 4 课）；② 动作链是「开窗 → 放面包 → 说话」的播放顺序，没有跳步；③ [Shot 2] 的切镜时间 <span class="en">At 00:05.000</span> 与第 1 步的拆镜计划严丝合缝。</p>
+  </div>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 4</span>加台词：先立身份，再把原文放进 &lt;d&gt;</h4>
+    <p>说话人第一次开口前，先给他一个<strong>稳定 ID</strong> 和一段<strong>声音辨识信息</strong>（年龄、音色），挂在 <span class="en">&lt;d&gt;</span> 之外；<span class="en">&lt;d&gt;</span> 里面只有语言标签＋用户原文，逐字不改（第 5 课细讲）。补上之后，描述字段就完整了：</p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>中间稿 · 第 4 步（描述字段完成）<button class="copybtn" type="button">复制</button></div><pre>integrated_multimodal_description: [Shot 1] Live-action, cinematic, a medium-wide shot frames a baker opening the shutters of a small street bakery before sunrise. The camera pushes in with small amplitude at slow speed as the middle-aged baker with a calm, slightly raspy voice (S1) places a fresh loaf on the wooden counter and says: &lt;d&gt;[English] First batch of the morning.&lt;/d&gt; [Shot 2] At 00:05.000, the camera cuts to a close-up of steam rising from the sliced bread while the baker's final words carry over from the previous shot.</pre></div>
+    <p class="glossline"><b>中文直译：</b>与第 3 步相比，新增的是说话人信息与台词：中年面包师，平静、略带沙哑的嗓音（S1），台词为 &lt;d&gt;[English] First batch of the morning.&lt;/d&gt;（大意：「今早的第一炉」——台词按规则保留英文原文，不译）。其余句子与第 3 步相同。</p>
+  </div>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 5</span>补声音两段：正文之外，还有两个字段</h4>
+    <p>正文写的是「与画面同步」的声音。除此之外还要单独写两段：<span class="en">overall_soundscape</span>（全片环境声）概括<strong>全片</strong>的环境声与物理声（1–4 句，不重复台词）；<span class="en">non_diegetic_music</span>（非叙事音乐·观众配乐）只写<strong>观众听得见、角色听不见</strong>的配乐（1–3 句，只写乐器、速度、节奏、动态）。两段的分野在第 6 课细讲。补完，成稿诞生：</p>
+    <p><span class="srcchip src-off">官方原文</span><span class="small">base-en.txt Case 1: T2VA 全文。</span></p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>成稿 · T2VA 面包房（原文）<button class="copybtn" type="button">复制</button></div><pre>integrated_multimodal_description: [Shot 1] Live-action, cinematic, a medium-wide shot frames a baker opening the shutters of a small street bakery before sunrise. The camera pushes in with small amplitude at slow speed as the middle-aged baker with a calm, slightly raspy voice (S1) places a fresh loaf on the wooden counter and says: &lt;d&gt;[English] First batch of the morning.&lt;/d&gt; [Shot 2] At 00:05.000, the camera cuts to a close-up of steam rising from the sliced bread while the baker's final words carry over from the previous shot.
+
+overall_soundscape: Wooden shutters scrape open over a quiet street as trays clink softly inside the bakery. The doorbell rings once, followed by light footsteps and the crisp sound of bread being sliced.
+
+non_diegetic_music: A soft acoustic-guitar pattern at a moderate tempo, joined by sparse upright-bass notes and a gentle fade at the end.</pre></div>
+  </div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 成稿 T2VA 面包房（仅供理解，不要复制、不要粘贴使用）</div><pre>integrated_multimodal_description（多模态正文）:[Shot 1] 真人实拍，电影感，一个中远景镜头框住一位面包师在日出前打开一家街边小面包房的百叶窗。镜头以小幅度、慢速度推近，此时中年面包师——平静、略带沙哑的嗓音（S1）——把一条新鲜面包放到木柜台上，并说道：&lt;d&gt;[English] First batch of the morning.&lt;/d&gt;（台词保留英文原文）[Shot 2] 在 00:05.000，镜头切到切开的面包升起蒸汽的特写，面包师最后一句话的声音从上一个镜头延续过来。
+
+overall_soundscape（全片环境声）：木质百叶窗在安静的街道上刮擦着打开，面包房里托盘轻轻碰撞。门铃响了一声，随后是轻快的脚步声和切面包时清脆的声音。
+
+non_diegetic_music（非叙事音乐·观众配乐）：一段柔和的原声吉他旋律，中等速度，加入稀疏的低音提琴音符，结尾轻轻淡出。</pre></div>
+
+  <h3>结构备忘：一条指令（或没有）+ 三个字段</h3>
+  <p>刚才的五步走完，你其实已经用满了基础模式的全部结构。它由两部分组成：<strong>第一部分是对齐指令</strong>（只有关键帧模式有，T2VA 没有），<strong>第二部分是三个核心字段</strong>，顺序固定。</p>
+  <div class="tbl"><table>
+    <tr><th>字段</th><th>写什么</th><th>不写什么</th></tr>
+    <tr><td><span class="en">integrated_multimodal_description</span>（多模态正文）</td><td>沿时间线写：画面、动作、镜头、说话人、台词、歌唱，以及与画面同步的<strong>叙事内声音</strong>（角色能听到的声音）。这是正文主体。</td><td>不写剧情梗概；不写全片性的环境声总结（那是下一字段的事）。</td></tr>
+    <tr><td><span class="en">overall_soundscape</span>（全片环境声）</td><td>概括<strong>全片</strong>的环境声、物理动作声、非言语人声（第 6 课）。</td><td>不重复台词、歌唱、叙事内音乐——它们已在正文里。</td></tr>
+    <tr><td><span class="en">non_diegetic_music</span>（非叙事音乐·观众配乐）</td><td>只写<strong>观众能听见、角色听不见</strong>的背景音乐（第 6 课）。</td><td>角色能听到的电台、电视、手机音乐不写这里，写进正文。</td></tr>
+  </table></div>
+  <p>对齐指令必须是提示词的<strong>第一行，后跟一个空行</strong>，三种关键帧模式各有一句固定原文，照抄、只换数值：</p>
+  <p><strong>I2VA</strong>（首帧）的指令永远是这一句：</p>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>I2VA 指令（原文）<button class="copybtn" type="button">复制</button></div><pre>For the target video, at 0.00 seconds into the target video, &lt;Picture 1&gt; (from [Shot 1]) is fully referenced.</pre></div>
+  <p class="glossline"><b>中文直译：</b>目标视频中，在第 0.00 秒处，&lt;Picture 1&gt;（来自 [Shot 1]）被完整引用——即这张图就是视频的第一帧。</p>
+  <p><strong>FL2VA</strong>（首帧＋尾帧）的指令永远是这一句（把 N 与 S.SS 换成实际值）：</p>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>FL2VA 指令（原文）<button class="copybtn" type="button">复制</button></div><pre>How the reference pictures align with the target video — Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot N) aligns with the S.SS-second mark of the target video.</pre></div>
+  <p class="glossline"><b>中文直译：</b>参考图与目标视频的对齐方式——Picture 1（来自 Shot 1）对齐目标视频的 0.00 秒处；Picture 2（来自 Shot N）对齐目标视频的第 S.SS 秒处。</p>
+  <p><strong>L2VA</strong>（尾帧）的指令永远是这一句：</p>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>L2VA 指令（原文）<button class="copybtn" type="button">复制</button></div><pre>How the reference pictures align with the target video — &lt;Picture 1&gt; (from [Shot N]) aligns with the S.SS-second mark of the target video.</pre></div>
+  <p class="glossline"><b>中文直译：</b>参考图与目标视频的对齐方式——&lt;Picture 1&gt;（来自 [Shot N]）对齐目标视频的第 S.SS 秒处（即最后一帧）。</p>
+  <div class="note"><b>两个记号别写错</b>
+  <strong>N</strong> = 实际最后一个镜头的序号（比如全片 3 个镜头，N 就是 3）；<strong>S.SS</strong> = 有效视频时长，且必须<strong>恰好两位小数</strong>（如 8 秒写 <span class="en">8.00</span>，6.5 秒写 <span class="en">6.50</span>）。注意 FL2VA 指令里是裸写的 <span class="en">Picture 1 / Picture 2</span>（不带尖括号），I2VA 与 L2VA 里带尖括号的 <span class="tagchip">&lt;Picture 1&gt;</span>——照原文，不要统一。</div>
+
+  <h3>演示二 · I2VA：雨窗列车（较短，重点看指令行怎么落）</h3>
+  <p><span class="srcchip src-teach">教学示范</span><span class="small">步骤为教学而设；成稿出自 base-en.txt Case 2。</span></p>
+  <div class="note"><b>输入</b>一张图：年轻女子坐在雨水覆盖的列车车窗边，手里拿着一封折好的信。需求：「以这张图为首帧，8 秒，她抬眼望向窗外流动的城市灯光，说一句 <span class="en">I get off at the next station.</span>」图被指定为首帧 → <strong>I2VA</strong>。</div>
+  <div class="stepbox">
+    <h4><span class="snum">STEP 1</span>先落指令行：它永远是第一行</h4>
+    <p>把上面的 I2VA 指令原文原样放在提示词第一行，后面空一行，再开始写字段。没有变体、没有替换项——I2VA 的指令是全固定句。</p>
+    <h4><span class="snum">STEP 2</span>正文第一句先「认领」首帧，再往前发展</h4>
+    <p>I2VA 的正文写法是<strong>从图出发</strong>：第一句先把图中已有的东西锚死——人物外观、服装、座位位置、车厢布局都明说「保持」——然后才写图之后发生的动作：抬眼、倒影在玻璃上移动、开口、沿原有折痕把信折好。锚定句与发展句合起来就是成稿的 [Shot 1]。</p>
+    <h4><span class="snum">STEP 3</span>台词与声音两段照演示一的办法补齐</h4>
+    <p><span class="srcchip src-off">官方原文</span><span class="small">base-en.txt Case 2: I2VA 全文。对照看：指令行独立成行；正文第一句在「认领」首帧（preserving her appearance, clothing, seat position, and the carriage layout）。</span></p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>成稿 · I2VA 雨窗列车（原文）<button class="copybtn" type="button">复制</button></div><pre>For the target video, at 0.00 seconds into the target video, &lt;Picture 1&gt; (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic, the young woman shown in &lt;Picture 1&gt; remains beside the rain-covered train window, preserving her appearance, clothing, seat position, and the carriage layout. The camera trucks right with small amplitude at slow speed as she lifts her gaze from the folded letter toward the passing city lights. Her reflection moves across the glass while the quiet, breathy young woman (S1) says: &lt;d&gt;[English] I get off at the next station.&lt;/d&gt; She folds the letter along its existing crease.
+
+overall_soundscape: The train wheels produce a steady metallic rhythm beneath a low ventilation hum. Rain ticks against the window while paper rustles softly in her hands.
+
+non_diegetic_music: Sustained cello notes at a slow tempo with widely spaced piano tones, gradually decreasing in volume.</pre></div>
+  </div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 成稿 I2VA 雨窗列车（仅供理解，不要复制、不要粘贴使用）</div><pre>对齐指令：目标视频中，在第 0.00 秒处，&lt;Picture 1&gt;（来自 [Shot 1]）被完整引用。
+
+integrated_multimodal_description（多模态正文）:[Shot 1] 真人实拍，电影感，&lt;Picture 1&gt; 中的年轻女子仍坐在被雨水覆盖的列车车窗旁，她的外貌、服装、座位位置和车厢布局保持不变。镜头以小幅度、慢速度向右平移（Truck Right），她从折好的信上抬起目光，望向窗外流过的城市灯光。她的倒影在玻璃上移动，安静、带气息感的年轻女声（S1）说道：&lt;d&gt;[English] I get off at the next station.&lt;/d&gt;（台词保留英文原文）她沿着原有的折痕把信折好。
+
+overall_soundscape（全片环境声）：列车车轮在低沉的通风嗡鸣之下发出稳定的金属节奏声。雨点敲打车窗，她手中的纸轻轻沙沙作响。
+
+non_diegetic_music（非叙事音乐·观众配乐）：大提琴的持续音符，慢速，钢琴音符间隔宽疏，音量逐渐减小。</pre></div>
+  <p>FL2VA 与 L2VA 的正文写法与 I2VA 不同（一个写「路」、一个写「倒推」），放在第 7 课专门讲，并各配一条官方成稿对照。</p>
+</section>
+
+<!-- ================= 第 3 课 ================= -->
+<section class="ch" id="ch3">
+  <span class="ch-num">LESSON 3</span>
+  <h2>把画面写具体：每个词都要对应看得见、听得见的东西</h2>
+  <p class="lede">H3 提示词的第一文风纪律：<strong>你写的每个细节，都要能在画面里被指出来、或在声音里被听出来。</strong>指不出、听不见的词——情绪、氛围、评价——对模型来说都是空转。这一课练的就是把空转的词换成可执行的细节。</p>
+
+  <h3>抽象词 → 具体写法：改写对照表</h3>
+  <p><span class="srcchip src-teach">教学示范</span><span class="small">下表右列的改法是教学创作，不是官方原文；学的是方法：问自己「这个词在画面上长什么样、听起来是什么声」，把答案写下来。</span></p>
+  <div class="tbl"><table>
+    <tr><th style="min-width:130px">抽象说法</th><th>为什么空转</th><th>具体改法（教学示范）</th></tr>
+    <tr><td><span class="en">cinematic</span>（电影感）</td><td>没说是哪种光、哪种景深、哪种色调</td><td><span class="en">warm tungsten light from a single table lamp, shallow depth of field, the background shelves falling into soft blur</span><br><span class="small">直译：来自一盏台灯的暖钨丝光，景深浅，背景的架子渐渐化作柔和的虚影</span>——写光源、景深、虚化</td></tr>
+    <tr><td><span class="en">beautiful scenery</span>（美丽的风景）</td><td>没说画面里到底有什么</td><td><span class="en">a narrow stone path between two rows of cherry trees in full bloom, petals drifting down in a light breeze</span><br><span class="small">直译：两排盛开的樱花树之间一条狭窄的石板路，花瓣在微风中飘落</span>——把景物逐件点名</td></tr>
+    <tr><td>紧张的气氛</td><td>氛围看不见；能看见的是行为与声音</td><td><span class="en">her fingers tap the table edge twice; the wall clock's ticking is the only sound; she glances at the door every few seconds</span><br><span class="small">直译：她的手指在桌沿敲了两下；挂钟的滴答声是唯一的声音；她每隔几秒就瞥一眼门口</span>——写小动作、写唯一声源、写重复行为</td></tr>
+    <tr><td>高级感（产品）</td><td>是评价，不是画面</td><td><span class="en">a matte-black bottle on a brushed-steel surface, one hard light from the upper left, generous empty space around the product</span><br><span class="small">直译：哑光黑瓶子放在拉丝钢表面上，左上方一束硬光，产品四周留出大片空白</span>——写材质、光位、留白</td></tr>
+    <tr><td>温馨的感觉</td><td>同上</td><td><span class="en">steam curling up from two mugs, a knitted blanket draped over the sofa arm, lamplight glowing warm on their faces</span><br><span class="small">直译：两只杯子升起袅袅热气，一条针织毯搭在沙发扶手上，灯光暖暖地照在他们的脸上</span>——写热气、织物、暖光落点</td></tr>
+    <tr><td>孤独感</td><td>同上</td><td><span class="en">a table set for two with only one chair occupied, the second plate untouched, rain streaking the window beside him</span><br><span class="small">直译：桌上摆着两人的餐具，只有一把椅子坐了人，第二个盘子没人动过，雨在他身旁的窗上划出水痕</span>——用「缺席的痕迹」写孤独</td></tr>
+  </table></div>
+
+  <h3>首镜要交代什么：一张清单</h3>
+  <p>每一镜、尤其是 [Shot 1]，动笔前过一遍这五项——缺了哪项，模型就自己编哪项：</p>
+  <ol>
+    <li><strong>风格</strong>：只在 [Shot 1] 开头给（如 Live-action, cinematic），全片一次。</li>
+    <li><strong>初始构图</strong>：景别＋主体在画面中的位置（如「中景，女子坐在画面右侧的窗边」）。</li>
+    <li><strong>主体外观</strong>：年龄、性别、发型、服装、标志性物件——首次出现写全，后面镜头只用简短指代。</li>
+    <li><strong>场景锚点</strong>：空间是什么、关键家具 / 道具在哪、光从哪来。</li>
+    <li><strong>当前状态</strong>：主体此刻在做什么、拿着什么、朝向哪里——动作从这里起步。</li>
+  </ol>
+
+  <h3>动作怎么写：按播放顺序，一镜一个主要变化</h3>
+  <ul>
+    <li><strong>按播放顺序写。</strong>先发生的先写，不要把结果提前剧透再倒回去补过程——模型按你写的顺序理解时间线。</li>
+    <li><strong>一个镜头一个主要变化。</strong>一个镜头里塞三个独立事件（进门、吵架、出门），每个都写不透；拆成三个镜头，或只保留主事件、其余降为背景。</li>
+    <li><strong>物件操作写完整因果链。</strong>不是「她打开了伞」，而是「松开车把 → 举伞过肩 → 推开伞骨 → 伞面张开」——每个中间状态都可观察（对照第 7 课 FL2VA 范例）。</li>
+  </ul>
+
+  <h3>头号文风病：「剧情梗概病」正反例</h3>
+  <p>新手最常见的写法是把提示词写成故事梗概：只有剧情、没有镜头。模型拿到梗概，只能自己乱编构图与节奏。</p>
+  <div class="badbox"><p class="badlabel">✗ 反例（教学示范）</p>
+  <p>一位年轻母亲时隔十年回到家乡，在老车站与父亲重逢，两人多年的隔阂在泪水中化解。</p>
+  <p class="small" style="color:inherit">问题：没有镜头、没有景别、没有谁站在哪、没有动作过程——「隔阂」「化解」全是不可拍的内心戏。</p></div>
+  <p><span class="srcchip src-teach">教学示范</span><span class="small">同一内容，改成可拍的写法：</span></p>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>✓ 正例（教学示范）<button class="copybtn" type="button">复制</button></div><pre>[Shot 1] Live-action, a medium-wide shot frames a nearly empty provincial train platform in late-afternoon light. A woman in her early thirties with a dark ponytail and a beige trench coat stands in the right foreground holding a suitcase, facing an elderly man in a grey jacket who waits beside a bench ten paces away, a cloth cap held in both hands. Neither moves for a moment. The camera pushes in with small amplitude at slow speed as she sets the suitcase down, walks the ten paces, and stops in front of him; he raises the cap halfway, then lowers it, and she takes his hands.</pre></div>
+  <p class="glossline"><b>中文直译：</b>[Shot 1] 真人实拍，一个中远景镜头框住傍晚光线下一个几乎没人的外省火车站站台。三十岁出头的女子，深色马尾、米色风衣，手提行李箱站在画面右侧前景，面对十步开外长椅旁等候的老人——老人穿灰色夹克，双手拿着一顶布帽。两人一时都没有动。镜头以小幅度、慢速度推近，她放下行李箱，走完这十步，在他面前停下；他把帽子举起一半，又放了下去，她握住了他的双手。</p>
+  <p>对比着看正例做了什么：给了景别与站位（相距十步）、给了可辨识的外观（马尾、风衣、布帽）、把「隔阂」换成了可拍的行为（谁都不动 → 放下行李 → 走过去 → 他举帽又放下 → 她握住他的手）。<strong>内心戏永远要翻译成行为，才写得进提示词。</strong></p>
+</section>
+
+<!-- ================= 第 4 课 ================= -->
+<section class="ch" id="ch4">
+  <span class="ch-num">LESSON 4</span>
+  <h2>运镜怎么写：先选对，再写成句子</h2>
+  <p class="lede">运镜写作分两步：先<strong>选</strong>（这一镜该用哪种运动、要不要干脆切镜），再<strong>写</strong>（按「类型＋幅度＋速度」写成自然句子）。先给完整的词汇表——表里的词就是全部可选范围，不要自创运动名。</p>
+
+  <div class="tbl"><table>
+    <tr><th>维度</th><th>表达</th><th>含义</th></tr>
+    <tr><td>运动类型</td><td><span class="en">Zoom In / Zoom Out</span>（变焦拉近 / 拉远）</td><td>焦距变化，机位不动</td></tr>
+    <tr><td>运动类型</td><td><span class="en">Push In / Pull Out</span>（机位推近 / 拉远）</td><td>机位向前移 / 向后移</td></tr>
+    <tr><td>运动类型</td><td><span class="en">Pan Left / Pan Right</span>（左摇 / 右摇）</td><td>机位不动，镜头水平转动</td></tr>
+    <tr><td>运动类型</td><td><span class="en">Truck Left / Truck Right</span>（机位左移 / 右移）</td><td>机位水平平移</td></tr>
+    <tr><td>运动类型</td><td><span class="en">Tilt Up / Tilt Down</span>（上仰 / 下俯）</td><td>机位不动，镜头垂直俯仰</td></tr>
+    <tr><td>运动类型</td><td><span class="en">Pedestal Up / Pedestal Down</span>（机位上升 / 下降）</td><td>机位整体上升 / 下降</td></tr>
+    <tr><td>运动类型</td><td><span class="en">Arc Shot</span>（环绕镜头）</td><td>机位绕主体走弧线</td></tr>
+    <tr><td>运动类型</td><td><span class="en">Tracking Shot</span>（跟拍）</td><td>机位跟随移动的主体</td></tr>
+    <tr><td>运动类型</td><td><span class="en">Static Shot</span>（固定镜头）</td><td>机位与镜头完全静止</td></tr>
+    <tr><td>运动类型</td><td><span class="en">Shake Slightly / Shake Strongly</span>（轻微 / 强烈抖动）</td><td>轻微 / 强烈的手持抖动</td></tr>
+    <tr><td>运动类型</td><td><span class="en">POV</span>（主观视角）</td><td>主体的主观视角</td></tr>
+    <tr><td>运动类型</td><td><span class="en">Roll Clockwise / Roll Counterclockwise</span>（顺时针 / 逆时针滚转）</td><td>机位绕镜头轴顺时针 / 逆时针滚转</td></tr>
+    <tr><td>幅度</td><td><span class="en">with small amplitude</span>（小幅度）</td><td>小范围构图变化</td></tr>
+    <tr><td>幅度</td><td><span class="en">with large amplitude</span>（大幅度）</td><td>大范围构图变化</td></tr>
+    <tr><td>速度</td><td><span class="en">at slow speed</span>（慢速）</td><td>慢速变化</td></tr>
+    <tr><td>速度</td><td><span class="en">at fast speed</span>（快速）</td><td>快速变化</td></tr>
+  </table></div>
+  <div class="warn"><b>最容易混的一组：Zoom vs Push、Pan vs Truck、Tilt vs Pedestal</b>
+  Zoom 是变焦（机位不动、焦距变），Push 是机位真的往前走；Pan 是原地转镜头，Truck 是机位平移；Tilt 是原地俯仰，Pedestal 是机位升降。写错类型，模型给你的运动质感就完全不同。</div>
+  <p>幅度与速度只在有意义时才加——中等幅度、正常速度通常省略不写。写法上，运镜要融入叙述写成句子，<strong>不要把术语当标签堆在句尾</strong>。三个官方例句：</p>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>运镜例句（原文）<button class="copybtn" type="button">复制</button></div><pre>The camera pushes in with small amplitude at slow speed toward the folded letter in her hands.
+The camera pans right with large amplitude at fast speed, revealing the open doorway.
+The camera holds a static shot as the runner exits the frame.</pre></div>
+  <p class="glossline"><b>中文直译：</b>① 镜头以小幅度、慢速度推近她手中的折好的信。② 镜头以大幅度、快速向右摇，露出敞开的门口。③ 镜头保持固定，跑者跑出画面。</p>
+
+  <h3>怎么选：四条经验</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>想靠近主体 → Push In 还是 Zoom In？</h4>
+      <p>想「走近去看清表情、让空间感一起变」用 <span class="en">Push In</span>（机位真的前进，背景会相对移动）；只想「把主体拉大、画面变扁」用 <span class="en">Zoom In</span>（机位不动，空间被压缩）。日常叙事默认 Push In，监视感、远观感才用 Zoom。</p>
+    </div>
+    <div class="card">
+      <h4>只想换个景别 → 优先运镜，不要切镜</h4>
+      <p>同一个主体、同一件事，只是想从中景变近景交代细节——一次小幅 Push In 就够了。切镜是「换信息」，为换景别而切镜，时间线会被切碎。</p>
+    </div>
+    <div class="card">
+      <h4>主体在移动 → 让机位跟着（Tracking / Truck）</h4>
+      <p>人物边走边说，机位不动就会走出画。用 <span class="en">Tracking Shot</span> 跟随，或 <span class="en">Truck</span> 平移保持她在画面中的位置；反过来，想表现「人走了、世界还在」，就故意 Static，让她走出画框（见上面第三条官方案例句）。</p>
+    </div>
+    <div class="card">
+      <h4>揭示新信息 → Pan / Tilt / Pull Out</h4>
+      <p>「先看到 A、再露出旁边的 B」是摇与拉的活儿：<span class="en">Pan</span> 水平揭示、<span class="en">Tilt</span> 上下揭示、<span class="en">Pull Out</span> 退后露出全貌。若 B 与 A 不在同一空间、或时间跳了——那就不是运镜能办的，老实切镜。</p>
+    </div>
+  </div>
+  <div class="note"><b>切镜与运镜的分工（一句话版）</b>新信息（主体、空间、状态、视角、时间变了）→ 切镜；同一份信息换个看法（更近、跟随、揭示相邻区域）→ 运镜。切镜句式与时间戳的写法在第 9 课。</div>
+
+  <h3>对照示范：同一画面，三种运镜写法</h3>
+  <p><span class="srcchip src-teach">教学示范</span><span class="small">同一个画面、三种写法、三种完全不同的观感。写之前先想清楚要哪一种效果，再选词。</span></p>
+  <h4>画面一：书桌上的一封信</h4>
+  <div class="tbl"><table>
+    <tr><th>写法</th><th>句子</th><th>效果</th></tr>
+    <tr><td>Static</td><td><span class="en">The camera holds a static shot on the unopened letter lying beside a cup of tea.</span><br><span class="small">直译：镜头固定对着一封未拆的信，信旁放着一杯茶。</span></td><td>静止凝视，压迫感与等待感最强；适合「没人敢拆这封信」</td></tr>
+    <tr><td>Push In</td><td><span class="en">The camera pushes in with small amplitude at slow speed toward the handwriting on the envelope.</span><br><span class="small">直译：镜头以小幅度、慢速度推近信封上的手写字迹。</span></td><td>注意力被缓缓收窄到字迹上，像观众自己凑近去看</td></tr>
+    <tr><td>Pan Right</td><td><span class="en">The camera pans right with small amplitude, revealing the telephone next to the letter, still off the hook.</span><br><span class="small">直译：镜头以小幅度向右摇，露出信旁边的电话，听筒还没挂好。</span></td><td>信不是重点，「信＋没挂好的电话」拼出的信息才是重点</td></tr>
+  </table></div>
+  <h4>画面二：邮递员沿街走</h4>
+  <div class="tbl"><table>
+    <tr><th>写法</th><th>句子</th><th>效果</th></tr>
+    <tr><td>Static</td><td><span class="en">The camera holds a static shot as the postman crosses the frame from left to right and exits.</span><br><span class="small">直译：镜头保持固定，邮递员从画面左侧穿行到右侧并走出画面。</span></td><td>人物只是路过，街道才是主角；日常感、纪实感</td></tr>
+    <tr><td>Tracking</td><td><span class="en">The camera tracks alongside the postman at his walking pace, keeping him centered as shopfronts slide past behind him.</span><br><span class="small">直译：镜头以邮递员的步行速度与他并行跟拍，让他保持在画面中央，店面在他身后滑过。</span></td><td>观众与他同行，人物是主角；适合边走边演的戏</td></tr>
+    <tr><td>Pull Out</td><td><span class="en">The camera pulls out with large amplitude at slow speed, shrinking the postman into the full length of the morning street.</span><br><span class="small">直译：镜头以大幅度、慢速度拉远，邮递员在整条清晨街道的全长中变小。</span></td><td>人物变小、环境变大；收尾镜头的常用法，带一点感慨</td></tr>
+  </table></div>
+  <h4>画面三：山顶上的人</h4>
+  <div class="tbl"><table>
+    <tr><th>写法</th><th>句子</th><th>效果</th></tr>
+    <tr><td>Zoom In</td><td><span class="en">The camera zooms in at slow speed on the climber's silhouette against the ridge.</span><br><span class="small">直译：镜头以慢速度变焦拉近登山者在山脊上的剪影。</span></td><td>远距离「拉近」，空间被压扁，剪影感强，像望远镜在看</td></tr>
+    <tr><td>Push In</td><td><span class="en">The camera pushes in with small amplitude at slow speed toward the climber, the valley dropping away behind her.</span><br><span class="small">直译：镜头以小幅度、慢速度向登山者推近，她身后的山谷向下退开。</span></td><td>机位真实靠近，背景的山谷随之相对移动，临场感强</td></tr>
+    <tr><td>Arc Shot</td><td><span class="en">The camera arcs slowly around the climber, revealing first the valley behind her, then the summit cross beside her.</span><br><span class="small">直译：镜头缓缓绕登山者走弧线，先露出她身后的山谷，再露出她身旁的山顶十字架。</span></td><td>绕行揭示四周空间；适合登场、亮相、环绕展示</td></tr>
+  </table></div>
+</section>
+
+<!-- ================= 第 5 课 ================= -->
+<section class="ch" id="ch5">
+  <span class="ch-num">LESSON 5</span>
+  <h2>台词与人声怎么写：五个动作</h2>
+  <p class="lede">写一句台词，要连续做对五个动作：<strong>定 ID → 立身份 → 原文进 &lt;d&gt; → 画外音补闭唇 → 跨切加标记</strong>。漏任何一个，成片里就会出现对错口型、认错人、或者台词被改掉。</p>
+
+  <div class="stepbox">
+    <h4><span class="snum">动作 1</span>定 ID：开口之前先编号</h4>
+    <ul>
+      <li>会说话、唱歌或画外发声的主体用稳定 ID：<span class="en">(S1)</span>、<span class="en">(S2)</span>……按<strong>发声出现顺序</strong>分配。</li>
+      <li>多个已编号说话人齐声时用复合 ID，如 <span class="en">(S1,S2)</span>。</li>
+      <li>同一说话人<strong>跨镜头 ID 不变</strong>；从不发声的角色<strong>不给 ID</strong>。</li>
+    </ul>
+    <h4><span class="snum">动作 2</span>立身份：首次出现给足辨识信息</h4>
+    <p>说话人首次出现时，要给出足够建立稳定身份的信息：角色类型、年龄、性别、是否在画面内、音高、音色、语速、口音。写在 ID 旁边，如 <span class="en">the middle-aged baker with a calm, slightly raspy voice (S1)</span>。之后再开口，只用简短指代＋同一个 ID。</p>
+    <h4><span class="snum">动作 3</span>原文进 &lt;d&gt;：里面只有原文</h4>
+    <p>说话人描述、ID、动作与语气都写在 <span class="en">&lt;d&gt;</span> <strong>之外</strong>；<span class="en">&lt;d&gt;</span> 之内只有<strong>语言标签 + 用户原文</strong>，逐字逐标点保留，不翻译、不改写：</p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>台词格式（原文）<button class="copybtn" type="button">复制</button></div><pre>The young woman with a quiet, breathy voice (S1) says: &lt;d&gt;[English] I get off at the next station.&lt;/d&gt;
+The two children (S1,S2) shout together, &lt;d&gt;[English] Wait for us!&lt;/d&gt;</pre></div>
+    <p class="glossline"><b>中文直译：</b>① 年轻女子，安静、带气息感的嗓音（S1）说：&lt;d&gt;[English] I get off at the next station.&lt;/d&gt;（大意：「我下一站下车」——台词保留英文原文）② 两个孩子（S1,S2）齐声喊：&lt;d&gt;[English] Wait for us!&lt;/d&gt;（大意：「等我们一下！」）</p>
+    <h4><span class="snum">动作 4</span>画外音补闭唇：固定句式 + 闭唇声明，缺一不可</h4>
+    <p>画外音必须用固定句式 <span class="en">says in an off-screen voiceover</span>；并且<strong>每条画外音 &lt;d&gt; 之后立刻写明</strong>对应画面人物的嘴唇保持闭合——不写，模型就会让画面里的人动嘴对口型：</p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>画外音（原文）<button class="copybtn" type="button">复制</button></div><pre>The man (S1) says in an off-screen voiceover: &lt;d&gt;[English] I still remember that road.&lt;/d&gt; while his lips remain completely closed.</pre></div>
+    <p class="glossline"><b>中文直译：</b>男子（S1）以画外音说道：&lt;d&gt;[English] I still remember that road.&lt;/d&gt;（大意：「我还记得那条路」），同时他的嘴唇完全闭合。</p>
+    <h4><span class="snum">动作 5</span>跨切加标记：声音不断，画面断</h4>
+    <ul>
+      <li>同一句台词<strong>跨越切镜</strong>时：在连接点两边都用 <span class="en">&lt;scenetrans&gt;</span>，并明说声音跨切延续，可用表达：<span class="en">continues seamlessly across the cut</span> / <span class="en">continues uninterrupted into the next shot</span> / <span class="en">carries over from the previous shot</span> / <span class="en">remains audible across the transition</span>。</li>
+      <li>台词被<strong>视频结尾截断</strong>时用 <span class="en">&lt;cutoff&gt;</span>。</li>
+    </ul>
+  </div>
+
+  <h3>附带一条：画面可见文字</h3>
+  <p>横幅、招牌、标签、字幕、霓虹字等真正出现在画面上的文字，用<strong>英文双引号</strong>原样引用、不翻译：</p>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>画面文字（原文）<button class="copybtn" type="button">复制</button></div><pre>A red neon sign reading "营业中" glows above the doorway.</pre></div>
+  <p class="glossline"><b>中文直译：</b>门口上方有一块红色霓虹灯牌亮着，上面写着「营业中」——画面文字保留原文语言，只用英文双引号原样引用。</p>
+
+  <h3>小练习：给这句台词找错</h3>
+  <p><span class="srcchip src-teach">教学示范</span><span class="small">题目设定：父亲的原话是「这车又晚点了。」，女儿的旁白原话是「我爸从来不抱怨。」下面这段写好的台词段至少有四处错。先自己找，再展开答案。</span></p>
+  <div class="badbox"><p class="badlabel">✗ 待改错的写法（教学示范）</p>
+  <pre style="white-space:pre-wrap;font-family:inherit;margin:8px 0">A middle-aged man stands at a rainy bus stop and says sadly: &lt;d&gt;[English] The bus is late again.&lt;/d&gt; His daughter narrates: &lt;d&gt;[English] My dad never complains.&lt;/d&gt;</pre></div>
+  <details class="ans"><summary>展开答案：错在哪、怎么改</summary><div class="ans-body">
+    <ol>
+      <li><strong>没有说话人 ID。</strong>两人都会发声，必须按发声顺序给 (S1)、(S2)，且全片复用。</li>
+      <li><strong>首次出现没有声音辨识信息。</strong>父亲只写了「sadly」（情绪），没有年龄、音色；女儿连声音描述都没有。</li>
+      <li><strong>台词被意译成英文。</strong><span class="en">&lt;d&gt;</span> 内必须逐字保留中文原文与标点，语言标签随之写原文语言。</li>
+      <li><strong>女儿是画外音，却没用固定句式、没写闭唇。</strong>必须用 <span class="en">says in an off-screen voiceover</span>，并紧跟画面人物（父亲）嘴唇保持闭合的声明。</li>
+    </ol>
+    <p>改后（教学示范）：</p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>改后（教学示范）<button class="copybtn" type="button">复制</button></div><pre>The middle-aged man with a low, tired voice (S1) says: &lt;d&gt;[Chinese] 这车又晚点了。&lt;/d&gt; His daughter, a young woman with a soft, clear voice (S2), says in an off-screen voiceover: &lt;d&gt;[Chinese] 我爸从来不抱怨。&lt;/d&gt; while her father's lips remain completely closed.</pre></div>
+    <p class="glossline"><b>中文直译：</b>中年男子，低沉、疲惫的嗓音（S1）说：&lt;d&gt;[Chinese] 这车又晚点了。&lt;/d&gt;他的女儿，年轻女子，柔和、清亮的嗓音（S2），以画外音说道：&lt;d&gt;[Chinese] 我爸从来不抱怨。&lt;/d&gt;同时她父亲的嘴唇完全闭合。（台词本来就是中文，在 &lt;d&gt; 里原样保留。）</p>
+  </div></details>
+</section>
+
+<!-- ================= 第 6 课 ================= -->
+<section class="ch" id="ch6">
+  <span class="ch-num">LESSON 6</span>
+  <h2>声音怎么写：先分拣，再落段</h2>
+  <p class="lede">写声音的动作只有两个：先把每一种声音<strong>分拣</strong>到它该去的地方——正文、<span class="en">overall_soundscape</span>、还是 <span class="en">non_diegetic_music</span>——再按各自的句数与文风落笔。判断标准只有一个：<strong>这声音是「世界里的」还是「配给观众的」，是「此刻同步的」还是「全片一直在的」。</strong></p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4><span class="en">overall_soundscape</span></h4>
+      <p><strong>世界里的声音，全片概括。</strong></p>
+      <ul>
+        <li><strong>1–4 个英文句子，一个连续段落</strong>。</li>
+        <li>内容：环境声、物理动作声、非言语人声——风、雨、交通、脚步、织物摩擦、撞击、呼吸、笑声、喘息。</li>
+        <li>台词、歌唱、叙事内音乐已经在正文里，<strong>不要在这里重复</strong>。</li>
+        <li>只有用户<strong>明确要求全片完全静音</strong>时才写 <span class="en">N/A</span>。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="en">non_diegetic_music</span></h4>
+      <p><strong>配给观众的音乐，角色听不见。</strong></p>
+      <ul>
+        <li><strong>1–3 个英文句子</strong>。</li>
+        <li>只写乐器、速度、节奏、动态变化；<strong>不用抽象情绪词，不解释配乐的情绪功能</strong>。</li>
+        <li>角色能听到的演唱、电台、电视、手机音乐是叙事内事件，写进正文，不写这里。</li>
+        <li>没有非叙事音乐时写 <span class="en">N/A</span>。</li>
+      </ul>
+    </div>
+  </div>
+  <p>而<strong>正文</strong>（<span class="en">integrated_multimodal_description</span>）收的是：台词、歌唱、与画面精确同步的叙事内声音——角色能听到的电台音乐、与某句台词咬合的罐头笑声、动作发生那一刻的撞击声，都先在正文里找到位置，再由 soundscape 做全片层面的概括呼应。</p>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>overall_soundscape 官方例句<button class="copybtn" type="button">复制</button></div><pre>overall_soundscape: Steady rain taps against the café windows while low room ambience continues underneath. The entrance bell rings once, followed by wet footsteps and the soft scrape of a chair.</pre></div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 仅供理解，不要复制、不要粘贴使用</div><pre>overall_soundscape（全片环境声）：稳定的雨声敲打着咖啡馆的窗户，低沉的室内环境声在下方持续。入口的铃铛响了一声，随后是湿漉漉的脚步声和椅子轻轻的刮擦声。</pre></div>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>non_diegetic_music 官方例句<button class="copybtn" type="button">复制</button></div><pre>non_diegetic_music: Sparse piano notes at a slow tempo, joined by sustained low strings that gradually increase in volume before fading out.</pre></div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 仅供理解，不要复制、不要粘贴使用</div><pre>non_diegetic_music（非叙事音乐·观众配乐）：稀疏的钢琴音符，慢速，加入持续的低音弦乐，音量逐渐增大，然后淡出。</pre></div>
+  <p class="small">注意两条例句的共同点：全是可听见的事实（什么在响、多快、怎么变），没有一个情绪形容词。这就是这两段的文风标准。</p>
+
+  <h3>声音分拣练习</h3>
+  <p><span class="srcchip src-teach">教学示范</span><span class="small">场景设定：一条 10 秒的夜戏——女儿深夜回到母亲家。下面十种声音，逐项判断该写进<strong>正文</strong>、<strong>overall_soundscape</strong> 还是 <strong>non_diegetic_music</strong>。先自己分拣，再展开答案。</span></p>
+  <ol>
+    <li>整夜持续的雨声</li>
+    <li>母亲说的一句台词</li>
+    <li>厨房收音机里放的老歌</li>
+    <li>女儿轻声哼的歌</li>
+    <li>只给观众听的钢琴配乐</li>
+    <li>婴儿在隔壁房间的哭声</li>
+    <li>女儿拖行李箱过地砖的声音</li>
+    <li>锅里粥煮开的咕嘟声</li>
+    <li>片尾观众专属的弦乐渐强</li>
+    <li>母亲笑出声的那一下</li>
+  </ol>
+  <details class="ans"><summary>展开答案：逐项归属与理由</summary><div class="ans-body">
+    <div class="tbl"><table>
+      <tr><th>#</th><th>声音</th><th>归属</th><th>理由</th></tr>
+      <tr><td>1</td><td>整夜持续的雨声</td><td><strong>soundscape</strong></td><td>全片一直在的环境声，正是这一段的本职</td></tr>
+      <tr><td>2</td><td>母亲的台词</td><td><strong>正文</strong></td><td>台词只进正文的 <span class="en">&lt;d&gt;</span>，soundscape 永不重复台词</td></tr>
+      <tr><td>3</td><td>收音机里的老歌</td><td><strong>正文</strong></td><td>角色能听到的音乐是叙事内事件，在它出现的镜头里写明</td></tr>
+      <tr><td>4</td><td>女儿哼的歌</td><td><strong>正文</strong></td><td>歌唱属于发声事件，与台词同等待遇，给 (Sx) 并用 <span class="en">&lt;d&gt;</span></td></tr>
+      <tr><td>5</td><td>观众专属钢琴配乐</td><td><strong>non_diegetic_music</strong></td><td>角色听不见的音乐，只写乐器、速度与动态</td></tr>
+      <tr><td>6</td><td>婴儿哭声</td><td><strong>soundscape</strong></td><td>非言语人声，属于全片概括层；若哭声要与某个镜头精确咬合，再在正文对应处点明</td></tr>
+      <tr><td>7</td><td>行李箱滚轮声</td><td><strong>soundscape</strong>（正文呼应）</td><td>物理动作声归 soundscape 概括；动作发生在正文哪一镜，可在那镜点一句</td></tr>
+      <tr><td>8</td><td>粥煮开的咕嘟声</td><td><strong>soundscape</strong></td><td>持续的物理声，全片概括即可</td></tr>
+      <tr><td>9</td><td>片尾弦乐渐强</td><td><strong>non_diegetic_music</strong></td><td>还是观众专属配乐的一部分，「渐强」就是这一段要写的动态变化</td></tr>
+      <tr><td>10</td><td>母亲的笑声</td><td><strong>soundscape</strong>（正文呼应）</td><td>笑声是非言语人声归 soundscape；若这一笑要精确接在某句台词之后（像开篇范例的罐头笑声），写进正文对应位置</td></tr>
+    </table></div>
+    <p>分拣口诀：<strong>说和唱进正文，世界底噪进 soundscape，观众的音乐进 non_diegetic_music；与画面咬合的声音可以在正文点名、再由 soundscape 概括呼应。</strong></p>
+  </div></details>
+</section>
+
+<!-- ================= 第 7 课 ================= -->
+<section class="ch" id="ch7">
+  <span class="ch-num">LESSON 7</span>
+  <h2>关键帧模式的写法差异：三种「从图出发」的笔法</h2>
+  <p class="lede">第 2 课演示了 I2VA 的落笔。三种关键帧模式的差别不在结构（都是指令行＋三字段），而在<strong>正文的笔法</strong>：I2VA 是「从图出发」，FL2VA 是「写两图之间的路」，L2VA 是「倒推着落回图上」。用错笔法，图就白给了。</p>
+
+  <h3>I2VA：从首帧向前发展</h3>
+  <div class="note"><b>写作时手该怎么动</b>先盯着图把已有的一切「认领」一遍（外观、服装、位置、布局），再松开手写图之后发生的事。</div>
+  <ul>
+    <li><span class="tagchip">&lt;Picture 1&gt;</span> 是视频 <strong>0.00 秒的真实首帧</strong>，属于 <span class="en">[Shot 1]</span>。</li>
+    <li>正文先确立图中的<strong>风格、主体、构图、场景锚点</strong>，再写接下来的动作。</li>
+    <li>角色身份、服装、颜色、关键物件、空间关系要与图<strong>保持一致</strong>。</li>
+  </ul>
+  <div class="flow"><span class="step">首帧锚定</span><span class="arr">→</span><span class="step">动作开始</span><span class="arr">→</span><span class="step">连续发展</span><span class="arr">→</span><span class="step">结果或反应</span></div>
+
+  <h3>FL2VA：写首尾之间的连续路径</h3>
+  <div class="note"><b>写作时手该怎么动</b>把两张图并排放在眼前，只写「从左图变成右图」的中间过程——每一步都要是摄像机能拍到的变化。切忌把两张图各描述一遍，那等于没写。</div>
+  <ul>
+    <li>Picture 1 是开场，Picture 2 是结尾。正文要<strong>补出中间的运动路径</strong>：主体如何移动、姿态如何变、物件如何被操作、构图如何演变、场景或光线如何过渡。</li>
+    <li><strong>一般优先单镜头</strong>，让模型从首帧连续插值到尾帧；多镜头只在明确要求时才用。</li>
+    <li>最后一帧必须由最后一个 <span class="en">[Shot N]</span> 在片尾抵达。</li>
+  </ul>
+  <div class="flow"><span class="step">首帧状态</span><span class="arr">→</span><span class="step">可观察的中间变化</span><span class="arr">→</span><span class="step">差异逐步缩小</span><span class="arr">→</span><span class="step">尾帧状态</span></div>
+  <p><span class="srcchip src-off">官方原文</span><span class="small">base-en.txt Case 3: FL2VA（8 秒单镜头）。注意指令行里尾帧写的是 (from Shot 1)——全片只有一个镜头，所以 N=1；再看正文如何把「路」写满：松开车把 → 举伞过肩 → 推开伞骨 → 水珠滚落 → 站进伞下 → 转正伞柄。</span></p>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>成稿 · FL2VA 雨中撑伞（原文）<button class="copybtn" type="button">复制</button></div><pre>How the reference pictures align with the target video — Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot 1) aligns with the 8.00-second mark of the target video.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic, a rain-soaked cyclist begins in the position and framing established by Picture 1, holding a closed black umbrella beside a silver bicycle. The camera pulls out with small amplitude at slow speed as she releases the bicycle handle, raises the umbrella above her shoulder, and presses the runner upward until the canopy opens. Water rolls from the expanding fabric while she steps beneath it, rotates the handle into the final angle, and settles into the pose, spacing, and composition established by Picture 2 at the end of the shot.
+
+overall_soundscape: Rain falls steadily on the pavement, followed by the metallic click of the umbrella runner and the soft snap of the canopy opening. Water drips from the bicycle frame as distant traffic passes.
+
+non_diegetic_music: N/A</pre></div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 成稿 FL2VA 雨中撑伞（仅供理解，不要复制、不要粘贴使用）</div><pre>对齐指令：参考图与目标视频的对齐方式——Picture 1（来自 Shot 1）对齐目标视频的 0.00 秒处；Picture 2（来自 Shot 1）对齐目标视频的 8.00 秒处。
+
+integrated_multimodal_description（多模态正文）：[Shot 1] 真人实拍，电影感，一位被雨淋湿的骑行者以 Picture 1 确立的姿势和构图开始，她身旁是一辆银色自行车，手里拿着一把合拢的黑伞。镜头以小幅度、慢速度拉远，她松开车把，把伞举到肩膀上方，向上推开伞骨滑杆，直到伞面张开。水珠从展开的伞布上滚落，她站到伞下，把伞柄转到最终的角度，落定为 Picture 2 在镜头结尾确立的姿势、间距和构图。
+
+overall_soundscape（全片环境声）：雨稳定地落在路面上，随后是伞骨滑杆的金属咔哒声和伞面打开时柔和的啪声。水从自行车车架上滴落，远处有车辆驶过。
+
+non_diegetic_music（非叙事音乐·观众配乐）：N/A（无）</pre></div>
+
+  <h3>L2VA：推断开场，落回尾帧</h3>
+  <div class="note"><b>写作时手该怎么动</b>先从尾帧里找「连接件」（同一只手、同样的袖子、同样的光线），把它们提前埋进你反推的开场里，结尾收束时才严丝合缝。</div>
+  <ul>
+    <li><span class="tagchip">&lt;Picture 1&gt;</span> 是<strong>最后一帧</strong>，属于最后一个 <span class="en">[Shot N]</span>——<strong>不是 Shot 1</strong>（最常见的锚定错误，见第 10 课排错表）。</li>
+    <li>从用户意图与尾帧反推一个<strong>合理的前置状态</strong>，再写角色、物件、镜头、场景如何逐步接近参考图。</li>
+  </ul>
+  <div class="flow"><span class="step">合理前置状态</span><span class="arr">→</span><span class="step">明确的动作与过渡路径</span><span class="arr">→</span><span class="step">最后一镜逐步收束</span><span class="arr">→</span><span class="step">落到尾帧</span></div>
+  <p><span class="srcchip src-off">官方原文</span><span class="small">base-en.txt Case 4: L2VA（6 秒单镜头）。尾帧图是「碎了一地的玻璃杯」，于是反推出「完好的杯子在桌边」作前置状态；结尾逐项对齐——破裂形态、手的位置、机位角度、光线、最终构图全部 established by &lt;Picture 1&gt;。</span></p>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>成稿 · L2VA 碎杯（原文）<button class="copybtn" type="button">复制</button></div><pre>How the reference pictures align with the target video — &lt;Picture 1&gt; (from [Shot 1]) aligns with the 6.00-second mark of the target video.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic, a close shot begins with an intact drinking glass near the edge of a dark wooden table, while the same hand and sleeve visible in &lt;Picture 1&gt; approach from the right. The camera pushes in with small amplitude at slow speed as the fingertips strike the rim. The glass tips, falls, and hits the floor with a sharp impact; cracks spread through it as fragments slide outward. Toward the end, the moving pieces lose momentum and settle into the exact broken arrangement, hand position, camera angle, lighting, and final composition established by &lt;Picture 1&gt;.
+
+overall_soundscape: Fingertips tap the glass before it scrapes across the tabletop, falls, and breaks with a sharp crash. Small fragments scatter and gradually stop sliding across the floor.
+
+non_diegetic_music: A low electronic pulse at a slow tempo, ending immediately after the glass breaks.</pre></div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 成稿 L2VA 碎杯（仅供理解，不要复制、不要粘贴使用）</div><pre>对齐指令：参考图与目标视频的对齐方式——&lt;Picture 1&gt;（来自 [Shot 1]）对齐目标视频的 6.00 秒处。
+
+integrated_multimodal_description（多模态正文）：[Shot 1] 真人实拍，电影感，一个近景以一只完好的玻璃杯开始，杯子靠近深色木桌的边缘，&lt;Picture 1&gt; 中可见的同一只手和袖子从右侧接近。镜头以小幅度、慢速度推近，指尖碰到杯口。杯子倾倒、坠落，以尖锐的撞击声砸在地板上；裂纹在杯身上蔓延，碎片向外滑开。接近结尾时，移动的碎片失去动量，落定为 &lt;Picture 1&gt; 所确立的准确破碎排列、手的位置、镜头角度、光线和最终构图。
+
+overall_soundscape（全片环境声）：指尖轻敲玻璃，杯子在桌面上刮擦、坠落，以尖锐的碎裂声摔碎。小碎片四散，在地板上滑动并逐渐停下。
+
+non_diegetic_music（非叙事音乐·观众配乐）：一段低沉的电子脉冲，慢速，在玻璃破碎后立即结束。</pre></div>
+</section>
+
+<!-- ================= 第 8 课 ================= -->
+<section class="ch" id="ch8">
+  <span class="ch-num">LESSON 8</span>
+  <h2>给参考素材写：Ref2VA 写作全程演示</h2>
+  <p class="lede">素材一旦是「作参考、不作帧」，就走 Ref2VA 的<strong>六段结构</strong>。这一课用开篇解剖过的那条官方成稿当标本，按真实写作顺序走一遍：<strong>盘点素材 → 定义标签 → 写 summary → 写 retention → 写正文 → 补声音</strong>。素材还是那一套：咖啡馆环境图 1 张、萨摩耶照片 3 张、金发女子视频 1 段、年轻男子视频 1 段、女子音色音频 1 段；需求是写一场三镜的咖啡馆抢饼干小品。</p>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 1</span>盘点素材：给每份素材定「角色」，再分配标签</h4>
+    <p>四类标签的判断标准只有一条：<strong>这份素材在目标视频里实际承担什么</strong>。</p>
+    <div class="tbl"><table>
+      <tr><th>标签</th><th>指什么</th><th>典型用途</th></tr>
+      <tr><td><span class="tagchip">&lt;Subject N&gt;</span></td><td>从参考素材中<strong>抽象出来的可见内容单元</strong>，可在目标视频中复用或修改</td><td>人、动物、物体、场景环境、服装、道具、界面、视觉特效、风格、动作、表情、姿势</td></tr>
+      <tr><td><span class="tagchip">&lt;Picture N&gt;</span></td><td>充当<strong>具体目标帧</strong>或<strong>分镜规划锚点</strong>的参考图本身</td><td>某镜首帧 / 关键帧 / 尾帧 / 编辑关键帧 / 构图锚点 / 分镜参考</td></tr>
+      <tr><td><span class="tagchip">&lt;Video N&gt;</span></td><td>提供<strong>全片级关系</strong>的参考视频</td><td>剪辑源、续接起点、运镜 / 剪辑 / 节奏 / 时间结构参考</td></tr>
+      <tr><td><span class="tagchip">&lt;Audio N&gt;</span></td><td>被<strong>复制或被参考</strong>的音频信号</td><td>独立音频素材，或参考视频中被启用的同步音轨</td></tr>
+    </table></div>
+    <p>盘点本课的素材，结论是：</p>
+    <ul>
+      <li>咖啡馆环境图 → 定义 <span class="tagchip">&lt;Subject 1&gt;</span>（环境是个可见内容单元）。</li>
+      <li>萨摩耶三张照片 → <strong>共同</strong>定义 <span class="tagchip">&lt;Subject 2&gt;</span>（一个 Subject 可以由多个素材共同定义）。</li>
+      <li>女子视频、男子视频 → 各自定义 <span class="tagchip">&lt;Subject 3&gt;</span>、<span class="tagchip">&lt;Subject 4&gt;</span>。视频里的人是「可见内容」，归 Subject；这两段视频本身既不是剪辑源、也不是续接起点，所以<strong>不立</strong>独立的 Video 条目去指代它们——<span class="tagchip">&lt;Video N&gt;</span> 只管全片级关系，不替代 Subject。</li>
+      <li>女子音色音频 → <span class="tagchip">&lt;Audio 1&gt;</span>，且明确绑定说话人 <span class="en">&lt;Subject 3&gt; (S1)</span>。</li>
+    </ul>
+    <div class="warn"><b>盘点阶段两个高频误判（先在这里避开）</b>
+    ① <strong>只提供外观、场景、服装或风格的图，不要单独立 &lt;Picture N&gt; 条目</strong>——把出处写进对应 Subject 的定义里即可；Picture 只给真正充当帧锚 / 分镜锚的图。② <strong>普通参考视频不会仅仅因为文件里有声音就自动产生 &lt;Audio N&gt;</strong>——只有音频确实被复制或被参考时才建。另外，<span class="tagchip">&lt;Video N&gt;</span> 与 <span class="tagchip">&lt;Audio N&gt;</span> 独立编号，序号不表示配对。</div>
+  </div>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 2</span>写 subject_definitions（主体定义）：把名册落成文字</h4>
+    <p>每个 Subject 一句：是谁、出自哪个素材、关键特征是什么。Subject 代表「会被实际用进目标视频的内容」，不是源文件本身。音频若绑定目标说话人，直接复用全局说话人 ID 写成 <span class="en">&lt;Subject N&gt; (Sx)</span>——ID 来自目标视频的全局发声顺序，音频定义不能自己另行编号；一段音频承担多个角色时，用一句自然句写完。</p>
+    <p><span class="srcchip src-off">官方原文</span><span class="small">与开篇成稿的第一段相同。对照 Step 1 的盘点逐行看：四个 Subject 分工干净，&lt;Audio 1&gt; 一行交代清角色与绑定关系。</span></p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>中间稿 · subject_definitions（原文）<button class="copybtn" type="button">复制</button></div><pre>subject_definitions:
+&lt;Subject 1&gt; is the coffee-shop environment in &lt;Picture 1&gt;, featuring an exposed brick wall, an orange tufted sofa with patterned pillows, a neon sign, and a wooden coffee table.
+&lt;Subject 2&gt; is the fluffy white Samoyed in &lt;Picture 2&gt;, &lt;Picture 3&gt;, and &lt;Picture 4&gt;, with thick white fur, pointed ears, a dark nose, and a curved tail.
+&lt;Subject 3&gt; is the young blonde woman in &lt;Video 1&gt;, with long blonde hair and a light-pink button-down shirt with rolled-up sleeves.
+&lt;Subject 4&gt; is the young man in &lt;Video 2&gt;, with short wavy brown hair and a dark-grey hoodie with drawstrings.
+&lt;Audio 1&gt; is the voice-timbre reference for &lt;Subject 3&gt; (S1), containing a spoken English vocal layer.</pre></div>
+    <div class="zhd"><div class="zhd-head">中文对照 · 仅供理解，不要复制、不要粘贴使用</div><pre>subject_definitions（主体定义）:
+&lt;Subject 1&gt; 是 &lt;Picture 1&gt; 中的咖啡馆环境，特征为：裸露的砖墙、带图案抱枕的橙色绒面沙发、霓虹灯牌和一张木质咖啡桌。
+&lt;Subject 2&gt; 是 &lt;Picture 2&gt;、&lt;Picture 3&gt; 和 &lt;Picture 4&gt; 中毛茸茸的白色萨摩耶，特征为：厚厚的白毛、尖耳朵、黑鼻子和卷曲的尾巴。
+&lt;Subject 3&gt; 是 &lt;Video 1&gt; 中的金发年轻女子，特征为：金色长发、浅粉色纽扣衬衫，袖子卷起。
+&lt;Subject 4&gt; 是 &lt;Video 2&gt; 中的年轻男子，特征为：棕色短卷发、带抽绳的深灰色连帽衫。
+&lt;Audio 1&gt; 是 &lt;Subject 3&gt;（S1）的音色参考音频，内含一段英语人声。</pre></div>
+    <p class="small">一致性铁律：标签一旦分配，在后面四段里含义全程一致，不改名、不换指代。</p>
+  </div>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 3</span>写 summary（任务摘要）：先判任务类型，再概括</h4>
+    <p><span class="en">summary</span> 是一个简短英文段落，开头用<strong>方括号任务类型前缀</strong>定性。类型按每个素材在目标视频中的<strong>实际角色</strong>选，多类型用 <span class="en">" + "</span> 连接、不重复：</p>
+    <div class="tbl"><table>
+      <tr><th>任务类型</th><th>何时用</th></tr>
+      <tr><td><span class="en">keyframe completion</span>（关键帧补全）</td><td>一图充当目标视频的首帧 / 关键帧 / 尾帧 / 编辑关键帧等<strong>具体帧锚</strong></td></tr>
+      <tr><td><span class="en">reference generation</span>（参考生成）</td><td>素材提供角色、场景、风格、动作、运镜、分镜等<strong>生成指引</strong>，但不充当具体帧、也不是被剪辑或续接的源视频</td></tr>
+      <tr><td><span class="en">video editing</span>（视频剪辑）</td><td><strong>直接修改</strong>已有源视频。编辑一张图片、或在静帧之间生成，都不算</td></tr>
+      <tr><td><span class="en">video continuation</span>（视频续接）</td><td>新内容从已有源视频<strong>续接、延长、恢复或转场</strong>而来</td></tr>
+      <tr><td><span class="en">audio reuse</span>（音频复用）</td><td>同一音频信号被<strong>整体或部分复用</strong>（直接复制）</td></tr>
+      <tr><td><span class="en">audio reference</span>（音频参考）</td><td><strong>不直接复制信号</strong>，只参考音乐风格、音色、台词歌词内容、音效质感、节拍或连续性</td></tr>
+    </table></div>
+    <p>本课的判断过程：素材没有任何帧锚 → 没有 keyframe completion；没有源视频被剪辑或续接 → 没有 video editing / continuation；图片与视频都只提供生成指引 → reference generation；音频只借音色、不复制信号 → audio reference（不是 audio reuse）。拼起来就是 <span class="en">[reference generation + audio reference]</span>。三个易错点：① 有视频 / 音频出现不自动产生对应类型（只提供运镜节奏的参考视频通常只是 reference generation）；② 剪辑源视频且保留原声要同时写 audio reuse，续接但只延续听感用 audio reference；③ summary 只能用已定义的标签，不得引入新标签。另：视频剪辑任务在前缀之后，summary 必须以 <span class="en">The target video is an edited version of &lt;Video 1&gt;.</span> 开头。</p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>中间稿 · summary（原文）<button class="copybtn" type="button">复制</button></div><pre>summary:
+[reference generation + audio reference] The target video shows &lt;Subject 3&gt; eating a cookie in &lt;Subject 1&gt;. &lt;Subject 4&gt; enters with &lt;Subject 2&gt;, which lunges toward the cookie. The three-shot exchange uses &lt;Audio 1&gt; as the voice-timbre reference for &lt;Subject 3&gt; and ends with a canned audience laugh.</pre></div>
+  </div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 仅供理解，不要复制、不要粘贴使用</div><pre>summary（任务摘要）:
+[reference generation + audio reference]（参考生成 + 音频参考）目标视频展示 &lt;Subject 3&gt; 在 &lt;Subject 1&gt; 里吃一块饼干。&lt;Subject 4&gt; 带着 &lt;Subject 2&gt; 进入，萨摩耶扑向饼干。这场三镜头对手戏使用 &lt;Audio 1&gt; 作为 &lt;Subject 3&gt; 的音色参考，并以一阵罐头观众笑声收尾。</pre></div>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 4</span>写 retention_analysis（保留度分析）：逐个标签回答「保留到什么程度」</h4>
+    <p>每个标签一行，用固定标记值（英文原样，不许自创）。选标记时先问：<strong>在它已定义的参考角色范围内，保留了多少。</strong></p>
+    <div class="grid2">
+      <div class="card">
+        <h4>可见内容标记（Subject / Picture / Video）</h4>
+        <ul>
+          <li><span class="en">fully_preserved</span>（完整保留）：参考内容在其已定义角色内<strong>完整保留</strong>——特征全数沿用就选它。</li>
+          <li><span class="en">partially_preserved</span>（部分保留）：仍被使用，但部分已定义特征被改变、或只保留了一部分。</li>
+          <li><span class="en">attribute_transfer</span>（属性迁移）：参考特征被<strong>迁移</strong>到另一个可辨识的目标主体上（如把 A 的发型给 B）。</li>
+          <li><span class="en">weak_reference</span>（弱参考）：只保留风格、类别、构图或氛围的<strong>大体相似</strong>。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>音频标记（Audio）</h4>
+        <ul>
+          <li><span class="en">fully_copy</span>（完整复制）：完整源音频就是目标视频的<strong>完整最终音轨</strong>。</li>
+          <li><span class="en">partially_copy</span>（部分复制）：只复制部分时间线或部分音轨层，或复制后又有增、删、替换。</li>
+          <li><span class="en">reference</span>（仅参考）：不复制信号，只参考音色、节奏、音乐风格、台词内容或声音质感。</li>
+          <li><span class="en">weak_reference</span>（弱参考）：只保留类别或氛围的大体相似。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>条目格式（原文）<button class="copybtn" type="button">复制</button></div><pre>&lt;Subject 1&gt; (appears in [Shot 1], [Shot 3]): fully_preserved - ...
+&lt;Picture 2&gt; ([Shot 1] first frame): fully_preserved - ...
+&lt;Video 1&gt; (cut and pacing structure): weak_reference - ...
+&lt;Audio 1&gt;: fully_copy - &lt;Audio 1&gt; is reused 1:1 as the target video's complete final audio track.
+&lt;Audio 2&gt;: reference - the target speaker follows &lt;Audio 2&gt;'s voice timbre and measured delivery without copying the original signal.</pre></div>
+    <p class="glossline"><b>中文对照：</b>&lt;Subject 1&gt;（出现在 [Shot 1]、[Shot 3]）：fully_preserved（完整保留）- ……；&lt;Picture 2&gt;（[Shot 1] 首帧）：fully_preserved - ……；&lt;Video 1&gt;（剪辑与节奏结构）：weak_reference（弱参考）- ……；&lt;Audio 1&gt;：fully_copy（完整复制）- &lt;Audio 1&gt; 被 1:1 复用为目标视频的完整最终音轨；&lt;Audio 2&gt;：reference（仅参考）- 目标说话人跟随 &lt;Audio 2&gt; 的音色和匀速的演绎方式，不复制原始信号。</p>
+    <div class="warn"><b>标记的选择边界</b>标记只能在该标签<strong>已定义的参考角色范围</strong>内选择。目标视频里新加的动作、背景、剧情事件，<strong>不算</strong>参考保真度的损失——别因为「视频里多了原图没有的东西」就把 fully_preserved 降级。本课四个主体都是原样沿用、全片新剧情，所以全是 fully_preserved；音频只借音色，所以是 reference。</div>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>中间稿 · retention_analysis（原文）<button class="copybtn" type="button">复制</button></div><pre>retention_analysis:
+&lt;Subject 1&gt; (appears in [Shot 1], [Shot 2], [Shot 3]): fully_preserved - the exposed brick wall, orange tufted sofa, patterned pillows, neon sign, and wooden coffee table are retained.
+&lt;Subject 2&gt; (appears in [Shot 1], [Shot 2]): fully_preserved - the Samoyed's thick white fur, pointed ears, dark nose, and curved tail are retained.
+&lt;Subject 3&gt; (appears in [Shot 1], [Shot 2], [Shot 3]): fully_preserved - the blonde woman's identity, long hair, and light-pink shirt are retained.
+&lt;Subject 4&gt; (appears in [Shot 1], [Shot 2]): fully_preserved - the young man's short wavy brown hair and dark-grey hoodie are retained.
+&lt;Audio 1&gt;: reference - its vocal timbre guides the dialogue delivery of &lt;Subject 3&gt; without copying the original signal.</pre></div>
+    <div class="zhd"><div class="zhd-head">中文对照 · 仅供理解，不要复制、不要粘贴使用</div><pre>retention_analysis（保留度分析）:
+&lt;Subject 1&gt;（出现在 [Shot 1]、[Shot 2]、[Shot 3]）：fully_preserved（完整保留）——裸露的砖墙、橙色绒面沙发、图案抱枕、霓虹灯牌和木质咖啡桌全部保留。
+&lt;Subject 2&gt;（出现在 [Shot 1]、[Shot 2]）：fully_preserved（完整保留）——萨摩耶厚厚的白毛、尖耳朵、黑鼻子和卷曲的尾巴全部保留。
+&lt;Subject 3&gt;（出现在 [Shot 1]、[Shot 2]、[Shot 3]）：fully_preserved（完整保留）——金发女子的身份、长发和浅粉色衬衫全部保留。
+&lt;Subject 4&gt;（出现在 [Shot 1]、[Shot 2]）：fully_preserved（完整保留）——年轻男子的棕色短卷发和深灰色连帽衫全部保留。
+&lt;Audio 1&gt;：reference（仅参考）——它的人声音色指导 &lt;Subject 3&gt; 的台词演绎，不复制原始音频信号。</pre></div>
+    <p class="small">注意：retention 里逐项点名保留了哪些特征，且全段<strong>不出现 (Sx)</strong>——说话人 ID 只活在定义与正文里。</p>
+  </div>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 5</span>写 detailed_description（逐镜正文）：与基础模式四点不同，其余全同</h4>
+    <div class="tbl"><table>
+      <tr><th>维度</th><th>基础模式</th><th>Ref2VA</th></tr>
+      <tr><td>正文字段名</td><td><span class="en">integrated_multimodal_description</span></td><td><span class="en">detailed_description</span></td></tr>
+      <tr><td>风格开场位置</td><td>写在 <span class="en">[Shot 1]</span> 开头</td><td>在 <span class="en">[Shot 1]</span> <strong>之前</strong>，先用一到两句英文确立风格</td></tr>
+      <tr><td>参考信息</td><td>不用全参考标签</td><td>在参考内容<strong>首次出现与角色生效处</strong>插入四类标签</td></tr>
+      <tr><td>音频关系</td><td>只描述目标视频自身的声音</td><td>在对应镜头或音频阶段引用 <span class="tagchip">&lt;Audio N&gt;</span>，并说明是<strong>复制还是参考</strong></td></tr>
+    </table></div>
+    <p>其余规则——镜头编号、时间戳（<span class="en">[Shot 2] At 00:09.000</span> 式）、运镜三维度、说话人 ID、<span class="en">&lt;d&gt;</span> 台词、跨切与截断、画面文字——全部沿用第 4–6 课，不另起一套。动笔要点：</p>
+    <ul>
+      <li><strong>篇幅标尺</strong>：生成类任务正文通常 <strong>350–500 个英文词</strong>；台词密集型优先保证完整台词时间线，不机械凑字数；视频剪辑类按源视频复杂度缩放。单镜头不等于可以写短。</li>
+      <li><strong>首次出现要重述特征</strong>：重要 Subject 首次清晰出现时，在当镜写出它的参考特征、画面位置与当前动作；后续镜头继续用同一标签，但不重复定义。</li>
+      <li><strong>帧锚用自然句式衔接</strong>：<span class="en">the shot begins from &lt;Picture 1&gt;</span> / <span class="en">the shot's keyframe corresponds to &lt;Picture 2&gt;</span> / <span class="en">the shot ends on &lt;Picture 3&gt;</span>。剪辑 / 续接时在源状态与续接关系生效处引用 <span class="tagchip">&lt;Video N&gt;</span>。</li>
+      <li><strong>主体说话的组合写法</strong>：<span class="tagchip">&lt;Subject N&gt;</span> 标识「参考主体是谁」，<span class="en">(Sx)</span> 标识「实际说话人是谁」，写成 <span class="en">&lt;Subject 2&gt; (S1) turns toward the woman and says, &lt;d&gt;[English] ...&lt;/d&gt;</span>。主体画外发声保持同一组合并标注 <span class="en">off-screen</span>；说话人不对应任何已定义主体时，用稳定的声音描述＋(Sx)。(Sx) 按实际发声先后只分配一次、全程复用。</li>
+    </ul>
+    <div class="note"><b>BGM 内嵌歌词：不要虚构说话人</b>当言语内容只是被直接复用的 BGM / 完整音轨中的一个提示、且<strong>没有具体的人、角色、叙述者实际发出它</strong>时，用 <span class="tagchip">&lt;Audio N&gt;</span> 作声音来源，不要硬安一个 (Sx)。反之，只要有具体发声者，就必须分配并复用 (Sx)。示例：<span class="en">When &lt;Audio 1&gt; reaches the phrase &lt;d&gt;[English] I'm lonely lonely lonely lonely lonely I'm lonely&lt;/d&gt;, &lt;Subject 1&gt; performs the corresponding hand gesture without becoming a separate speaker source.</span><br><span class="small">直译：当 &lt;Audio 1&gt; 播到这句歌词时，&lt;Subject 1&gt; 做出对应的手势，但不因此成为一个独立的发声来源。</span></div>
+    <div class="note"><b>参考音频台词的复用与清洗</b>参考音频的台词歌词被<strong>直接复用</strong>、或输入明确要求<strong>重新演绎</strong>时，<span class="en">&lt;d&gt;</span> 内保留源文字与原文语言逐字；<strong>听不清的段落写 <span class="en">[unclear]</span>，不要猜、不要改述</strong>。标点标准化为 <span class="en">, . ? !</span> 等基本书面标点，去掉重复波浪号、emoji、项目符号与装饰性重复标点；完整陈述 / 疑问 / 感叹句分别以 <span class="en">.</span> / <span class="en">?</span> / <span class="en">!</span> 结尾。若只是参考音色、节奏、情绪或表达方式，<strong>不要</strong>把参考音频的原台词带进目标视频。</div>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>中间稿 · detailed_description（原文）<button class="copybtn" type="button">复制</button></div><pre>detailed_description:
+The target video uses a realistic multi-camera sitcom style with warm indoor lighting.
+[Shot 1] A medium shot establishes &lt;Subject 1&gt;, the coffee shop with its exposed brick wall, orange tufted sofa, patterned pillows, neon sign, and wooden coffee table. &lt;Subject 3&gt; (S1), the young woman with long blonde hair and a light-pink button-down shirt with rolled-up sleeves, sits on the sofa holding a chocolate-chip cookie. From the left, &lt;Subject 4&gt;, the young man with short wavy brown hair and a dark-grey hoodie with drawstrings, enters holding the leash of &lt;Subject 2&gt;, the thick-furred white Samoyed with pointed ears, a dark nose, and a curved tail. The dog lunges toward the cookie and pulls the leash taut. &lt;Subject 3&gt; (S1) jerks her hand back and, using the clear youthful voice timbre referenced from &lt;Audio 1&gt;, exclaims with light annoyance, &lt;d&gt;[English] Hey! Watch your dog!&lt;/d&gt; She closes her lips and guards the cookie while &lt;Subject 4&gt; pulls the dog back.
+[Shot 2] At 00:03.000, the shot cuts to a close-up of &lt;Subject 4&gt; (S2), the young man in the dark-grey hoodie from Shot 1, sitting beside &lt;Subject 3&gt; on the sofa and holding &lt;Subject 2&gt; securely in his arms. &lt;Subject 4&gt; (S2) says in a casual young male voice with a playful tone and an easy conversational pace, &lt;d&gt;[English] He just likes cookies more than me.&lt;/d&gt; He closes his mouth into an apologetic smile and strokes the dog's thick white fur.
+[Shot 3] At 00:05.000, the shot cuts to a close-up of &lt;Subject 3&gt; (S1), the blonde woman in the light-pink shirt from Shot 1. Her annoyance softens as she looks toward the Samoyed. &lt;Subject 3&gt; (S1) replies in the same clear youthful voice referenced from &lt;Audio 1&gt; with an amused cadence, &lt;d&gt;[English] Well, he has good taste at least.&lt;/d&gt; She smiles and raises the cookie in a small toast-like gesture. A classic canned audience laugh begins immediately after the line and continues through the final frame.</pre></div>
+    <div class="zhd"><div class="zhd-head">中文对照 · 仅供理解，不要复制、不要粘贴使用</div><pre>detailed_description（逐镜正文）:
+目标视频采用写实的多机位情景喜剧风格，室内灯光温暖。
+[Shot 1] 一个中景建立 &lt;Subject 1&gt;：这家咖啡馆里有裸露的砖墙、橙色绒面沙发、图案抱枕、霓虹灯牌和木质咖啡桌。&lt;Subject 3&gt;（S1）——金色长发、穿着卷起袖子的浅粉色纽扣衬衫的年轻女子——坐在沙发上，手里拿着一块巧克力豆饼干。从左侧，&lt;Subject 4&gt;——棕色短卷发、穿带抽绳深灰色连帽衫的年轻男子——牵着 &lt;Subject 2&gt;（厚毛的白色萨摩耶，尖耳朵、黑鼻子、卷曲的尾巴）走进来。狗扑向饼干，把牵引绳拉得笔直。&lt;Subject 3&gt;（S1）猛地把手缩回，用参考自 &lt;Audio 1&gt; 的清晰年轻音色、带着轻微恼意喊道：&lt;d&gt;[English] Hey! Watch your dog!&lt;/d&gt;（台词保留英文原文）她闭上嘴唇护住饼干，&lt;Subject 4&gt; 把狗往回拉。
+[Shot 2] 在 00:03.000，镜头切到 &lt;Subject 4&gt;（S2）的特写：穿深灰色连帽衫的年轻男子（来自 Shot 1）坐在沙发上 &lt;Subject 3&gt; 的身边，把 &lt;Subject 2&gt; 稳稳抱在怀里。&lt;Subject 4&gt;（S2）用随意的年轻男声、俏皮的语气和轻松自然的对话节奏说：&lt;d&gt;[English] He just likes cookies more than me.&lt;/d&gt;（台词保留英文原文）他闭上嘴，露出歉意的微笑，抚摸狗厚厚的白毛。
+[Shot 3] 在 00:05.000，镜头切到 &lt;Subject 3&gt;（S1）的特写：穿浅粉色衬衫的金发女子（来自 Shot 1）。她的恼意渐渐消退，望向萨摩耶。&lt;Subject 3&gt;（S1）用同样参考自 &lt;Audio 1&gt; 的清晰年轻嗓音、带着被逗乐的语调回答：&lt;d&gt;[English] Well, he has good taste at least.&lt;/d&gt;（台词保留英文原文）她微笑着把饼干举起，做了一个小小的、像举杯致意一样的动作。一阵经典的罐头观众笑声在台词之后立即响起，一直持续到最后一帧。</pre></div>
+  </div>
+
+  <div class="stepbox">
+    <h4><span class="snum">STEP 6</span>补声音两段：音频关系只写进匹配的那一层</h4>
+    <p>两段的定义与第 6 课相同。Ref2VA 多一条归属规则：<strong>参考音频的复制 / 参考关系，只写进与它可听层匹配的那一段</strong>——环境与音效层写进 <span class="en">overall_soundscape</span>，观众专属配乐写进 <span class="en">non_diegetic_music</span>，同一音频兼供两类就在两段各写对应部分；完整台词歌词只在正文的 <span class="en">&lt;d&gt;</span> 里，这两段不重复。本课的音频只是正文里的音色参考，声音两段回归最简形态：</p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>声音两段中的音频关系（原文示例）<button class="copybtn" type="button">复制</button></div><pre>overall_soundscape: The copied ambience layer from &lt;Audio 1&gt; continues throughout the target video.
+non_diegetic_music: &lt;Audio 2&gt; is directly reused as the complete audience-only score.</pre></div>
+    <p class="glossline"><b>中文直译：</b>overall_soundscape（全片环境声）：从 &lt;Audio 1&gt; 复制的环境声层贯穿目标视频始终。non_diegetic_music（非叙事音乐）：&lt;Audio 2&gt; 被直接复用为完整的观众专属配乐。</p>
+    <div class="cb"><div class="cb-head"><span class="dot"></span>本课成稿的声音两段（原文）<button class="copybtn" type="button">复制</button></div><pre>overall_soundscape:
+Soft indoor coffee-shop room tone continues throughout the video.
+
+non_diegetic_music:
+N/A</pre></div>
+    <div class="zhd"><div class="zhd-head">中文对照 · 仅供理解，不要复制、不要粘贴使用</div><pre>overall_soundscape（全片环境声）:
+柔和的室内咖啡馆环境底噪贯穿全片。
+
+non_diegetic_music（非叙事音乐·观众配乐）:
+N/A（无）</pre></div>
+  </div>
+</section>
+
+<!-- ================= 第 9 课 ================= -->
+<section class="ch" id="ch9">
+  <span class="ch-num">LESSON 9</span>
+  <h2>时长与切镜的算术：写之前先算账</h2>
+  <p class="lede">提示词的时间线是一笔要算平的账：总时长、每个切点、每句台词占的时间，必须互相咬合。这一课把第 2 课拆镜头时用到的算术单独讲清。</p>
+
+  <h3>硬约束</h3>
+  <ul>
+    <li>单段时长 <strong>4–15 秒</strong>；提示词描述的总时长 = 目标时长，一秒不差。</li>
+    <li><span class="en">[Shot 1]</span> <strong>不带时间戳</strong>；后续镜头顺序编号，每个以一个<strong>严格递增</strong>的切镜时间开头，且必须落在时长之内，格式精确到毫秒：</li>
+  </ul>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>切镜时间戳格式（原文）<button class="copybtn" type="button">复制</button></div><pre>[Shot 2] At 00:03.500, the camera cuts to...</pre></div>
+  <p class="glossline"><b>中文直译：</b>[Shot 2] 在 00:03.500，镜头切到……（后续每个镜头的切点都照这个格式写：镜头号 + At 时间戳 + 切镜句式）。</p>
+  <p>普通切镜用这五个句式之一：<span class="en">the camera cuts to</span> / <span class="en">the shot cuts to</span> / <span class="en">the shot transitions to</span> / <span class="en">the shot changes to</span> / <span class="en">the shot switches to</span>。交叉溶解（cross-dissolve）、淡入淡出（fade）、划变（wipe）<strong>只在用户明确要求时</strong>才用，不要自作主张加转场特效。</p>
+
+  <h3>台词量与镜头时长的匹配直觉</h3>
+  <p><span class="srcchip src-teach">教学示范</span><span class="small">下面的语速是帮助排镜头的经验值，不是官方规定；官方只要求总时长对齐。用它反推：先估台词要占几秒，再决定这个镜头至少留多长。</span></p>
+  <div class="tbl"><table>
+    <tr><th>语言</th><th>自然语速（经验值）</th><th>换算示例</th></tr>
+    <tr><td>英文台词</td><td>约 2–2.5 词 / 秒（含停顿与表演）</td><td>一句 10 个词的台词，至少留出 4–5 秒</td></tr>
+    <tr><td>中文台词</td><td>约 3–4 字 / 秒</td><td>一句 14 字的台词，至少留出 4 秒上下</td></tr>
+  </table></div>
+  <ul>
+    <li><strong>台词塞不下就拆镜或删动作。</strong>一个 3 秒镜头里同时写「说完 12 个词＋完成一个大动作」，模型必然丢一样。</li>
+    <li><strong>动作也要计价。</strong>「走过去、坐下、拿起杯子」这类复合动作，按每个小动作约 1–2 秒在心里过一遍。</li>
+    <li><strong>切点落在动作的自然断点上</strong>：一句话说完、一个动作完成、视线转移完成——不要在一个动作的中间下刀。</li>
+  </ul>
+
+  <h3>分配示范：15 秒切 4 个镜头</h3>
+  <p><span class="srcchip src-teach">教学示范</span><span class="small">需求：一支 15 秒的茶饮小片——清晨茶山、采茶、冲泡、端杯望山。分配如下（教学创作，非官方范例）：</span></p>
+  <div class="tbl"><table>
+    <tr><th>镜头</th><th>时段</th><th>时长</th><th>这一镜干什么</th><th>切点时间戳</th></tr>
+    <tr><td>[Shot 1]</td><td>0–4 秒</td><td>4 秒</td><td>建立：茶山全景，采茶人入画，建立空间与光线</td><td>无（首镜不带时间戳）</td></tr>
+    <tr><td>[Shot 2]</td><td>4–8.5 秒</td><td>4.5 秒</td><td>动作：手指采摘嫩芽的特写，只做「摘」这一件事</td><td><span class="en">At 00:04.000</span></td></tr>
+    <tr><td>[Shot 3]</td><td>8.5–12 秒</td><td>3.5 秒</td><td>过程：热水注入茶壶，蒸汽升起，无台词所以可以短</td><td><span class="en">At 00:08.500</span></td></tr>
+    <tr><td>[Shot 4]</td><td>12–15 秒</td><td>3 秒</td><td>收束：端杯望向茶山，画面停稳落幅</td><td><span class="en">At 00:12.000</span></td></tr>
+  </table></div>
+  <p>核对口径：切点 04.000 ＜ 08.500 ＜ 12.000 严格递增；最后一镜结束于 15.00 秒 = 目标时长；每镜只有一个主要任务。这张表就是动笔前的「账本」——第 2 课的 Step 1 拆的正是这个。</p>
+
+  <h3>超过 15 秒怎么办：拆段，每段独立成稿</h3>
+  <ul>
+    <li><strong>在写作层面拆，不在一稿里硬塞。</strong>17 秒的故事就写成两条独立提示词（如 9 秒＋8 秒），每条都自带完整的三字段或六段结构、各自满足 4–15 秒。</li>
+    <li><strong>段界落在自然断点上</strong>：场景转换处、动作完成点、一句台词说完之后——不要把一个动作或一句话劈成两段。</li>
+    <li><strong>下一段的开头要能「接住」上一段的结尾</strong>：把上一段的尾帧当作下一段的首帧（I2VA）或参考素材（Ref2VA）来写，人物外观、服装、光线在新一段的开头重新锚定一遍，不要指望模型记得上一段写过什么。</li>
+  </ul>
+</section>
+
+<!-- ================= 第 10 课 ================= -->
+<section class="ch" id="ch10">
+  <span class="ch-num">LESSON 10</span>
+  <h2>改稿课：三条烂稿的救法</h2>
+  <p class="lede">会写，还要会<strong>看出哪里写坏了</strong>。下面三条烂稿覆盖新手最常见的三类病——梗概病、声音混乱、标签混乱——每条都按「全文 → 逐条找错 → 改后稿」的顺序过一遍。改稿时用的全是前面九课的规则；这一课是把规则收拢成手感的关键。</p>
+  <p><span class="srcchip src-teach">教学示范</span><span class="small">本课三条烂稿与三条改后稿均为教学创作，不是官方范例；改法依据的规则全部出自官方指南。</span></p>
+
+  <h3>烂稿 ① 剧情梗概型</h3>
+  <p><strong>需求</strong>：10 秒，老邮递员最后一次送信，走村里的小路，把信塞进木栅栏的信箱，笑笑离开。</p>
+  <div class="badbox"><p class="badlabel">✗ 烂稿全文（教学示范）</p>
+  <pre style="white-space:pre-wrap;font-family:inherit;margin:8px 0">integrated_multimodal_description: A cinematic and beautiful video about an old postman delivering his last letter. He feels nostalgic and emotional as he walks through the village. The atmosphere is warm and touching. At the end he delivers the letter and smiles happily.
+
+overall_soundscape: N/A
+
+non_diegetic_music: Emotional and moving music.</pre></div>
+  <h4>逐条找错</h4>
+  <ol>
+    <li><strong>通篇是梗概，没有镜头。</strong>没有 <span class="en">[Shot 1]</span>、没有景别、没有构图、没有主体站在哪——模型没有任何可执行信息（第 3 课梗概病）。</li>
+    <li><strong>抽象词堆砌。</strong><span class="en">cinematic / beautiful / nostalgic / emotional / warm / touching</span> 全是看不见的内心与评价（第 3 课）。</li>
+    <li><strong>动作没有过程。</strong>「delivers the letter」一笔带过：怎么走、怎么拿信、塞进哪里，全没写（第 3 课因果链）。</li>
+    <li><strong>soundscape 误写 N/A。</strong>用户没要求全片静音；走路、塞信都是实打实的声音（第 6 课）。</li>
+    <li><strong>non_diegetic_music 只剩情绪词。</strong><span class="en">Emotional and moving</span> 不是乐器、不是速度，无法执行（第 6 课）。</li>
+  </ol>
+  <h4>改后稿</h4>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>改后稿 ①（教学示范）<button class="copybtn" type="button">复制</button></div><pre>integrated_multimodal_description: [Shot 1] Live-action, a medium-wide shot frames an elderly postman in a faded green uniform walking a narrow village lane at dawn, a worn leather mailbag on his shoulder. The camera tracks alongside him with small amplitude at slow speed as he stops before a wooden gate, takes a single envelope from the bag, and looks at it for a moment. [Shot 2] At 00:05.500, the camera cuts to a close-up of his weathered hand sliding the envelope into the gate's mail slot. He rests his palm on the gate briefly, then steps back and smiles.
+
+overall_soundscape: Birds chirp in the quiet lane while the mailbag's leather strap creaks softly with each step. The envelope slides against wood, followed by the light metallic click of the mail slot.
+
+non_diegetic_music: A solo harmonica melody at a slow tempo, joined by soft acoustic-guitar chords that fade out in the final seconds.</pre></div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 改后稿 ①（仅供理解，不要复制、不要粘贴使用）</div><pre>integrated_multimodal_description（多模态正文）：[Shot 1] 真人实拍，一个中远景镜头框住一位穿褪色绿色制服的老邮递员在清晨走一条狭窄的村路，肩上挎着磨损的皮质邮包。镜头以小幅度、慢速度与他并行跟拍，他在一扇木栅栏门前停下，从邮包里取出一封信，看了它一会儿。[Shot 2] 在 00:05.500，镜头切到他布满风霜的手的特写：把信封滑进栅栏门上的投信口。他的手掌在门上停留片刻，然后退后一步，微笑起来。
+
+overall_soundscape（全片环境声）：安静的小路上鸟鸣阵阵，邮包的皮带随每一步轻轻吱呀作响。信封贴着木头滑过，随后是投信口轻微的金属咔哒声。
+
+non_diegetic_music（非叙事音乐·观众配乐）：一段口琴独奏旋律，慢速，加入柔和的原声吉他和弦，在最后几秒淡出。</pre></div>
+  <p class="small">改动对照：拆成两镜并给出切点（00:05.500）；情绪全部翻译成行为（看信一会儿、手掌在门上停留、退后微笑）；soundscape 写回真实声音；配乐落到乐器＋速度＋动态。</p>
+
+  <h3>烂稿 ② 声音混乱型</h3>
+  <p><strong>需求</strong>：8 秒，夜里厨房，女儿拖着行李进门；妈妈坐在桌边等她，收音机在放老歌。妈妈原话：「回来啦，锅里给你留了粥。」女儿的内心旁白原话：「那一刻我突然不想走了。」</p>
+  <div class="badbox"><p class="badlabel">✗ 烂稿全文（教学示范）</p>
+  <pre style="white-space:pre-wrap;font-family:inherit;margin:8px 0">integrated_multimodal_description: [Shot 1] Live-action, a warm kitchen at night. A young woman opens the door and comes in. Her mother sits by the table, happy and relieved. The radio plays softly. [Shot 2] At 00:04.000, the camera cuts to the mother smiling at her daughter.
+
+overall_soundscape: The mother says: &lt;d&gt;[English] You're back, I saved you some porridge.&lt;/d&gt; The daughter thinks: &lt;d&gt;[English] At that moment I suddenly did not want to leave.&lt;/d&gt; Kitchen sounds and radio music fill the room.
+
+non_diegetic_music: Warm, healing, emotional music that makes people want to cry.</pre></div>
+  <h4>逐条找错</h4>
+  <ol>
+    <li><strong>台词写进了 overall_soundscape。</strong>台词只属于正文的 <span class="en">&lt;d&gt;</span>；soundscape 只概括环境与物理声（第 6 课分拣）。</li>
+    <li><strong>台词被意译成英文。</strong>两句原话都是中文，必须逐字保留、语言标签随原文（第 5 课动作 3）。</li>
+    <li><strong>没有说话人 ID、没有声音辨识信息。</strong>两位发声者都没编号、没音色描述（第 5 课动作 1、2）。</li>
+    <li><strong>内心旁白没按画外音写。</strong>女儿在画面内但不开口说话——必须用 <span class="en">says in an off-screen voiceover</span> 并紧跟她嘴唇保持闭合的声明（第 5 课动作 4）。</li>
+    <li><strong>收音机音乐的归属含糊。</strong>它是角色能听到的叙事内音乐，应在正文出现的镜头里明确写出，而不是塞进 soundscape 一笔带过（第 6 课）。</li>
+    <li><strong>non_diegetic_music 全是情绪词。</strong>本题唯一的音乐就是收音机（叙事内），观众专属配乐不存在，应老实写 <span class="en">N/A</span>（第 6 课）。</li>
+  </ol>
+  <h4>改后稿</h4>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>改后稿 ②（教学示范）<button class="copybtn" type="button">复制</button></div><pre>integrated_multimodal_description: [Shot 1] Live-action, a medium shot frames a small kitchen at night under a warm ceiling lamp. An old-fashioned radio on the counter plays a soft old song that both women can hear. The young woman (S2) pushes the door open and steps in with a suitcase. Her mother, an older woman with a gentle, slightly hoarse voice (S1), looks up from the table and says: &lt;d&gt;[Chinese] 回来啦，锅里给你留了粥。&lt;/d&gt; The daughter (S2) says in an off-screen voiceover: &lt;d&gt;[Chinese] 那一刻我突然不想走了。&lt;/d&gt; while her lips remain completely closed. [Shot 2] At 00:04.500, the camera cuts to a close-up of the mother rising to ladle porridge from the pot, still smiling.
+
+overall_soundscape: The door latch clicks and the suitcase wheels roll briefly over the tiles. A pot lid rattles softly as porridge simmers on the stove.
+
+non_diegetic_music: N/A</pre></div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 改后稿 ②（仅供理解，不要复制、不要粘贴使用）</div><pre>integrated_multimodal_description（多模态正文）：[Shot 1] 真人实拍，一个中景框住夜晚的小厨房，头顶是温暖的吊灯。柜台上一台老式收音机播放着一首柔和的老歌，两个女人都能听到。年轻女子（S2）推开门，提着行李箱走进来。她的母亲，年长女子，温柔、略带沙哑的嗓音（S1），从桌边抬起头说道：&lt;d&gt;[Chinese] 回来啦，锅里给你留了粥。&lt;/d&gt;女儿（S2）以画外音说道：&lt;d&gt;[Chinese] 那一刻我突然不想走了。&lt;/d&gt;同时她的嘴唇完全闭合。[Shot 2] 在 00:04.500，镜头切到母亲的特写：她起身从锅里舀粥，仍在微笑。
+
+overall_soundscape（全片环境声）：门闩咔哒一声，行李箱的轮子在地砖上短暂滚动。灶上的粥翻滚着，锅盖轻轻作响。
+
+non_diegetic_music（非叙事音乐·观众配乐）：N/A（无——唯一的音乐是正文里收音机放的老歌，属于叙事内音乐）</pre></div>
+
+  <h3>烂稿 ③ Ref2VA 标签混乱型</h3>
+  <p><strong>素材与需求</strong>：一张 8 岁男孩的照片（只提供外观）；一段海边空镜视频（只借它的运镜与节奏，自带海浪声）；需求是 6 秒、男孩在自家厨房学煎蛋。</p>
+  <div class="badbox"><p class="badlabel">✗ 烂稿全文（教学示范）</p>
+  <pre style="white-space:pre-wrap;font-family:inherit;margin:8px 0">subject_definitions:
+&lt;Picture 1&gt; is the first frame of the target video, showing the boy.
+&lt;Audio 1&gt; is the audio track of &lt;Video 1&gt;.
+
+summary:
+[reference generation] The target video shows &lt;Subject 1&gt; the boy cooking, filmed like &lt;OceanClip 1&gt;.
+
+retention_analysis:
+&lt;Picture 1&gt;: partially_preserved - the boy appears in a new kitchen scene.
+
+detailed_description:
+The target video is in a home-video style.
+[Shot 1] The boy fries an egg in the kitchen. [Shot 2] At 00:02.000, the shot cuts to the egg in the pan. [Shot 3] At 00:01.500, the shot cuts back to the boy smiling.
+
+overall_soundscape: Kitchen sounds.
+
+non_diegetic_music: Happy music.</pre></div>
+  <h4>逐条找错</h4>
+  <ol>
+    <li><strong>只供外观的照片被立成了 &lt;Picture 1&gt; 帧锚。</strong>照片不充当任何一帧，出处应写进 Subject 的定义（第 8 课 Step 1 误判 ①）。</li>
+    <li><strong>带声视频被自动建了 &lt;Audio 1&gt;。</strong>海浪声既不复制也不参考，不建 Audio（第 8 课 Step 1 误判 ②）。</li>
+    <li><strong>summary 里新造标签 &lt;OceanClip 1&gt;，还引用了未定义的 &lt;Subject 1&gt;。</strong>summary 只能使用已定义的标签；视频应以它在定义段中的身份被引用（第 8 课 Step 3）。</li>
+    <li><strong>retention 标错对象、选错程度。</strong>该打标的是 Subject；男孩外观原样沿用应是 fully_preserved——「换了新场景」是新增剧情，不算保真损失（第 8 课 Step 4）。对视频的运镜借鉴也漏了打标（应为 weak_reference）。</li>
+    <li><strong>时间戳不递增。</strong>[Shot 3] 的 00:01.500 小于 [Shot 2] 的 00:02.000，时间线倒流（第 9 课）。</li>
+    <li><strong>正文是梗概。</strong>没有构图、没有特征复述、没有标签落点、没有运镜——而需求恰恰要求借参考视频的运镜（第 3、8 课）。</li>
+  </ol>
+  <h4>改后稿</h4>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>改后稿 ③（教学示范）<button class="copybtn" type="button">复制</button></div><pre>subject_definitions:
+&lt;Subject 1&gt; is the boy in &lt;Picture 1&gt;, with short black hair, a round face, and a yellow apron over a white T-shirt.
+&lt;Video 1&gt; is a seaside clip referenced only for its slow lateral camera movement and pacing.
+
+summary:
+[reference generation] The target video shows &lt;Subject 1&gt; learning to fry an egg in a home kitchen, using the slow lateral tracking movement and unhurried pacing referenced from &lt;Video 1&gt;.
+
+retention_analysis:
+&lt;Subject 1&gt; (appears in [Shot 1], [Shot 2]): fully_preserved - the boy's short black hair, round face, yellow apron, and white T-shirt are retained.
+&lt;Video 1&gt; (camera movement and pacing): weak_reference - only the slow lateral movement and pacing are followed.
+
+detailed_description:
+The target video is in a bright, realistic home-video style with natural window light.
+[Shot 1] A medium shot frames &lt;Subject 1&gt;, the boy with short black hair and a yellow apron, standing at a stove with a frying pan. Following the slow lateral movement referenced from &lt;Video 1&gt;, the camera trucks right with small amplitude at slow speed as he cracks an egg against the pan's rim and tips it in. [Shot 2] At 00:03.500, the shot cuts to a close-up of the egg white spreading and setting around the yolk while &lt;Subject 1&gt; watches from the edge of the frame, holding the shell halves.
+
+overall_soundscape:
+The egg sizzles steadily in the pan under a faint kitchen fan hum. The shell taps lightly against the pan's rim.
+
+non_diegetic_music:
+N/A</pre></div>
+  <div class="zhd"><div class="zhd-head">中文对照 · 改后稿 ③（仅供理解，不要复制、不要粘贴使用）</div><pre>subject_definitions（主体定义）:
+&lt;Subject 1&gt; 是 &lt;Picture 1&gt; 中的男孩，特征为：黑色短发、圆脸、白色 T 恤外穿黄色围裙。
+&lt;Video 1&gt; 是一段海边短片，仅供参考其缓慢的横向镜头移动与节奏。
+
+summary（任务摘要）:
+[reference generation]（参考生成）目标视频展示 &lt;Subject 1&gt; 在自家厨房学煎蛋，使用参考自 &lt;Video 1&gt; 的缓慢横向跟移镜头和从容的节奏。
+
+retention_analysis（保留度分析）:
+&lt;Subject 1&gt;（出现在 [Shot 1]、[Shot 2]）：fully_preserved（完整保留）——男孩的黑色短发、圆脸、黄色围裙和白色 T 恤全部保留。
+&lt;Video 1&gt;（运镜与节奏）：weak_reference（弱参考）——只跟随其缓慢的横向移动与节奏。
+
+detailed_description（逐镜正文）:
+目标视频采用明亮、写实的家庭录像风格，自然的窗光。
+[Shot 1] 一个中景框住 &lt;Subject 1&gt;——黑色短发、穿黄色围裙的男孩——站在灶台前，面前是一口煎锅。跟随参考自 &lt;Video 1&gt; 的缓慢横向移动，镜头以小幅度、慢速度向右平移（Truck Right），他把鸡蛋在锅沿上磕开，倒入锅中。[Shot 2] 在 00:03.500，镜头切到蛋清在蛋黄周围摊开、凝固的特写，&lt;Subject 1&gt; 在画面边缘看着，手里拿着两半蛋壳。
+
+overall_soundscape（全片环境声）:
+鸡蛋在锅里稳定地滋滋作响，下方有微弱的厨房排风扇嗡鸣。蛋壳轻轻敲击锅沿。
+
+non_diegetic_music（非叙事音乐·观众配乐）:
+N/A（无）</pre></div>
+
+  <h3>排错总表：写完之后逐项自查</h3>
+  <div class="tbl"><table>
+    <tr><th style="min-width:170px">错误</th><th>后果</th><th>改法</th></tr>
+    <tr><td>把正文写成剧情梗概</td><td>模型没有可执行的镜头信息</td><td>逐镜写构图、位置、动作、运镜与声音</td></tr>
+    <tr><td>用 cinematic / beautiful 等抽象词充数</td><td>画面不可控</td><td>换成具体可视、可听的细节</td></tr>
+    <tr><td>台词被翻译或改写</td><td>与原意不符</td><td><span class="en">&lt;d&gt;</span> 内逐字保留原文与标点</td></tr>
+    <tr><td>画外音后没写嘴唇闭合</td><td>画面人物会跟着动嘴</td><td>每条画外音后立刻补 lips remain closed</td></tr>
+    <tr><td>把台词歌词重复写进 overall_soundscape</td><td>声音层混乱</td><td>台词只留在正文；soundscape 只写环境与物理声</td></tr>
+    <tr><td>non_diegetic_music 写抽象情绪词</td><td>无法执行</td><td>只写乐器、速度、节奏、动态变化</td></tr>
+    <tr><td>标签在各段不一致，或在 summary 里新造标签</td><td>参考关系断裂</td><td>标签先在 subject_definitions 定义，全程复用同一写法</td></tr>
+    <tr><td>把只提供外观参考的图写成独立 &lt;Picture N&gt; 帧锚</td><td>模式语义错误，图被当成某一帧</td><td>出处写进 Subject 定义；Picture 只给真帧锚</td></tr>
+    <tr><td>普通参考视频带声音就自动建 &lt;Audio N&gt;</td><td>音频关系虚构</td><td>只有音频被复制或被参考时才建 Audio</td></tr>
+    <tr><td>retention 标记超出已定义角色范围，或把新增剧情算作保真损失</td><td>分析失真</td><td>标记只在已定义角色内选；新增内容不算损失</td></tr>
+    <tr><td>听不清的参考台词靠猜</td><td>内容错误</td><td>写 <span class="en">[unclear]</span></td></tr>
+    <tr><td>时间戳不递增，或总时长对不上</td><td>时间线错乱</td><td>首镜无时间戳、后续严格递增、末帧时间等于目标时长</td></tr>
+    <tr><td>FL2VA 写成两张静态图描述</td><td>没有中间路径，插值无从下手</td><td>写可观察的中间变化，并逐步收束到尾帧</td></tr>
+    <tr><td>L2VA 把尾图当 Shot 1</td><td>锚定错位，全片方向反了</td><td>尾图属于最后一个镜头 [Shot N]</td></tr>
+  </table></div>
+</section>
+
+<!-- ================= 第 11 课 ================= -->
+<section class="ch" id="ch11">
+  <span class="ch-num">LESSON 11</span>
+  <h2>练习区：自己动手写一遍</h2>
+  <p class="lede">六道题按课程顺序排：先判模式，再扩写、改写、上标记、搭骨架、算时间。先自己写完，再展开参考答案对照——答案都严格按官方格式写成，可直接当评分标尺。</p>
+  <p><span class="srcchip src-teach">教学示范</span><span class="small">题目与参考答案均为教学创作；格式、标记与句式依据官方指南。</span></p>
+
+  <h3>练习 1 · 判断模式（5 个需求）</h3>
+  <ol>
+    <li>「没有任何素材，写一条 6 秒的：雨夜便利店，店员把最后一把伞递给门外的老人。」</li>
+    <li>「这张照片是第一帧：滑板少年蹲在坡道顶端。让他冲下去，10 秒。」</li>
+    <li>「首帧是合上的礼盒，尾帧是打开后露出的戒指，中间 8 秒补出来。」</li>
+    <li>「定妆图里的人 + 场景图里的街道 + 这段录音的音色，写一场 12 秒的夜戏对白。」</li>
+    <li>「视频最后一帧必须是这张图：棋盘上将死的局面。前面 9 秒推出来。」</li>
+  </ol>
+  <details class="ans"><summary>展开参考答案</summary><div class="ans-body">
+    <div class="tbl"><table>
+      <tr><th>#</th><th>模式</th><th>理由</th></tr>
+      <tr><td>1</td><td><strong>T2VA</strong></td><td>无任何素材，纯文字构建时间线</td></tr>
+      <tr><td>2</td><td><strong>I2VA</strong></td><td>图被明确指定为首帧，从图出发向前发展</td></tr>
+      <tr><td>3</td><td><strong>FL2VA</strong></td><td>首尾帧都已给定，任务是补中间路径</td></tr>
+      <tr><td>4</td><td><strong>Ref2VA</strong></td><td>图只供外观与场景参考、不作帧；还涉及参考音频</td></tr>
+      <tr><td>5</td><td><strong>L2VA</strong></td><td>只有尾帧给定，反推开场并收束回尾帧</td></tr>
+    </table></div>
+  </div></details>
+
+  <h3>练习 2 · 把一句话扩写成 T2VA 三字段</h3>
+  <p>需求：「6 秒，清晨渔港，一位老渔民把小船推下水。」要求：单镜头；写全三字段；没有配乐需求时第三段自己判断。</p>
+  <details class="ans"><summary>展开参考答案</summary><div class="ans-body">
+    <div class="cb"><div class="cb-head"><span class="dot"></span>参考答案（教学示范）<button class="copybtn" type="button">复制</button></div><pre>integrated_multimodal_description: [Shot 1] Live-action, a wide shot frames a quiet fishing harbor at dawn, low mist over still water. An elderly fisherman in a dark raincoat grips the bow of a small wooden boat resting on the mudflat. The camera pushes in with small amplitude at slow speed as he leans his weight forward and slides the boat toward the waterline, its hull scraping over the wet mud until the bow floats free and rocks gently.
+
+overall_soundscape: The hull scrapes softly over mud, followed by gentle water lapping against the wood. Distant gulls call once over the harbor's low ambient hush.
+
+non_diegetic_music: N/A</pre></div>
+    <div class="zhd"><div class="zhd-head">中文对照 · 练习 2 参考答案（仅供理解，不要复制、不要粘贴使用）</div><pre>integrated_multimodal_description（多模态正文）：[Shot 1] 真人实拍，一个远景框住黎明时分安静的渔港，平静的水面上飘着低雾。一位穿深色雨衣的老渔民握住停在泥滩上的一条小木船的船头。镜头以小幅度、慢速度推近，他把身体的重量向前压，把船推向水线，船体刮过湿泥，直到船头脱离泥滩浮起来，轻轻摇晃。
+
+overall_soundscape（全片环境声）：船体在泥上轻轻刮擦，随后是水轻轻拍打船木的声音。远处海鸥在港口低沉的环境静谧中叫了一声。
+
+non_diegetic_music（非叙事音乐·观众配乐）：N/A（无）</pre></div>
+  </div></details>
+
+  <h3>练习 3 · 把三句抽象描写改具体</h3>
+  <ol>
+    <li>「画面很有电影感。」（场景：清晨渔港）</li>
+    <li>「屋子里的气氛很压抑。」</li>
+    <li>「她看起来很开心。」</li>
+  </ol>
+  <details class="ans"><summary>展开参考答案</summary><div class="ans-body">
+    <div class="tbl"><table>
+      <tr><th>原句</th><th>改法（教学示范）</th><th>换了什么</th></tr>
+      <tr><td>画面很有电影感</td><td><span class="en">soft pre-dawn light filtering through harbor mist, shallow depth of field, the distant masts fading into grey</span><br><span class="small">直译：黎明前的柔光透过港口的雾气，景深浅，远处的桅杆在灰色中隐去</span></td><td>换成光线、景深与虚化层次</td></tr>
+      <tr><td>气氛很压抑</td><td><span class="en">the only sounds are a dripping tap and a ticking wall clock; the man sits motionless with hunched shoulders, staring at the table</span><br><span class="small">直译：唯一的声音是滴水的水龙头和滴答作响的挂钟；男子一动不动、耸着肩，盯着桌子</span></td><td>换成仅有的声源与静止的姿态</td></tr>
+      <tr><td>她看起来很开心</td><td><span class="en">she laughs out loud, eyes narrowing, claps once, then covers her mouth with both hands</span><br><span class="small">直译：她大笑出声，眼睛眯起，拍了一下手，然后双手捂住嘴</span></td><td>换成一串可见的表情与动作</td></tr>
+    </table></div>
+  </div></details>
+
+  <h3>练习 4 · 给对话稿加上正确的 (Sx) 与 &lt;d&gt;</h3>
+  <p>原始对话稿（未加任何标记）：爷爷在院子画面里喊：「伢子，慢点跑。」孙子在画面外远处回应：「知道啦——」话没说完，视频结束。要求：分配 ID、补声音辨识信息、台词入 <span class="en">&lt;d&gt;</span>、处理片尾截断、该闭唇的要写闭唇。</p>
+  <details class="ans"><summary>展开参考答案</summary><div class="ans-body">
+    <div class="cb"><div class="cb-head"><span class="dot"></span>参考答案（教学示范）<button class="copybtn" type="button">复制</button></div><pre>The elderly man with a rough, carrying voice (S1) calls out toward the lane: &lt;d&gt;[Chinese] 伢子，慢点跑。&lt;/d&gt; From off-screen in the distance, his grandson, a young boy with a bright, high voice (S2), calls back, &lt;d&gt;[Chinese] 知道啦——&lt;cutoff&gt;&lt;/d&gt; while the old man's lips remain completely closed.</pre></div>
+    <p class="glossline"><b>中文直译：</b>老人，粗粝、穿透力强的嗓音（S1）朝小路喊道：&lt;d&gt;[Chinese] 伢子，慢点跑。&lt;/d&gt;从远处画面外，他的孙子，年轻男孩，明亮、高亢的嗓音（S2）回应道：&lt;d&gt;[Chinese] 知道啦——&lt;cutoff&gt;&lt;/d&gt;（话被片尾截断），同时老人的嘴唇完全闭合。（台词为中文原文，原样保留。）</p>
+    <p>自查点：爷爷先发声为 (S1)、孙子为 (S2)；两人都给了声音辨识信息；原文逐字未动；孙子的声音来自画外，爷爷（画面内人物）的闭唇要声明；片尾截断用 <span class="en">&lt;cutoff&gt;</span> 标在被截断处。</p>
+  </div></details>
+
+  <h3>练习 5 · 写 Ref2VA 的前三段骨架</h3>
+  <p>素材：① 角色图——穿红色长裙的女舞者照片，只供外观；② 场景图——旧剧院舞台照片，只供场景；③ 音频——一段女声旁白录音，只借音色。需求：10 秒，舞者在旧剧院舞台上独舞，一位画外女声旁白念一句新台词。只写 <span class="en">subject_definitions</span>、<span class="en">summary</span>、<span class="en">retention_analysis</span> 三段。</p>
+  <details class="ans"><summary>展开参考答案</summary><div class="ans-body">
+    <div class="cb"><div class="cb-head"><span class="dot"></span>参考答案（教学示范）<button class="copybtn" type="button">复制</button></div><pre>subject_definitions:
+&lt;Subject 1&gt; is the old theater stage environment in &lt;Picture 2&gt;, featuring rows of worn red velvet seats, a gilded proscenium arch, and a dusty wooden stage floor.
+&lt;Subject 2&gt; is the dancer in &lt;Picture 1&gt;, with long black hair in a low bun and a flowing red dress with long sleeves.
+&lt;Audio 1&gt; is the voice-timbre reference for the off-screen narrator (S1).
+
+summary:
+[reference generation + audio reference] The target video shows &lt;Subject 2&gt; dancing alone on the stage of &lt;Subject 1&gt;, while an off-screen narrator (S1) speaks one new line in the voice timbre referenced from &lt;Audio 1&gt;.
+
+retention_analysis:
+&lt;Subject 1&gt; (appears in [Shot 1], [Shot 2]): fully_preserved - the worn red velvet seats, gilded proscenium arch, and dusty wooden stage floor are retained.
+&lt;Subject 2&gt; (appears in [Shot 1], [Shot 2]): fully_preserved - the dancer's long black hair in a low bun and flowing red dress are retained.
+&lt;Audio 1&gt;: reference - the narrator follows &lt;Audio 1&gt;'s voice timbre and calm pacing without copying the original signal.</pre></div>
+    <div class="zhd"><div class="zhd-head">中文对照 · 练习 5 参考答案（仅供理解，不要复制、不要粘贴使用）</div><pre>subject_definitions（主体定义）:
+&lt;Subject 1&gt; 是 &lt;Picture 2&gt; 中的旧剧院舞台环境，特征为：一排排磨损的红色天鹅绒座椅、镀金的镜框式舞台口和满是灰尘的木质舞台地板。
+&lt;Subject 2&gt; 是 &lt;Picture 1&gt; 中的舞者，特征为：黑色长发梳成低发髻、飘逸的红色长裙、长袖。
+&lt;Audio 1&gt; 是画外叙述者（S1）的音色参考音频。
+
+summary（任务摘要）:
+[reference generation + audio reference]（参考生成 + 音频参考）目标视频展示 &lt;Subject 2&gt; 在 &lt;Subject 1&gt; 的舞台上独舞，同时画外叙述者（S1）以参考自 &lt;Audio 1&gt; 的音色说一句新台词。
+
+retention_analysis（保留度分析）:
+&lt;Subject 1&gt;（出现在 [Shot 1]、[Shot 2]）：fully_preserved（完整保留）——磨损的红色天鹅绒座椅、镀金镜框式舞台口和满是灰尘的木质舞台地板全部保留。
+&lt;Subject 2&gt;（出现在 [Shot 1]、[Shot 2]）：fully_preserved（完整保留）——舞者梳成低发髻的黑色长发和飘逸的红色长裙全部保留。
+&lt;Audio 1&gt;：reference（仅参考）——叙述者跟随 &lt;Audio 1&gt; 的音色和平静的节奏，不复制原始信号。</pre></div>
+    <p>自查点：两张图都只供参考，所以没有独立的 Picture 帧锚条目，出处写进 Subject 定义；旁白不是已定义主体，音频定义用「稳定的声音描述＋(S1)」绑定；新台词是新写的、不是复制原录音，所以任务类型是 audio reference、标记是 reference；retention 里不写 (Sx)——注意答案里 summary 出现 (S1) 是允许的，禁写的只是 retention_analysis。</p>
+  </div></details>
+
+  <h3>练习 6 · 给 12 秒需求做切镜时间分配表</h3>
+  <p>需求：「12 秒香水广告片：晨光里的梳妆台 → 手拿起香水瓶 → 喷洒的瞬间 → 她闭眼微笑收尾。」要求：4 个镜头，给出每镜时段、任务与切点时间戳。</p>
+  <details class="ans"><summary>展开参考答案</summary><div class="ans-body">
+    <div class="tbl"><table>
+      <tr><th>镜头</th><th>时段</th><th>任务</th><th>切点</th></tr>
+      <tr><td>[Shot 1]</td><td>0–3.5 秒</td><td>建立：晨光落在梳妆台上，香水瓶居中，空间与光线交代完</td><td>无（首镜不带时间戳）</td></tr>
+      <tr><td>[Shot 2]</td><td>3.5–7 秒</td><td>动作：手入画拿起香水瓶，特写瓶身与指尖</td><td><span class="en">At 00:03.500</span></td></tr>
+      <tr><td>[Shot 3]</td><td>7–9.5 秒</td><td>高潮：按下喷头，雾珠在逆光里散开（动作单一，所以可以短）</td><td><span class="en">At 00:07.000</span></td></tr>
+      <tr><td>[Shot 4]</td><td>9.5–12 秒</td><td>收束：她闭眼微笑，画面停稳落幅</td><td><span class="en">At 00:09.500</span></td></tr>
+    </table></div>
+    <p>自查点：切点 03.500 ＜ 07.000 ＜ 09.500 严格递增；末镜结束于 12 秒 = 目标时长；每镜只有一个任务；无台词，所以镜头长短按动作密度分配。</p>
+  </div></details>
+</section>
+
+<!-- ================= 工具页 ================= -->
+<section class="ch" id="ch12">
+  <span class="ch-num">TOOLKIT</span>
+  <h2>工具页：空白模板、交付检查清单与速查卡</h2>
+  <p class="lede">写新稿时从模板起步，交付前用清单逐项勾完，最后拿速查卡兜底核对格式。</p>
+
+  <h3>空白模板 A · 基础模式（复制后填空）</h3>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>基础模式模板（T2VA 删除指令行；I2VA / FL2VA / L2VA 只保留对应一行）<button class="copybtn" type="button">复制</button></div><pre>[I2VA] For the target video, at 0.00 seconds into the target video, &lt;Picture 1&gt; (from [Shot 1]) is fully referenced.
+[FL2VA] How the reference pictures align with the target video — Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot N) aligns with the S.SS-second mark of the target video.
+[L2VA] How the reference pictures align with the target video — &lt;Picture 1&gt; (from [Shot N]) aligns with the S.SS-second mark of the target video.
+
+integrated_multimodal_description: [Shot 1] &lt;Style&gt;, &lt;shot size&gt; frames &lt;subject + initial composition + scene&gt;. The camera &lt;motion type + amplitude + speed&gt; as &lt;action develops&gt;. &lt;Speaker description&gt; (S1) says: &lt;d&gt;[Language] &lt;original dialogue&gt;&lt;/d&gt; [Shot 2] At 00:0X.XXX, the camera cuts to &lt;new information&gt;.
+
+overall_soundscape: &lt;1–4 sentences: ambience + physical sounds + non-verbal human sounds&gt;
+
+non_diegetic_music: &lt;1–3 sentences: instrumentation + tempo + rhythm + dynamics, or N/A&gt;</pre></div>
+
+  <h3>空白模板 B · Ref2VA 六段骨架（复制后填空）</h3>
+  <div class="cb"><div class="cb-head"><span class="dot"></span>Ref2VA 模板<button class="copybtn" type="button">复制</button></div><pre>subject_definitions:
+&lt;Subject 1&gt; is &lt;definition + source asset + key features&gt;.
+&lt;Picture 1&gt; is &lt;only if it is a real frame / storyboard anchor&gt;.
+&lt;Video 1&gt; is &lt;only for whole-video relationships&gt;.
+&lt;Audio 1&gt; is &lt;audio role; add (Sx) if bound to a target speaker&gt;.
+
+summary:
+[task type + task type] &lt;One short paragraph using only defined labels.&gt;
+
+retention_analysis:
+&lt;Subject 1&gt; (appears in [Shot 1]): fully_preserved / partially_preserved / attribute_transfer / weak_reference - &lt;what is retained&gt;.
+&lt;Audio 1&gt;: fully_copy / partially_copy / reference / weak_reference - &lt;how the audio is used&gt;.
+
+detailed_description:
+&lt;One or two sentences establishing style.&gt;
+[Shot 1] &lt;Composition, subject appearance and position, environment and lighting, actions, camera, current sound, labels where they take effect.&gt;
+[Shot 2] At 00:0X.XXX, the shot cuts to &lt;...&gt;.
+
+overall_soundscape:
+&lt;Ambience and physical sounds; audio-copy relationship for this layer if any.&gt;
+
+non_diegetic_music:
+&lt;Audience-only score, or its reuse relationship, or N/A.&gt;</pre></div>
+
+  <h3>中英术语对照表</h3>
+  <p class="small">全站出现的英文术语集中在这里：写稿时遇到不认识的字段、标签、标记或运镜词，回这里查。左列英文是写进提示词的原样，右列中文只供理解。</p>
+  <h4>字段名</h4>
+  <div class="tbl"><table>
+    <tr><th>英文</th><th>中文</th><th>出现位置</th></tr>
+    <tr><td><span class="en">integrated_multimodal_description</span></td><td>多模态正文</td><td>基础模式三字段之首，正文主体</td></tr>
+    <tr><td><span class="en">overall_soundscape</span></td><td>全片环境声</td><td>基础模式与 Ref2VA 共有，概括全片环境 / 物理 / 非言语声</td></tr>
+    <tr><td><span class="en">non_diegetic_music</span></td><td>非叙事音乐·观众配乐</td><td>角色听不见、只有观众能听到的配乐</td></tr>
+    <tr><td><span class="en">subject_definitions</span></td><td>主体定义</td><td>Ref2VA 第一段，给素材立标签名册</td></tr>
+    <tr><td><span class="en">summary</span></td><td>任务摘要</td><td>Ref2VA 第二段，以方括号任务类型开头</td></tr>
+    <tr><td><span class="en">retention_analysis</span></td><td>保留度分析</td><td>Ref2VA 第三段，逐标签打保留度标记</td></tr>
+    <tr><td><span class="en">detailed_description</span></td><td>逐镜正文</td><td>Ref2VA 第四段，真正的正文</td></tr>
+  </table></div>
+  <h4>标签与记号</h4>
+  <div class="tbl"><table>
+    <tr><th>英文</th><th>中文</th><th>含义</th></tr>
+    <tr><td><span class="tagchip">&lt;Subject N&gt;</span></td><td>主体</td><td>从参考素材抽象出的可见内容单元（人、物、场景、风格等）</td></tr>
+    <tr><td><span class="tagchip">&lt;Picture N&gt;</span></td><td>帧锚图</td><td>充当具体目标帧或分镜规划锚点的参考图本身</td></tr>
+    <tr><td><span class="tagchip">&lt;Video N&gt;</span></td><td>全片级参考视频</td><td>提供剪辑源、续接、运镜 / 节奏等全片级关系的参考视频</td></tr>
+    <tr><td><span class="tagchip">&lt;Audio N&gt;</span></td><td>参考 / 复用音频</td><td>被复制或被参考的音频信号</td></tr>
+    <tr><td><span class="en">(S1) / (S2)</span></td><td>说话人编号</td><td>按发声顺序分配，全片复用不变；齐声用 (S1,S2)</td></tr>
+    <tr><td><span class="en">&lt;d&gt;…&lt;/d&gt;</span></td><td>台词标记</td><td>内只放语言标签 + 台词 / 歌词原文，逐字不译</td></tr>
+    <tr><td><span class="en">&lt;scenetrans&gt;</span></td><td>跨切标记</td><td>同一句台词跨越切镜时，在连接点两边各放一个</td></tr>
+    <tr><td><span class="en">&lt;cutoff&gt;</span></td><td>截断标记</td><td>台词被视频结尾截断时，标在截断处</td></tr>
+    <tr><td><span class="en">[unclear]</span></td><td>听不清占位</td><td>参考音频里听不清的段落照此写，不猜不改述</td></tr>
+    <tr><td><span class="en">[Shot N]</span></td><td>镜头号</td><td>[Shot 1] 不带时间戳，后续镜头带严格递增的切点时间</td></tr>
+  </table></div>
+  <h4>六种任务类型（summary 前缀）</h4>
+  <div class="tbl"><table>
+    <tr><th>英文</th><th>中文</th><th>何时用</th></tr>
+    <tr><td><span class="en">keyframe completion</span></td><td>关键帧补全</td><td>图充当首帧 / 关键帧 / 尾帧等具体帧锚</td></tr>
+    <tr><td><span class="en">reference generation</span></td><td>参考生成</td><td>素材只提供生成指引，不作帧、不是剪辑或续接源</td></tr>
+    <tr><td><span class="en">video editing</span></td><td>视频剪辑</td><td>直接修改已有源视频</td></tr>
+    <tr><td><span class="en">video continuation</span></td><td>视频续接</td><td>新内容从源视频续接、延长、恢复或转场而来</td></tr>
+    <tr><td><span class="en">audio reuse</span></td><td>音频复用</td><td>同一音频信号被整体或部分直接复制</td></tr>
+    <tr><td><span class="en">audio reference</span></td><td>音频参考</td><td>不复制信号，只参考音色、风格、节拍等</td></tr>
+  </table></div>
+  <h4>八个保留度标记（retention_analysis）</h4>
+  <div class="tbl"><table>
+    <tr><th>英文</th><th>中文</th><th>适用对象</th></tr>
+    <tr><td><span class="en">fully_preserved</span></td><td>完整保留</td><td>可见内容（Subject / Picture / Video）</td></tr>
+    <tr><td><span class="en">partially_preserved</span></td><td>部分保留</td><td>可见内容</td></tr>
+    <tr><td><span class="en">attribute_transfer</span></td><td>属性迁移</td><td>可见内容（特征被搬到另一个主体上）</td></tr>
+    <tr><td><span class="en">weak_reference</span></td><td>弱参考</td><td>可见内容与音频通用（只保留大体相似）</td></tr>
+    <tr><td><span class="en">fully_copy</span></td><td>完整复制</td><td>音频（即目标视频的完整最终音轨）</td></tr>
+    <tr><td><span class="en">partially_copy</span></td><td>部分复制</td><td>音频</td></tr>
+    <tr><td><span class="en">reference</span></td><td>仅参考</td><td>音频（不复制信号）</td></tr>
+  </table></div>
+  <h4>运镜词</h4>
+  <div class="tbl"><table>
+    <tr><th>英文</th><th>中文</th><th>英文</th><th>中文</th></tr>
+    <tr><td><span class="en">Zoom In / Zoom Out</span></td><td>变焦拉近 / 拉远</td><td><span class="en">Push In / Pull Out</span></td><td>机位推近 / 拉远</td></tr>
+    <tr><td><span class="en">Pan Left / Pan Right</span></td><td>左摇 / 右摇</td><td><span class="en">Truck Left / Truck Right</span></td><td>机位左移 / 右移</td></tr>
+    <tr><td><span class="en">Tilt Up / Tilt Down</span></td><td>上仰 / 下俯</td><td><span class="en">Pedestal Up / Pedestal Down</span></td><td>机位上升 / 下降</td></tr>
+    <tr><td><span class="en">Arc Shot</span></td><td>环绕镜头</td><td><span class="en">Tracking Shot</span></td><td>跟拍</td></tr>
+    <tr><td><span class="en">Static Shot</span></td><td>固定镜头</td><td><span class="en">Shake Slightly / Shake Strongly</span></td><td>轻微 / 强烈抖动</td></tr>
+    <tr><td><span class="en">POV</span></td><td>主观视角</td><td><span class="en">Roll Clockwise / Roll Counterclockwise</span></td><td>顺时针 / 逆时针滚转</td></tr>
+    <tr><td><span class="en">with small amplitude</span></td><td>小幅度</td><td><span class="en">with large amplitude</span></td><td>大幅度</td></tr>
+    <tr><td><span class="en">at slow speed</span></td><td>慢速</td><td><span class="en">at fast speed</span></td><td>快速</td></tr>
+  </table></div>
+  <h4>切镜句式</h4>
+  <div class="tbl"><table>
+    <tr><th>英文</th><th>中文</th></tr>
+    <tr><td><span class="en">the camera cuts to</span></td><td>镜头切到</td></tr>
+    <tr><td><span class="en">the shot cuts to</span></td><td>镜头切到</td></tr>
+    <tr><td><span class="en">the shot transitions to</span></td><td>镜头转到</td></tr>
+    <tr><td><span class="en">the shot changes to</span></td><td>镜头换到</td></tr>
+    <tr><td><span class="en">the shot switches to</span></td><td>镜头切换到</td></tr>
+    <tr><td><span class="en">continues seamlessly across the cut</span> 等</td><td>（声音）跨切无缝延续——跨切台词的四种常用表达，见第 5 课动作 5</td></tr>
+    <tr><td><span class="en">says in an off-screen voiceover</span></td><td>以画外音说道——画外音固定句式，其后必须紧跟闭唇声明</td></tr>
+  </table></div>
+
+  <h3>交付前检查清单</h3>
+  <p class="small">进度只记在当前页面里，刷新即清零——把它当一次性的出门检查，而不是存档。</p>
+  <div class="checkwrap">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <strong>交付前检查清单</strong><span class="small" id="checkCount">已完成 0 / 20</span>
+    </div>
+    <div class="progressbar" style="margin:10px 0 8px"><i id="checkBar"></i></div>
+    <div id="checkList">
+      <label class="checkitem"><input type="checkbox"><span>模式选对了：按「图是干什么用的」判断，而不是按图的数量</span></label>
+      <label class="checkitem"><input type="checkbox"><span>总时长在 4–15 秒内，且提示词的时间线与目标时长严格对齐</span></label>
+      <label class="checkitem"><input type="checkbox"><span>字段名与段落顺序照指南原文（基础三字段 / Ref2VA 六段），没有自创变体</span></label>
+      <label class="checkitem"><input type="checkbox"><span>对齐指令是提示词第一行、后跟一个空行；S.SS 恰好两位小数，N 是最后一个镜头的序号</span></label>
+      <label class="checkitem"><input type="checkbox"><span>[Shot 1] 不带时间戳；后续时间戳严格递增且都在时长之内</span></label>
+      <label class="checkitem"><input type="checkbox"><span>每一镜都写了构图、主体位置、环境、动作、运镜、当前声音——不是剧情梗概</span></label>
+      <label class="checkitem"><input type="checkbox"><span>运镜写成自然句子，用的是词汇表里的类型词；幅度 / 速度只在有意义时加</span></label>
+      <label class="checkitem"><input type="checkbox"><span>说话人 ID 稳定且跨镜不变；不发声的角色没有 ID；齐声用了复合 ID</span></label>
+      <label class="checkitem"><input type="checkbox"><span>&lt;d&gt; 内只有语言标签与原文，逐字逐标点、未翻译未改写</span></label>
+      <label class="checkitem"><input type="checkbox"><span>每条画外音用了 says in an off-screen voiceover，且其后立刻写了嘴唇保持闭合</span></label>
+      <label class="checkitem"><input type="checkbox"><span>跨切台词两边都有 &lt;scenetrans&gt; 并明示延续；片尾截断用了 &lt;cutoff&gt;</span></label>
+      <label class="checkitem"><input type="checkbox"><span>画面可见文字用英文双引号原样引用、未翻译</span></label>
+      <label class="checkitem"><input type="checkbox"><span>overall_soundscape 是 1–4 句一段，只写环境 / 物理 / 非言语声，没有重复台词</span></label>
+      <label class="checkitem"><input type="checkbox"><span>non_diegetic_music 是 1–3 句，只写乐器 / 速度 / 节奏 / 动态；没有就写 N/A</span></label>
+      <label class="checkitem"><input type="checkbox"><span>（关键帧）I2VA 从首帧锚点出发；FL2VA 写了中间路径并落回尾帧；L2VA 的尾图属于最后一个镜头</span></label>
+      <label class="checkitem"><input type="checkbox"><span>（Ref2VA）四类标签先定义、全程同义复用；summary 没有引入新标签</span></label>
+      <label class="checkitem"><input type="checkbox"><span>（Ref2VA）只提供外观参考的图写进了 Subject 定义，没有误立为 &lt;Picture N&gt; 帧锚</span></label>
+      <label class="checkitem"><input type="checkbox"><span>（Ref2VA）retention 标记只在已定义角色范围内选择；新增剧情没被算作保真损失</span></label>
+      <label class="checkitem"><input type="checkbox"><span>（Ref2VA）听不清的参考台词写了 [unclear]；只参考音色时没有带入原台词</span></label>
+      <label class="checkitem"><input type="checkbox"><span>通篇没有未解析的参考标签，没有 cinematic / beautiful 式抽象词充数</span></label>
+    </div>
+    <p class="small" id="checkDone" style="display:none;color:var(--accent2);font-weight:700;margin-top:10px">✓ 全部勾完——可以交付了。</p>
+  </div>
+
+  <h3>一页速查卡</h3>
+  <div class="cheat">
+    <h3>MiniMax H3 速查</h3>
+    <div class="row"><span class="k">五模式</span><span>T2VA 纯文本建时间线 · I2VA 首帧出发 · FL2VA 首尾之间走路径 · L2VA 收束到尾帧 · Ref2VA 素材只作参考不作帧</span></div>
+    <div class="row"><span class="k">基础三字段</span><span><span class="en">integrated_multimodal_description</span> → <span class="en">overall_soundscape</span> → <span class="en">non_diegetic_music</span></span></div>
+    <div class="row"><span class="k">Ref2VA 六段</span><span><span class="en">subject_definitions</span> → <span class="en">summary</span> → <span class="en">retention_analysis</span> → <span class="en">detailed_description</span> → <span class="en">overall_soundscape</span> → <span class="en">non_diegetic_music</span></span></div>
+    <div class="row"><span class="k">四标签</span><span><span class="en">&lt;Subject N&gt;</span> 可见内容单元 · <span class="en">&lt;Picture N&gt;</span> 帧 / 分镜锚 · <span class="en">&lt;Video N&gt;</span> 全片级关系 · <span class="en">&lt;Audio N&gt;</span> 被复制或参考的音频</span></div>
+    <div class="row"><span class="k">可见四标记</span><span><span class="en">fully_preserved</span> · <span class="en">partially_preserved</span> · <span class="en">attribute_transfer</span> · <span class="en">weak_reference</span></span></div>
+    <div class="row"><span class="k">音频四标记</span><span><span class="en">fully_copy</span> · <span class="en">partially_copy</span> · <span class="en">reference</span> · <span class="en">weak_reference</span></span></div>
+    <div class="row"><span class="k">任务类型</span><span><span class="en">keyframe completion</span> · <span class="en">reference generation</span> · <span class="en">video editing</span> · <span class="en">video continuation</span> · <span class="en">audio reuse</span> · <span class="en">audio reference</span>（多类型用 " + " 连接）</span></div>
+    <div class="row"><span class="k">时间戳</span><span>[Shot 1] 无时间戳；后续 <span class="en">[Shot N] At MM:SS.mmm,</span> 严格递增；对齐指令里的时长 S.SS 恰好两位小数</span></div>
+    <div class="row"><span class="k">台词</span><span>描述与 (Sx) 在 &lt;d&gt; 外；&lt;d&gt; 内只有 [语言标签] + 原文逐字。画外音：<span class="en">says in an off-screen voiceover</span> + 紧跟闭唇声明。跨切 <span class="en">&lt;scenetrans&gt;</span>，截断 <span class="en">&lt;cutoff&gt;</span></span></div>
+    <div class="row"><span class="k">声音两段</span><span>soundscape 1–4 句（仅明确要求全静音才 N/A）；music 1–3 句（无非叙事音乐写 N/A，只写乐器 / 速度 / 节奏 / 动态）</span></div>
+    <div class="row"><span class="k">运镜公式</span><span>类型（Zoom / Push / Pan / Truck / Tilt / Pedestal / Arc / Tracking / Static / Shake / POV / Roll）+ 幅度（small / large amplitude）+ 速度（slow / fast speed），写成句子</span></div>
+    <div class="row"><span class="k">时长红线</span><span>单段 4–15 秒；描述总时长 = 目标时长</span></div>
+  </div>
+</section>
+
+<!-- ================= 附录 ================= -->
+<section class="ch" id="ch13">
+  <span class="ch-num">APPENDIX</span>
+  <h2>附录：风格技能一句话索引</h2>
+  <p class="lede">官方技能包里除核心技能外，还有 8 个「风格技能」。它们不是另一套写法，而是<strong>把同一套 H3 写法针对某一类片子封装成的生产流程</strong>——先把这门课的写法学熟，遇到对应品类时再去调用它们，自然就用得上。这里只留一句话索引，不展开。</p>
+  <div class="tbl"><table>
+    <tr><th>技能</th><th>它封装了哪类片子的写法</th></tr>
+    <tr><td><span class="en">minimalist-product-ad-generator</span></td><td>把「一张产品图 → Apple 风极简产品广告短片」的写法封装成带确认关卡的流程。</td></tr>
+    <tr><td><span class="en">3d-animation-short-generator</span></td><td>把「一句创意 → 皮克斯感 3D 动画短片」的写法封装成含镜头表自检门的完整流程。</td></tr>
+    <tr><td><span class="en">papercraft-stop-motion-explainer</span></td><td>把「分层纸雕 / 剪纸定格质感的科普讲解」的写法封装成 19 步流程。</td></tr>
+    <tr><td><span class="en">brand-promo-video-generator</span></td><td>把「品牌宣传短片」的写法封装成带品牌事实核查与生成前硬确认的流程。</td></tr>
+    <tr><td><span class="en">music-video-subtitle-generator</span></td><td>把「带歌词贴字的音乐 MV」的写法封装成含参考分工与多镜头衔接锁的流程。</td></tr>
+    <tr><td><span class="en">co-op-game-intro-generator</span></td><td>把「双人合作游戏主菜单 / 开场动画」的写法封装成先确认首图、再回填视频提示词的流程。</td></tr>
+    <tr><td><span class="en">paper-collage-explainer-generator</span></td><td>把「半调纸拼贴定格讲解动画」的写法封装成两道确认门加停格组装的流程。</td></tr>
+    <tr><td><span class="en">handdrawn-live-video-generator</span></td><td>把「手绘发光动画融进实拍空间的 15 秒短片」的写法封装成固定分段结构。</td></tr>
+  </table></div>
+  <footer>本课基于官方 MiniMax H3 技能 h3-prompt-writing 及其指南 references/base-en.txt、references/ref-en.txt 整理：标注「官方原文」的内容为指南原文照引；标注「教学示范」的内容（写作步骤、改写示范、烂稿与改后稿、练习与参考答案、时长经验值）为本课教学创作。技能包仍在持续维护，规则版本以官方仓库为准。</footer>
+</section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ---------- copy buttons ---------- */
+  document.querySelectorAll(".cb").forEach(function(box){
+    var btn = box.querySelector(".copybtn");
+    var pre = box.querySelector("pre");
+    if(!btn || !pre) return;
+    btn.addEventListener("click", function(){
+      var text = pre.innerText;
+      function done(){
+        btn.textContent = "已复制 ✓";
+        btn.classList.add("done");
+        setTimeout(function(){ btn.textContent = "复制"; btn.classList.remove("done"); }, 1600);
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done).catch(function(){ fallback(); });
+      } else { fallback(); }
+      function fallback(){
+        var ta = document.createElement("textarea");
+        ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); } catch(e){}
+        document.body.removeChild(ta); done();
+      }
+    });
+  });
+
+  /* ---------- mobile TOC ---------- */
+  var toc = document.getElementById("toc");
+  var toggle = document.getElementById("tocToggle");
+  toggle.addEventListener("click", function(){ toc.classList.toggle("show"); });
+  toc.querySelectorAll("a").forEach(function(a){
+    a.addEventListener("click", function(){ toc.classList.remove("show"); });
+  });
+
+  /* ---------- scroll highlight ---------- */
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute("href").slice(1)] = a; });
+  if("IntersectionObserver" in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          links.forEach(function(a){ a.classList.remove("active"); });
+          var a = map[en.target.id];
+          if(a) a.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-20% 0px -70% 0px" });
+    document.querySelectorAll("section.ch").forEach(function(s){ obs.observe(s); });
+  }
+
+  /* ---------- checklist ---------- */
+  var boxes = Array.prototype.slice.call(document.querySelectorAll("#checkList input[type=checkbox]"));
+  var bar = document.getElementById("checkBar");
+  var count = document.getElementById("checkCount");
+  var doneMsg = document.getElementById("checkDone");
+  function refresh(){
+    var n = boxes.filter(function(b){ return b.checked; }).length;
+    bar.style.width = (boxes.length ? (n / boxes.length * 100) : 0) + "%";
+    count.textContent = "已完成 " + n + " / " + boxes.length;
+    doneMsg.style.display = (n === boxes.length && n > 0) ? "block" : "none";
+    boxes.forEach(function(b){ b.closest(".checkitem").classList.toggle("done", b.checked); });
+  }
+  boxes.forEach(function(b){ b.addEventListener("change", refresh); });
+  refresh();
+
+  /* ---------- mode decision wizard ---------- */
+  var wizBody = document.getElementById("wizBody");
+  var STRUCT = {
+    "T2VA": "结构：无对齐指令，直接写三字段 —— integrated_multimodal_description → overall_soundscape → non_diegetic_music（第 2 课）。",
+    "I2VA": "结构：首帧指令行（Picture 1 在 0.00 秒、属于 Shot 1）+ 空行 + 三核心字段。正文走「首帧锚定 → 动作开始 → 连续发展 → 结果或反应」（第 2、7 课）。",
+    "FL2VA": "结构：首尾帧指令行（尾帧时刻 = 目标时长，两位小数）+ 空行 + 三核心字段。正文只写中间路径，优先单镜头（第 2、7 课）。",
+    "L2VA": "结构：尾帧指令行（Picture 1 属于最后一个 Shot N）+ 空行 + 三核心字段。正文从合理前置状态逐步收束到尾帧（第 2、7 课）。",
+    "Ref2VA": "结构：六段 —— subject_definitions → summary → retention_analysis → detailed_description → overall_soundscape → non_diegetic_music。帧锚立为独立 &lt;Picture N&gt;，外观参考立为 &lt;Subject N&gt;（第 8 课）。"
+  };
+  var WHY = {
+    "T2VA": "你没有任何参考素材，全部信息来自文字——从零构建完整时间线即可。",
+    "I2VA": "这张图被明确指定为视频的第一帧，任务是让它动起来并向前发展。",
+    "FL2VA": "首尾两帧都已给定，任务是补出两帧之间连续、可观察的变化路径。",
+    "L2VA": "只有结尾给定，任务是反推一个合理开场并稳稳落回这张尾帧。",
+    "Ref2VA": "素材的角色是「提供参考」而不是「充当某一帧」（或同时混有帧锚与纯参考），必须走全参考六段结构，用标签管理每份素材的角色。"
+  };
+  var steps = [
+    {
+      q: "第 1 题：你手里有参考素材吗（图片 / 视频 / 音频）？",
+      opts: [
+        { t: "没有，纯文字需求", next: "T2VA" },
+        { t: "有参考素材", next: 1 }
+      ]
+    },
+    {
+      q: "第 2 题：素材里有没有视频或音频要被剪辑、续接、复制或参考？",
+      opts: [
+        { t: "有视频 / 音频参与（剪辑源、续接、音色参考、音频复用等）", next: "Ref2VA" },
+        { t: "没有，只有图片（或纯图片参考）", next: 2 }
+      ]
+    },
+    {
+      q: "第 3 题：这些图里，有没有哪张被明确指定为视频的某一帧（首帧 / 尾帧 / 关键帧）？",
+      opts: [
+        { t: "没有——图只提供外观、角色、场景或风格参考", next: "Ref2VA" },
+        { t: "有，图就是具体的帧", next: 3 }
+      ]
+    },
+    {
+      q: "第 4 题：帧锚的情况是哪一种？",
+      opts: [
+        { t: "只有一张，是首帧", next: "I2VA" },
+        { t: "只有一张，是尾帧", next: "L2VA" },
+        { t: "两张，分别是首帧和尾帧", next: "FL2VA" },
+        { t: "除了帧锚，还有其他只作参考的图 / 素材混在一起", next: "Ref2VA" }
+      ]
+    }
+  ];
+  function renderStep(i){
+    var s = steps[i];
+    var html = '<div class="wiz-progress">模式决策向导 · ' + (i + 1) + ' / ' + steps.length + '</div>';
+    html += '<div class="wiz-q">' + s.q + '</div><div class="wiz-opts">';
+    s.opts.forEach(function(o, idx){
+      html += '<button type="button" class="wiz-opt" data-idx="' + idx + '">' + o.t + '</button>';
+    });
+    html += '</div>';
+    wizBody.innerHTML = html;
+    wizBody.querySelectorAll(".wiz-opt").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var o = s.opts[Number(btn.getAttribute("data-idx"))];
+        if(typeof o.next === "number"){ renderStep(o.next); } else { renderResult(o.next); }
+      });
+    });
+  }
+  function renderResult(mode){
+    wizBody.innerHTML =
+      '<div class="wiz-progress">模式决策向导 · 结论</div>' +
+      '<div class="wiz-result"><div class="small">你应该使用</div><div class="mode">' + mode + '</div>' +
+      '<p style="margin:8px 0 4px">' + WHY[mode] + '</p>' +
+      '<p style="margin:4px 0 0"><strong>对应结构：</strong>' + STRUCT[mode] + '</p></div>' +
+      '<button type="button" class="wiz-restart" id="wizRestart">重新判断</button>';
+    document.getElementById("wizRestart").addEventListener("click", function(){ renderStep(0); });
+  }
+  renderStep(0);
+})();
+</script>
+</body>
+</html>
