@@ -8,3 +8,5 @@
 - `midjourney/` — 《Midjourney 教程：从第一张图到稳定出好图》
 
 三套教程各自是单文件 HTML（由 Muse 网页教程导出后加了全站顶栏），内容更新时替换对应文件并 push 即可。
+
+部署：Cloudflare Pages 项目 `yoyo-tutorial`（yoyo-tutorial.pages.dev），Git 绑定本仓库 main 分支，push 即自动部署；无构建命令，输出目录为仓库根目录。
