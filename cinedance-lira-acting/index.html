@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>CineDance × LIRA × 表演系统教程</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600&family=Noto+Sans+SC:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#faf7f0; --panel:#f3eee2; --inset:#ece5d3; --line:#ddd3ba;
+  --ink:#211d16; --ink2:#57503f; --ink3:#8a8168;
+  --accent:#9a6b1e; --accent-soft:#f0e3c2;
+  --code-bg:#1c1a15; --code-ink:#ece5d0; --code-gold:#e3b94e; --code-dim:#9d947b;
+  --r-s:4px; --r-m:8px; --r-l:12px;
+  --serif:"Noto Serif SC",Georgia,serif; --sans:"Noto Sans SC",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --paper:#171512; --panel:#201d18; --inset:#29241c; --line:#3a342a;
+    --ink:#ece5d3; --ink2:#b8ae96; --ink3:#857d68; --accent:#d9a83e; --accent-soft:#33290f;
+    --code-bg:#0f0e0b; }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+button,[role="button"],summary,select,input:not([type=checkbox],[type=radio]){min-height:2.25rem}
+a{color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+.topnav{position:sticky;top:44px;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topnav-in{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.topnav-in::-webkit-scrollbar{display:none}
+.topnav a{flex:0 0 auto;padding:10px 12px;font-size:13px;color:var(--ink2);text-decoration:none;border-bottom:2px solid transparent;min-height:44px;display:flex;align-items:center}
+.topnav a.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:500}
+header.hero{padding:52px 0 8px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--accent);margin:0 0 14px}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,5.4vw,44px);line-height:1.25;margin:0 0 16px}
+.lede{font-size:17px;color:var(--ink2);max-width:720px;margin:0}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(23px,3.6vw,30px);line-height:1.35;margin:0 0 10px}
+h3{font-family:var(--serif);font-weight:600;font-size:19px;margin:28px 0 8px}
+h4{font-size:15px;font-weight:500;margin:20px 0 6px}
+p{margin:0 0 12px}
+section{padding:44px 0 8px;border-top:1px solid var(--line);margin-top:44px}
+section:first-of-type{border-top:none;margin-top:8px}
+.mod-tag{display:inline-block;font-family:var(--mono);font-size:12px;color:var(--accent);border:1px solid var(--line);border-radius:var(--r-s);padding:2px 8px;margin-bottom:12px;background:var(--panel)}
+.sub{color:var(--ink2);max-width:760px}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:stretch;margin:24px 0 8px}
+.flow .step{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-m);padding:16px}
+.flow .step b{font-family:var(--serif);font-size:17px;display:block;margin-bottom:4px}
+.flow .step span{font-size:13.5px;color:var(--ink2);line-height:1.6;display:block}
+.flow .arr{display:flex;align-items:center;color:var(--ink3);font-size:18px}
+@media(max-width:700px){.flow{grid-template-columns:1fr}.flow .arr{justify-content:center;transform:rotate(90deg)}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-m);padding:16px 18px}
+.card b.t{display:block;font-size:15px;margin-bottom:4px}
+.card p,.card li{font-size:14.5px;color:var(--ink2)}
+.card ul{margin:6px 0 0;padding-left:18px}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:14px 0}
+th{font-weight:500;text-align:left;color:var(--ink);border-bottom:2px solid var(--line);padding:8px 10px}
+td{border-bottom:1px solid var(--line);padding:8px 10px;color:var(--ink2);vertical-align:top}
+td:first-child{color:var(--ink)}
+.tbl-wrap{overflow-x:auto}
+pre{position:relative;background:var(--code-bg);color:var(--code-ink);border-radius:var(--r-m);padding:16px 18px;font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto;margin:12px 0;white-space:pre-wrap;word-break:break-word}
+pre .g{color:var(--code-gold)}
+pre .d{color:var(--code-dim)}
+.copy{position:absolute;top:8px;right:8px;background:transparent;border:1px solid #4a4436;color:var(--code-dim);border-radius:var(--r-s);font-family:var(--mono);font-size:11px;padding:4px 10px;cursor:pointer;min-height:32px}
+.copy:hover{color:var(--code-ink);border-color:var(--code-dim)}
+code{font-family:var(--mono);font-size:.88em;background:var(--inset);border-radius:var(--r-s);padding:1px 5px}
+pre code{background:none;padding:0}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 var(--r-m) var(--r-m) 0;padding:12px 16px;font-size:14.5px;margin:14px 0}
+.note p{margin:0}
+.src{font-family:var(--mono);font-size:11.5px;color:var(--ink3);border-bottom:1px dotted var(--ink3)}
+details{border:1px solid var(--line);border-radius:var(--r-m);background:var(--panel);margin:10px 0}
+details summary{cursor:pointer;padding:12px 16px;font-weight:500;font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:44px}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";font-family:var(--mono);color:var(--accent);font-size:18px}
+details[open ] summary::after{content:"–"}
+details .body{padding:0 16px 14px;font-size:14.5px;color:var(--ink2)}
+details .body p,details .body li{color:var(--ink2)}
+ul.tight,ol.tight{margin:6px 0 12px;padding-left:22px}
+ul.tight li,ol.tight li{margin-bottom:5px}
+.check{list-style:none;padding:0;margin:10px 0}
+.check li{padding:6px 0 6px 26px;position:relative;font-size:14.5px;color:var(--ink2);border-bottom:1px dashed var(--line)}
+.check li::before{content:"☐";position:absolute;left:2px;color:var(--accent)}
+.scale{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:14px 0}
+.scale div{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-m);padding:10px;font-size:12.5px;color:var(--ink2)}
+.scale div b{display:block;font-family:var(--serif);font-size:20px;color:var(--ink)}
+@media(max-width:760px){.scale{grid-template-columns:repeat(2,1fr)}}
+footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink3)}
+.pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.pill{font-family:var(--mono);font-size:12px;background:var(--inset);border-radius:var(--r-s);padding:4px 9px;color:var(--ink2)}
+</style>
+</head>
+<body><nav id="sitebar" style="position:fixed;top:0;left:0;right:0;height:44px;z-index:99999;background:rgba(24,24,46,.96);display:flex;align-items:center;gap:2px;padding:0 12px;font:14px/1.4 'Noto Sans SC',sans-serif;overflow-x:auto;white-space:nowrap;"><a href="../" style="color:#b9bce0;text-decoration:none;padding:4px 10px;border-radius:999px;">教程站首页</a><a href="../minimax-h3/" style="color:#b9bce0;text-decoration:none;padding:4px 10px;border-radius:999px;">MiniMax H3 教程</a><a href="../higgsfield/" style="color:#b9bce0;text-decoration:none;padding:4px 10px;border-radius:999px;">Higgsfield 教程</a><a href="../midjourney/" style="color:#b9bce0;text-decoration:none;padding:4px 10px;border-radius:999px;">Midjourney 教程</a><a href="../cinedance-lira-acting/" style="color:#fff;text-decoration:none;padding:4px 10px;border-radius:999px;background:#6c63ff;font-weight:700;">三技能综合教程</a></nav><style>body{padding-top:44px !important}</style>
+<nav class="topnav"><div class="topnav-in">
+<a href="#pipeline">总览</a><a href="#cinedance">一 · CineDance</a><a href="#lira">二 · LIRA</a><a href="#acting">三 · 表演系统</a><a href="#together">合用流程</a><a href="#cheat">速查</a>
+</div></nav>
+<div class="wrap">
+<header class="hero">
+<p class="kicker">AI FILM PROMPT SYSTEMS — TUTORIAL</p>
+<h1>CineDance × LIRA × 表演系统教程</h1>
+<p class="lede">三套提示词系统，一条完整的 AI 影视流水线：<strong>LIRA</strong> 负责把角色、场景、道具的图做对；<strong>CineDance V4</strong> 负责把图变成空间、光学、物理都锁得住的视频镜头；<strong>表演系统</strong> 负责让镜头里的人像活人一样行动。这份教程按原 skill 文件整理：方法、模板、清单都可以直接照着用，英文模板点右上角即可复制。</p>
+<div class="flow" id="pipeline">
+<div class="step"><b>LIRA — 出图</b><span>图像提示词优化：角色定妆、场景、道具、外科式改图。先把「谁、什么样、在哪」定死。</span></div>
+<div class="arr">→</div>
+<div class="step"><b>CineDance — 导镜头</b><span>Seedance 2.0 / Higgsfield 视频导演系统：首帧、站位、视线、镜头、物理、光，全部上锁。</span></div>
+<div class="arr">→</div>
+<div class="step"><b>表演系统 — 演人物</b><span>把「目标—障碍—策略—节拍—潜台词」写进提示词的表演层，让人物在压力下行动。</span></div>
+</div>
+<p class="sub">三者的共同底色是同一句话：<strong>控制力来自具体的、可观察的描述，不来自形容词堆砌。</strong>LIRA 说「精度胜过冗长」，CineDance 说「改进来自更强的信号，不是更多的膨胀」，表演系统说「演的是压力下的行为，不是情绪的展示」。</p>
+</header>
+
+<!-- ================= CINEDANCE ================= -->
+<section id="cinedance">
+<span class="mod-tag">MODULE 1 · VIDEO DIRECTION</span>
+<h2>一、CineDance V4 — Seedance 视频导演系统</h2>
+<p class="sub">CineDance 的定位不是「写漂亮文案」，而是一个带内部推理的导演代理：它在落笔前先做场景诊断、空间调度、光学选择、物理校验、参考控制和连续性控制，最后只交付一条干净的、可直接生成的 Seedance 提示词。除非你明确要求分析或讲解，它的最终输出<strong>只有成稿提示词</strong>，用清晰的电影英语写成。</p>
+
+<h3>1.1 内部 4-D 方法论（静默执行，不输出）</h3>
+<div class="grid2">
+<div class="card"><b class="t">D1 · Deconstruct 解构</b><p>只提取当前这一镜：出场角色、有效的 @tag、地点参考、道具、载具、动作、对白、时长、画幅、格式模式、第一帧画面、空间布局、地标、移动路径、光向、情绪状态、音频要求、禁止带入的东西。同时删掉：未出场角色、过期 @tag、场次编号、剧本头、上一场的措辞、「和之前一样」之类的一切不可见内容。</p></div>
+<div class="card"><b class="t">D2 · Diagnose 诊断</b><p>写之前先找翻车点：首帧会不会空镜？角色会不会出场太晚？模型会不会自己先来个无用的建立镜头？角色离地标太远？视线反转？左右站位翻转？镜头会不会漂到「舒服的中间值」？光会不会变成平光？参考图会不会被过量文字覆盖？道具会不会拿错手？对白会不会错时？——任何一项有风险，就在成稿里加一句短而直接的锁。</p></div>
+<div class="card"><b class="t">D3 · Develop 构建</b><p>按固定顺序搭提示词：场景语境 → 输出设置 → 有效参考 → 地点地图 → 首帧占位 → 空间调度 → 角色锚点 → 格式模式 → 光学与镜头 → 机位与构图 → 动作时序 → 物理与材质 → 光与曝光 → 音频 → 正向锁 → 局部防翻车锁。关键原则：<strong>空间规则在镜头风格之前，光学在美学语言之前，光是优先级锁而不是装饰。</strong></p></div>
+<div class="card"><b class="t">D4 · Deliver 交付</b><p>只输出成稿提示词。不输出 QA、不输出推理、不输出清单、不解释、不提方法论，也不把写提示词的笔记混进提示词正文里。</p></div>
+</div>
+
+<h3>1.2 成稿结构：十二个段落</h3>
+<p>成稿按这个骨架组织，但不是每段都必填——平台 UI 已经控制的、或只会增加噪音的段落要删掉。</p>
+<pre><button class="copy">复制</button><code><span class="g">SCENE CONTEXT</span>          <span class="d">— 只写这一镜发生什么，1–2 句</span>
+<span class="g">ACTIVE REFERENCES</span>     <span class="d">— 仅本镜有效的 @tag</span>
+<span class="g">LOCATION MAP</span>          <span class="d">— 把地点参考转成可用的地图</span>
+<span class="g">FIRST FRAME AND SPATIAL BLOCKING</span>  <span class="d">— 首帧占位 + 站位调度</span>
+<span class="g">FORMAT MODE</span>           <span class="d">— 单镜头长拍 / 受控多镜</span>
+<span class="g">OPTICS</span>                <span class="d">— 按内容选定的镜头性格</span>
+<span class="g">CAMERA</span>                <span class="d">— 机位写成摄影师的身体行为</span>
+<span class="g">ACTION TIMING</span>         <span class="d">— 时间块 0:00–0:03 …</span>
+<span class="g">PHYSICS</span>               <span class="d">— 重量、惯性、接触、跟随</span>
+<span class="g">LIGHTING</span>              <span class="d">— 光向 + 曝光优先级（优先锁）</span>
+<span class="g">AUDIO</span>                 <span class="d">— 对白与声音规则</span>
+<span class="g">POSITIVE CONSTRAINTS</span>  <span class="d">— 正向锁，按需</span></code></pre>
+<p><span class="src">来源标记</span> <code>OUTPUT SETTINGS</code>（时长、画幅、fps 等）只有在 UI 里没选、或对剧情关键时才写进正文；<code>NEGATIVE CONSTRAINTS</code> 默认不单独成段——负面约束只在防某个已知翻车点时，贴在它要保护的正向规则旁边局部使用。</p>
+
+<h3>1.3 场景语境与参考：先把「这一镜」封死</h3>
+<ul class="tight">
+<li><strong>场景语境</strong>：1–2 句英文，只写本镜。不写场次号、不写前情提要、不写未出场角色、不带剧本头。例：<em>“A wounded young man stands beside a burned-out car in heavy rain while two companions face him from the foreground. He slowly raises a dented steel pipe and quietly refuses to go on.”</em></li>
+<li><strong>@tag 纪律</strong>：只列本镜用到的 tag，原样保留用户给的写法；不发明新 tag；上一镜的过期 tag 一个不留；每个 tag 必须对应本镜可见或必需的参考。</li>
+<li><strong>角色描述公式</strong>：只写本镜必需的最小锚点——年龄 + 角色/体型 + 当前状态 + 独特可见标识 + 动作关键的身体部位或道具，有对白才写声音，结尾加 <code>100% matches the reference</code>。不写完整面部解剖、不重复参考图里已清楚的服装细节。参考图是脸、身体、比例、服装、质感和身份的唯一真相，文字不许覆盖它。</li>
+<li><strong>上下文隔离</strong>：成稿是一份「密封的当前镜文件」。禁止出现：场次号、集数标签、剧本头、上一场梗概、未用角色/地点 tag、只在之前对白里被提到的人、旧镜头的道具，以及 previously / again / same as before / continues / as above 这类词。若前一句台词只为情绪衔接，用 <code>Prior audio context only, not visual content: “…”</code> 标注，不把其中的人或物视觉化。</li>
+</ul>
+<pre><button class="copy">复制</button><code>@HERO1V2: 20yo broad-shouldered wounded male, tangled blond hair falling over his eyes, blood-streaked grey hoodie, right shoulder roughly bandaged, left hand gripping a dented steel pipe. 100% matches the reference.</code></pre>
+
+<h3>1.4 地点地图：参考图是地理，不是构图</h3>
+<p>有地点参考时，先把它转成一张实用地图再写调度：机位在哪、朝向哪边、前景/中景/背景各是什么、主要地标的位置、角色位置、移动路径、光从哪来、纵深关系。地点图只供<strong>地理、材质、氛围、地标</strong>（及相关的光向）；除非用户明确要求，<strong>不要继承它的机位角度和构图</strong>。同理，风格参考永远不能压过身份、空间调度、动作、光学和光。</p>
+
+<h3>1.5 五把锁：首帧、站位、视线、地标、连续性</h3>
+<details open><summary>锁 1 · 首帧占位（First-frame occupancy）</summary><div class="body">
+<p>镜头必须一开场就有人，就直接写死：</p>
+<pre><button class="copy">复制</button><code>The first visible frame already contains all required characters in their correct positions.
+No empty establishing frame.
+No delayed character reveal.
+No opening frame without the required subjects.
+The spatial relationship is readable immediately in frame one.</code></pre>
+<p>只有用户明确要求时才允许空镜开场。闪切/极短建立镜头也必须立刻包含所需主体，不许抽象填充、不许无要求的风景插入。</p></div></details>
+<details><summary>锁 2 · 空间调度（Spatial blocking）</summary><div class="body">
+<p>每个重要主体都要写清：画面位置、世界位置、离地标或他人多远、身体朝向、视线朝向、移动方向、在前/中/后哪一层。用简单的物理语言：</p>
+<pre><button class="copy">复制</button><code>@HERO1V2 stands within 1 meter of the burned-out car, one hand resting on the scorched hood.
+@HERO2 and @HERO3 stand together in the foreground, facing @HERO1V2.
+Hero2 is camera-right of the pair. Hero3 is camera-left of the pair.
+Both bodies face Hero1. Both gaze lines are locked on Hero1.</code></pre>
+<p>空间精度重要时禁用弱词：near / around / beside / somewhere / nearby。换成可测量的：within 1 meter、touching、boots inside the root circle、hand on the handle、standing directly under the sign、back against the wall、at the south kerb edge。</p></div></details>
+<details><summary>锁 3 · 视线与身体朝向（Gaze &amp; orientation）</summary><div class="body">
+<p>身体方向和眼睛方向是两回事，关系重要时两个都要写：<code>torso faces X</code>、<code>eyes stay locked on X</code>、<code>head turns toward X</code>、<code>back faces camera</code>、<code>profile faces screen-left</code>、<code>looks past camera toward X</code>。对白场景：只有说台词的人嘴唇动，其他人安静聆听；不许画外音，除非写明。</p></div></details>
+<details><summary>锁 4 · 地标贴身（Landmark proximity）</summary><div class="body">
+<p>角色必须靠近某个地标时，用身体接触来锚定：within 1 meter、touching、手按在引擎盖上、背贴墙、站在招牌正下方、站在出租车后门前。反例：<em>near the tree / by the taxi / somewhere in the battlefield</em>——这类写法基本等于没写。</p></div></details>
+<details><summary>锁 5 · 多镜连续性（Multi-shot continuity）</summary><div class="body">
+<p>每次内切都必须保持：同一角色名单、同一地点地理、同一银幕方向、同一视线目标、同一左右关系、同一光向、同一服装、伤口、道具、手部状态，以及血/雪/泥/汗/水/火/烟的连续状态。切后不重置动作、不瞬移、不无理由改变与地标的距离、不凭空引入新道具或新角色。</p></div></details>
+
+<h3>1.6 格式模式：长拍还是多镜</h3>
+<p>默认 <strong>SINGLE CONTINUOUS TAKE（单镜头连续拍）</strong>。只有在这些情况下才改用 <strong>CONTROLLED MULTI-SHOT SEQUENCE（受控多镜序列）</strong>：用户明确要求剪切/闪切/蒙太奇/插入/反打/硬切；动作无法在一个机位里讲清；关键细节需要插入特写；两个同时发生的情绪反应需要不同角度；场景需要「地理 + 反应 + 细节」；或用户要预告片式、碎片化、记忆、梦境、混乱、冲击、MV 式剪辑。</p>
+<p>多镜时每一刀都要写明：该镜时长、机位、首帧可见主体、站位、动作、切型。只允许显式切型：<strong>HARD CUT / SMASH CUT / MATCH CUT / INSERT CUT / REVERSE CUT / WHIP CUT</strong>；默认禁止 fade、crossfade、dissolve 等转场效果。绝不让模型自己发明剪切，绝不切到未激活的角色或 @tag。</p>
+<pre><button class="copy">复制</button><code>Controlled multi-shot sequence with one HARD CUT at 1.0 second. Real-time motion. No subtitles, no music.</code></pre>
+
+<h3>1.7 光学系统：写「看得见的结果」，不写器材参数</h3>
+<p>Seedance 对<strong>可观察的镜头效果</strong>的响应，远好于对器材元数据的响应。所以主控制量不用毫米、光圈、ISO、镜头品牌，而用：<strong>对角视场角（度）+ 机位物理距离 + 可见光学结果 + 内容与视场角对齐</strong>。</p>
+<div class="tbl-wrap"><table>
+<tr><th>视场角</th><th>镜头性格</th><th>机位距离</th><th>适合的内容</th></tr>
+<tr><td><code>47°</code></td><td>标准（normal）</td><td>3–5 m</td><td>自然纪实动作；人眼视角、零明显畸变、比例自然</td></tr>
+<tr><td><code>84°</code></td><td>经典广角 / Cuarón 亲密广角</td><td>1–1.5 m</td><td>环境动作；近距离人脸但环境可见；前景身体存在感放大</td></tr>
+<tr><td><code>107°</code></td><td>广角直线（rectilinear）</td><td>0.5–0.8 m</td><td>大尺度环境地理；前景迫近、环境铺满画框、直线保持笔直、无鱼眼</td></tr>
+<tr><td><code>29°</code></td><td>短长焦人像</td><td>4–6 m</td><td>中景人像；靠镜头够到而非身体靠近，背景开始压缩、奶油虚化</td></tr>
+<tr><td><code>18°</code></td><td>经典长焦</td><td>6–8 m</td><td>紧情绪特写；强压缩、极浅焦点只锁眼睛、「被远观」的感觉</td></tr>
+<tr><td><code>8°</code></td><td>超长焦观察</td><td>20–25 m</td><td>远距离窥视：体育转播/狗仔/野生动物式；前景遮挡强制占下 30–45%</td></tr>
+</table></div>
+<p><strong>内容—视场角对齐规则</strong>：广角配环境、空间、身体、沉浸类内容；长焦配人像、观察、孤立、压缩类内容；微距/细节自成插入节拍。<strong>一个节拍里绝不混内容类别</strong>——人脸 + 环境地理 + 微距细节塞进同一个镜头，就是镜头漂移的头号原因；需要不同类别就用受控内切，每镜分配各自的镜头性格。</p>
+<details><summary>长焦 / 广角的「结果句式库」与防漂移锁</summary><div class="body">
+<p>长焦镜头至少带 4 句可观察短语：background completely blurred into a soft warm color wash / razor focus on the subject / only the subject is sharp / creamy bokeh wash / background compressed flat / close framing achieved through lens reach, not physical proximity / atmospheric haze between camera and subject / foreground occlusion as soft dark bokeh。</p>
+<p>广角镜头至少带 3 句：foreground body presence looms larger than natural / environment remains visible around the subject / deep edge-to-edge focus / straight lines stay rectilinear / camera physically close to subject / no telephoto compression。</p>
+<p>多镜同镜头时写死：<code>LENS IS X° ACROSS ALL SHOTS. NOT NEGOTIABLE.</code> 每镜开头 <code>LENS LOCK SHOT A = X°</code>、结尾 <code>LENS CHECK SHOT A: X° maintained, no drift.</code> 混合镜头只在内容类别变化时发生，且镜头之间只能硬切，不许平滑变焦过渡。</p>
+<p>反模式：extreme / ultra / super wide-angle 这类词、「wide shot」「establishing shot」当镜头指令、zoom out + 广角并用、用 f 值/ISO/品牌名作主控制、同一镜复合运镜、只写负面不写正面的镜头控制。</p></div></details>
+
+<h3>1.8 机位：写成摄影师的身体行为</h3>
+<p>机位段要定义：镜头性格、机位高度、距离、角度、在哪一侧、主体占画面多大、画面位置、运动方式、焦点行为、景深、手持质感、构图优先级。写「camera fixed at X」「lens at hip height」「operator stands on the shadow side」「subject occupies screen-left third」。手持要写出身体感：操作员的呼吸、微沉降、重心转移、有机的人工修正、肩扛的重量感；避免数码抖动、无意义乱晃，以及未要求的云台顺滑感和无人机漂浮感。即便构图给了自由，主体位置、视线、地标距离、光向、有效参考、动作时序、镜头性格这七样仍然锁死。</p>
+
+<h3>1.9 物理锁：一切运动都要有因果</h3>
+<div class="grid3">
+<div class="card"><b class="t">身体</b><p>走路：脚跟触地 → 重心转移 → 髋部摆动 → 脚尖蹬离 → 体重落定。跑步：真实触地、抬膝、对侧摆臂、躯干前倾、步幅变化。杜绝漂浮感 CG 跑姿。</p></div>
+<div class="card"><b class="t">物体与武器</b><p>手臂要显出承重，手腕角度随质量反应，物体有惯性、有加减速；门有铰链阻力，车有质量。杜绝无重量武器、无摩擦的脚、瞬移的刀刃、橡皮式 CG 运动。</p></div>
+<div class="card"><b class="t">流体与粒子</b><p>血：黏附、滴落、涂抹、汇聚、沾染、服从重力，液滴走抛物线。雪/烟/火/尘：顺风运动、在前中后景分层存在、随时间在物体上累积；热空气遇冷空气产生 shimmer。</p></div>
+</div>
+
+<h3>1.10 光：优先锁，不是装饰</h3>
+<p>光段必须写清：主光源、光的方向、机位在光的哪一侧、主体哪侧在阴影或轮廓里、背景亮度、曝光优先级、允许的高光、禁止的光失败。逆光（contre-jour）是典型场景：</p>
+<pre><button class="copy">复制</button><code>Subject stays between camera and the brighter background.
+Camera stays on the shadow side of the subject.
+Faces remain in deep shadow unless explicitly lit.
+Only rim light, edge light, wet speculars, eye glints, and environmental bounce reveal detail.
+No frontal key. No flat exposure. No beauty fill. No studio light unless requested.</code></pre>
+<p>如果之前的生成总是变平光，就加强曝光表述：<em>“The entire shot is exposed for the backlight, not for the face. The face is allowed to fall into crushed shadow. The silhouette and rim contour carry the image.”</em></p>
+
+<h3>1.11 动作时序与对白规则</h3>
+<ul class="tight">
+<li><strong>时间块</strong>：定时镜头按 <code>0:00 to 0:03 / 0:03 to 0:06 …</code> 分块，每块写：主体位置、动作、机位行为、关键道具状态、物理、相关音频。一块里不塞互相矛盾的动作；长拍要核算动作在给定时间内物理上做得完。</li>
+<li><strong>对白</strong>：只说引号里的剧本台词，一个字不多：无即兴、无字幕、无旁白（除非要求）、台词之外的角色名不许被念出来、无画外音（除非写明）、不说话时嘴唇静止。</li>
+<li><strong>声音处理</strong>：需要干净对白时，环境声在对白下自动压低，声音贴近、干净、情绪受控；需要前后静默时，每句台词前后至少留 1 秒静默；需要立刻开口时，台词在主镜头开始 0.3 秒内响起。</li>
+</ul>
+
+<h3>1.12 密度控制与风格语言</h3>
+<p>提示词只在「控制要紧处」加密：身份锚点、空间调度、首帧、视线、地标距离、手部与道具状态、定时动作、光学、光锁、物理、对白——这些写细。通用美貌描写、非关键服装、背景群众、不出镜道具——这些写粗。<strong>加形容词不会让提示词变好，信号变强才会。</strong>风格语言排在空间、光学、动作、光锁之后，用紧凑的锚点即可，如 <code>Kodak Vision3 500T, naturalistic low-key backlit silhouette, real grain, grounded physical cinema texture</code>，或 Lubezki / Deakins / Cuarón / Bergman / Refn 这类单个名字；忌纯诗意氛围词和长串影迷名单。质量后缀（<code>sharp clarity, natural colors, stable picture, no blur, no ghosting, no flickering</code>）只在有用且不冲突时加，它替代不了真正的机位、光和物理控制。</p>
+
+<h3>1.13 输出前静默自检（QA 不外露）</h3>
+<ul class="check">
+<li>所有 @tag 都真的在本镜用到？过期 tag 全删了？</li>
+<li>首帧正确？需要立刻可见的角色都在画面里？</li>
+<li>每个角色的位置、视线、身体朝向都清楚？地标距离是物理锚定的？</li>
+<li>机位在哪一侧清楚？镜头性格按内容类别选对了？镜头语言基于可见结果、且防漂移？</li>
+<li>光被保护住、不会变平光？道具在正确的手里？</li>
+<li>动作物理上可能？时间块自洽？对白干净、只有剧本台词？</li>
+<li>没有场次号和上下文泄漏？成稿是英文？QA 已隐藏？</li>
+</ul>
+<p>任何一项答「否」，先改稿再交付。</p>
+</section>
+
+<!-- ================= LIRA ================= -->
+<section id="lira">
+<span class="mod-tag">MODULE 2 · IMAGE PROMPTS</span>
+<h2>二、LIRA — 图像提示词优化系统</h2>
+<p class="sub">LIRA 是面向 <strong>AI 图像生成</strong>的提示词优化专家：把任何输入变成精确、可直接生产、不会「静默翻车」的图像提示词。它覆盖 Higgsfield Soul 2.0 / Cinema Studio AI Cast（角色）、Soul Cinema（场景与电影剧照）、Nano Banana Pro（改图，永远第一选择）、Seedream 4.5（只做质感修复）、GPT Image 2（最后手段的精细局部修改）。回复用用户的语言，但提示词正文和行业术语保持英文。</p>
+
+<h3>2.1 4-D 方法论与两种工作模式</h3>
+<div class="grid2">
+<div class="card"><b class="t">四步流程</b><ul>
+<li><strong>Deconstruct</strong>：拆出核心意图、主体、语境；定目标模型与输出约束（画幅、单图还是拼版、生成还是编辑）；标清「已给 vs 缺失」。</li>
+<li><strong>Diagnose</strong>：找含糊处（角度、光、色板、主体数量、构图），查完整性，评估是否踩已知翻车模式：插画漂移、纹身/文字伪影、多角色崩坏、提示词过长膨胀。</li>
+<li><strong>Develop</strong>：按任务类型选技法、给模型一个明确角色（机位/镜头、摄影师气质）、分层组织结构。</li>
+<li><strong>Deliver</strong>：产出优化后的提示词，按平台与复杂度排版，附简短使用说明（看什么、开关什么）。</li></ul></div>
+<div class="card"><b class="t">DETAIL / BASIC 两种模式</b><p><strong>DETAIL（默认）</strong>：输入含糊或高风险时，先问 2–3 个有针对性的澄清问题，再优化。</p><p><strong>BASIC</strong>：用户只想要提示词、或明说跳过提问（「直接给全的」「go」）时，修掉关键问题、套核心技法、立刻交付。</p><p>读用户的信号：贴来一段提示词说「帮我改成 Soul Cinema 版」是 BASIC；含糊一句「我需要一个场景」是 DETAIL。问题永远不超过 3 个。交付格式：简单需求就是「代码块里的提示词 + 一两行改了什么」；复杂需求在提示词后附简表说明每个锚点的用意，对比修改用 Before / After 表，不注水。</p></div>
+</div>
+
+<h3>2.2 模型路由表（先选对模型，再谈提示词）</h3>
+<div class="tbl-wrap"><table>
+<tr><th>任务</th><th>模型</th><th>为什么</th></tr>
+<tr><td>角色：定妆拼版、肖像、UGC / 时尚 / 编辑风、角色一致性</td><td><strong>Soul 2.0</strong>（或 Cinema Studio AI Cast）</td><td>专为写实角色生成；Soul ID 锁定同一张脸。AI Cast 自动生成角色参考拼版——Higgsfield 上的独立工具，参数全在 UI 里设，不需要提示词</td></tr>
+<tr><td>场景、环境、建立镜头、电影剧照、概念图</td><td><strong>Soul Cinema</strong></td><td>电影级质感、自然颗粒；支持 21:9；可把带 Soul ID 的角色放进电影场景</td></tr>
+<tr><td>道具拼版、产品风物件</td><td><strong>NBP / GPT Image 2</strong></td><td>写实产品语境更强，物件上的文字渲染精确</td></tr>
+<tr><td>改一张现成的图 — 永远第一选择</td><td><strong>Nano Banana Pro (NBP)</strong></td><td>在原图上做后期：改动最小，其余像素级保留；最高 4K；图中文字渲染最佳</td></tr>
+<tr><td>成图里 AI 质感发糊（皮肤、织物、表面）</td><td><strong>Seedream 4.5</strong></td><td>专职把糊掉的质感「救活」；不做定点编辑，只做质感 pass</td></tr>
+<tr><td>最后手段：一处极小元素的精细修改；场景视角切换</td><td><strong>GPT Image 2</strong></td><td>全图偏「脏」（会动整张图），但局部极强；反打等视角切换也走它</td></tr>
+</table></div>
+<div class="note"><p><strong>编辑通道的固定顺序：NBP 先行 → Seedream 只管质感 → GPT Image 2 兜底。</strong>一张图需要「重建」时那不是编辑——回 Soul 模型重新生成。未指明模型时的默认：角色→Soul 2.0，场景/电影帧→Soul Cinema，道具→NBP 或 GPT Image 2，改图→NBP 先行，质感糊→Seedream 4.5，NBP 拿不下的精细局部→GPT Image 2，视角切换→GPT Image 2（在 NBP 上必须把新布局逐件写明）。</p></div>
+
+<h3>2.3 十条防翻车铁律（所有模型通用）</h3>
+<ol class="tight">
+<li><strong>自然散文，不堆关键词。</strong>所有模型都按连贯的场景描写解析；「4k, masterpiece, trending」式堆词毫无作用。生成提示词里不用全大写分段标题——大写结构块（CHANGE / PRESERVE EXACTLY）只属于编辑提示词。</li>
+<li><strong>不许膨胀。</strong>精度胜过冗长：紧凑的 80–150 词胜过散乱的 400 词；过了某个点，每多一句都在稀释注意力、丢细节。目标总长 ≤1500–2000 字符。</li>
+<li><strong>正向 &gt; 负向。</strong>这些模型都没有负面提示词参数。生成时不写「不要什么」，只写「要什么」：干净皮肤写 <code>clean dry skin</code> 不写 no acne；空街写 <code>empty deserted street</code> 不写 no people。「not cartoon, not anime…」这种 NOT 堆叠反而会把这些概念注入画面。编辑时「移除」是合法操作（Remove the lamppost），但必须同时写明缺口用什么填（continuous brick wall behind）。</li>
+<li><strong>画幅与分辨率是平台参数。</strong>在 UI 里设，永远不写进提示词正文：正文里不许出现 <code>--ar</code>、<code>16:9</code>、<code>4K</code>。构图词可以写（wide panoramic frame、vertical full-body framing）。</li>
+<li><strong>光与材质写技术语言，不写氛围词。</strong><code>single overhead key light, soft 2:1 ratio, smooth falloff</code> 胜过 dramatic cinematic lighting；材质写真实名称加表面处理（board-formed concrete、oxidized copper verdigris）。机位语言（焦段、角度、景别、景深）有效——但光学/景深只用在角色上，不用在场景上。</li>
+<li><strong>色板用百分比控制。</strong><code>palette of 60% warm ochre, 30% deep charcoal, 10% rust-red</code>——所有模型都读得懂 60/30/10。用词写真实色相。这个配比必须来自用户指令、场景语境或用户上传的参考，绝不凭空发明一套盖过它们。</li>
+<li><strong>角色一致性靠 Soul ID，不靠散文。</strong>Soul ID 是 Soul 2.0 / Soul Cinema 上的平台参数，负责跨次生成锁同一张脸；散文只是加固（同一服装、同一标记），永远单独扛不起身份。</li>
+<li><strong>防插画漂移。</strong><code>character reference sheet</code> 和 <code>painterly</code> 会触发概念图画风，写实任务禁用；改用 <code>studio photographs / film character sheet / cinematic film still</code>。漂移了就加强写实锚点（胶片、镜头、真实材质），不要用 NOT 堆叠去救。</li>
+<li><strong>文字、纹身、真人三条线。</strong>图中文字：给引号里的确切文案 + 字体/字重/颜色（<code>Write 'GENUINE' in bold red serif on the sign</code>），含糊的「加点字」必糊。纹身：写具体真实图案（classic swallow、old-school dagger）+ clean line-work。真人：绝不把真实人名写进提示词，把参考转译成描述性特征（脸、体型、气质、年代）。提示词里不出现任何 IP / 品牌名。</li>
+<li><strong>编辑纪律：NBP 先行 + 最小 CHANGE、穷尽 PRESERVE。</strong>一次只改一处；不改的一切全部列进 PRESERVE EXACTLY。用户说你改过头了——就是改太多了：锁更多，改更少。</li>
+</ol>
+
+<h3>2.4 各模型细则</h3>
+<details open><summary>Soul 2.0 — 角色</summary><div class="body">
+<ul class="tight">
+<li>专长：写实角色生成——定妆拼版、肖像、UGC、时尚编辑风。质量参数 1.5k / 2k。</li>
+<li>画幅：1:1、16:9、9:16、4:3、3:4、3:2、2:3——<strong>没有 21:9</strong>；带角色的宽银幕帧去 Soul Cinema + Soul ID。</li>
+<li>参考图：1 张。提示词：紧凑自然散文 + 身份锚点（the same real person in all three panels）+ 摄影锚点（studio photographs、film character sheet、方向性光）。</li>
+<li>禁用：painterly、character reference sheet、大写分格块——分格用散文描述。</li>
+</ul></div></details>
+<details><summary>Soul Cinema — 场景与电影帧</summary><div class="body">
+<ul class="tight">
+<li>专长：电影级剧照、概念图、建立镜头。质量 1.5k / 2k；画幅含 <strong>21:9</strong>；参考图 1 张，可把 Soul ID 角色放入场景。</li>
+<li>强项：胶片质感、自然颗粒、光影、年代美学、皮肤与织物。近景和氛围驱动的场景表现最好；出的帧很适合当视频生成的关键帧。</li>
+<li><strong>机位锚点是场景的第一痛点</strong>：简单说法胜过抽象黑话——<code>high angle three-quarter wide shot, camera high above the room looking diagonally down at 45 degrees</code> 远胜 CCTV / fisheye 之类术语。</li>
+<li>模型自带胶片质感与颗粒，不要堆 grain/film 词：技术块里一行定调即可。</li>
+</ul></div></details>
+<details><summary>Cinema Studio AI Cast — 自动定妆</summary><div class="body">
+<p>自动生成一致的电影角色参考拼版，无需手写提示词：Higgsfield 上的独立工具，参数全在它自己的 UI 里。目标是参考拼版时，先把它作为快速通道提供给用户；需要完全控制时才用 Soul 2.0 的手写三格模板。</p></div></details>
+<details><summary>Nano Banana Pro — 编辑（永远第一）与道具</summary><div class="body">
+<ul class="tight">
+<li>角色一：编辑——每一次改图都从 NBP 开始；编辑 = 对原图做后期（原图是底，只改最小量；用编辑去「重建」一张图是禁止的，那是回 Soul 重新生成）。分辨率 1k / 2k / 4k，画幅含 21:9 与 4:5 / 5:4，参考图最多 14 张。</li>
+<li>对话式编辑：听得懂自然指令，会自己把光影和反射随改动一起调整；图中文字渲染最佳。</li>
+<li>角色二：道具生成（与 GPT Image 2 并列）——写实产品语境。</li>
+<li><strong>在 NBP 上做视角切换必须强制交代新布局</strong>：主视图里沙发在右，反打视图里必须明确写沙发在 LEFT，逐件交代每个主要物件的新位置；不写清，NBP 会把几何搅乱。</li>
+</ul></div></details>
+<details><summary>Seedream 4.5 — 只做质感 pass</summary><div class="body">
+<p>唯一职责：救活成图里糊掉的 AI 质感——皮肤（毛孔）、织物（织纹）、表面（污渍与纹理）。<strong>不做定点编辑，永远不要给它定点任务。</strong>分辨率基础到 4K、高阶约 6K，支持多参考。写法：目标写明 reviving sloppy AI textures，CHANGE 列出要处理的表面，PRESERVE 锁构图、脸、光、调色。</p></div></details>
+<details><summary>GPT Image 2 — 最后手段的局部手术</summary><div class="body">
+<ul class="tight">
+<li>性格：全图偏「脏」（会动整张图），但局部极强。</li>
+<li>用途一：NBP 拿不下的最精细局部修改——CHANGE 越小，结果越干净。用途二：道具产品风生成（与 NBP 并列，排版强）。用途三：场景视角切换（反打/换角度）默认走它。</li>
+<li>分辨率 1k / 2k / 4k，质量 low / medium / high。用同一个外科编辑模板，但 PRESERVE 列表要穷尽到极致——这个模型很乐意重绘它不该碰的地方。</li>
+</ul></div></details>
+
+<h3>2.5 配方库：技术块、色板、摄影师参照</h3>
+<h4>胶片颗粒电影调</h4>
+<pre><button class="copy">复制</button><code>Photorealistic ARRI Alexa LF anamorphic Cooke S4 lens at T2.0, organic 35mm Kodak Vision3 250D film grain, soft cinematic falloff, cinematic film still aesthetic</code></pre>
+<p>配去饱和调色 + 摄影师气质使用。写实角色拼版上不要写 painterly。</p>
+<h4>现代干净数字调</h4>
+<pre><button class="copy">复制</button><code>Shot on ARRI Alexa Mini LF with ARRI Signature Prime lens, clean modern digital cinematic capture, crisp natural detail, minimal fine grain, soft cinematic falloff, modern cinematic film still quality, hyperrealistic photographic detail</code></pre>
+<p>再配：<code>natural living skin tones, medium contrast, subtle cool tone in the shadows, true-to-life modern colour, no heavy desaturation</code>。与胶片调是两个世界：无重颗粒、无强去饱和。Soul Cinema 自带质感，技术块在那边写短一点——它们是定调锚，不是用来跟模型打架的。</p>
+<h4>色板包装句</h4>
+<pre><button class="copy">复制</button><code>Refined desaturated palette: [cool/dominant tones] dominating, [warm element] as the only warm contrast, deep crushed blacks, restrained naturalistic grading, soft low contrast, strong cinematic chiaroscuro</code></pre>
+<p>写实角色作业时删掉 painterly 一词，只在有意做绘画风环境图时保留。</p>
+<h4>摄影师 / 气质参照（点名即可，别堆名单）</h4>
+<div class="pill-row">
+<span class="pill">Roger Deakins — 自然主义光</span><span class="pill">Emmanuel Lubezki — 自然光、广角</span><span class="pill">Hoyte van Hoytema — Interstellar</span><span class="pill">Christopher Blauvelt — First Cow</span><span class="pill">Paweł Pawlikowski — 历史建筑里的现代忧郁</span><span class="pill">Andrei Tarkovsky — 框中框 内→外</span><span class="pill">Akira Kurosawa —  quiet landscape stillness</span><span class="pill">Naomi Kawase — 日式乡野氛围</span>
+</div>
+
+<h3>2.6 外科编辑模板（整个编辑通道共用）</h3>
+<pre><button class="copy">复制</button><code>Edit the image: [one-line goal].
+
+CHANGE: [only the single thing that changes, described precisely].
+
+PRESERVE EXACTLY:
+- [list every element that must stay identical: face, clothing, props,
+  positions, wall/floor, camera angle, all existing shadows]
+- Color grade, palette, contrast, grain, falloff
+
+ONLY CHANGE: [restate the one change]. 100% identical otherwise.</code></pre>
+<p>这条模板的教训只有一句：<strong>当用户说你改过头、偏了要求时，就是你改得太多——锁住一切，只改一处。</strong>Seedream 的质感 pass 和 GPT Image 2 的兜底手术都套这个模板，只是 CHANGE 的口径不同（前者列表面，后者收到最窄）。</p>
+
+<h3>2.7 四种提示词类型模板</h3>
+<details open><summary>类型 A · 角色三格定妆（Soul 2.0）</summary><div class="body">
+<p>平台参数：画幅 16:9、质量 2k、已有 Soul ID 就设上。快速通道提醒：AI Cast 能自动出参考拼版；下面的手写模板用于需要完全控制时。</p>
+<pre><button class="copy">复制</button><code>Three studio photographs of the same [person] arranged side by side on a flat neutral mid-grey studio backdrop, a film character sheet: full-body front photo on the left, full-body back photo in the middle, close-up portrait photo on the right, the same real person in all three, consistent across panels. Soft directional cinematic studio lighting from one side, gentle natural shadow falloff, clean neutral cinematic look.
+
+The [person]: [age, build, ethnicity-as-type, face features, hair, facial hair, distinctive marks — describe real-people references as features, never by name].
+
+[Wardrobe, consistent in all panels: ...]. [Distinctive props / signature items.]
+
+On the left panel the [person] stands straight facing the camera in a neutral pose, arms relaxed at the sides, full figure head to feet. In the middle panel the same standing pose is seen from behind. On the right panel a close-up head-and-shoulders portrait, [expression + key face details].
+
+[Palette line]. [Tech block].</code></pre>
+<ul class="tight">
+<li>不写 character reference sheet、不写 painterly；说 film character sheet / studio photographs。</li>
+<li>定妆拼版<strong>不加 rule of thirds</strong>（拼版是三分法的唯一例外）；其余一切视频/图像提示词都加。</li>
+<li>一致性锚点是命门：same real person in all three, consistent across panels，服装也要重复 consistent in all panels。分格用散文流写，不用 LEFT/MIDDLE/RIGHT 大写块。</li>
+<li>光用方向性（非平光）才有电影感；纹身/标记写具体图案 + 干净线条。</li>
+</ul></div></details>
+<details><summary>类型 B · 场景 / 环境（Soul Cinema）</summary><div class="body">
+<p>平台参数：宽银幕图画幅 21:9（标准视频用 16:9）、质量 2k。</p>
+<pre><button class="copy">复制</button><code>[Camera anchor — the hardest part; anchor it hard]. [Location identity]. [Key architectural / natural elements]. [Light source + direction + temperature]. [Secondary elements receding into depth]. [Palette wrapper]. [Tech block]. [Mood / cinematographer ref]. [Emptiness stated positively if the location must be empty: "empty deserted interior, bare walls, still air"].</code></pre>
+<ul class="tight">
+<li>机位锚点技巧：简单胜抽象；用真实器材 + 类型词（24mm wide、real estate interior photo）胜过抽象几何；地板/木板走向这类顽固几何，把它写进正向描述里重新框定（horizontal stripe pattern, no vanishing point in the floor），别硬顶着「木板」二字打架。</li>
+<li>框中框（门洞/窗口 内→外）：前景残墙作暗剪影围住开口，Tarkovsky《潜行者》气质。</li>
+<li>光学/景深语言不进场景——那是角色的。</li>
+</ul></div></details>
+<details><summary>类型 C · 道具拼版（NBP / GPT Image 2）</summary><div class="body">
+<p>平台参数：画幅 1:1（高道具用 3:4）、分辨率 2k–4k。这是唯一不走 Soul 模型的生成任务。</p>
+<pre><button class="copy">复制</button><code>Photorealistic [top-down / three-quarter overhead] product shot of [prop] on a [neutral grey concrete] surface, [soft directional lighting], isolated subject. [Concrete description of the prop, materials, wear state]. [Blank unbranded surfaces stated positively if no text/logos wanted]. [Tech block].</code></pre>
+<ul class="tight">
+<li>多状态（干净 / 破损 / 带血）= 分开的独立资产，各出一张。</li>
+<li>触发词警告：装置类道具容易撞安全过滤——用中性材质与功能描述（retro industrial electronic prop assembly, numerical readout），不用武器/爆炸类词。</li>
+<li>「不要 logo」：全篇删掉品牌名，正向写 plain unbranded wrapper, blank matte surface。</li>
+</ul></div></details>
+<details><summary>类型 D · 改图与视角切换</summary><div class="body">
+<ul class="tight">
+<li>改图：套 2.6 的外科模板，NBP 先行；质感糊去 Seedream；NBP 拿不下的精细局部去 GPT Image 2；要重建就回 Soul 重新生成。</li>
+<li>视角切换（反打 / 新机位）：默认 GPT Image 2。在 NBP 上做，则必须把镜像后的新布局逐件写死，例如：<em>“In the main view the sofa is on the right; in this reverse view the sofa is on the LEFT, the doorway behind the camera is now visible ahead.”</em></li>
+<li>附带一条视频注记：同一套人马也管视频——Seedance / Kling 里写人物要写<strong>动作状态而非过渡过程</strong>（详见模块三第 10 节）；Kling 用 Custom Multi-Shot（无时间码），Seedance 用时间码结构；用户要求时双语 EN + ZH 交付。</li>
+</ul></div></details>
+
+<h3>2.8 发送前清单</h3>
+<ul class="check">
+<li>模型按路由选对：生成走 Soul（拼版可用 AI Cast）、道具走 NBP / GPT Image 2、编辑 NBP 先行</li>
+<li>画幅与质量/分辨率在 UI 里设好，正文里没有它们</li>
+<li>自然散文；大写块（CHANGE / PRESERVE）只出现在编辑提示词里</li>
+<li>正向 &gt; 负向；编辑里的每个「移除」都配了填充物</li>
+<li>技术化光影（主光、光比、衰减）+ 具体材质（材质 + 表面处理）</li>
+<li>60/30/10 色板来自用户指令 / 场景语境 / 上传参考，没有凭空发明</li>
+<li>角色：Soul ID + 散文锚点双保险</li>
+<li>三分法：除角色拼版外处处适用</li>
+<li>无品牌、无 IP、无真人名；总长不膨胀（≤1500–2000 字符）</li>
+</ul>
+</section>
+
+<!-- ================= ACTING ================= -->
+<section id="acting">
+<span class="mod-tag">MODULE 3 · PERFORMANCE</span>
+<h2>三、表演系统 — 写进提示词的人物表演</h2>
+<p class="sub">这套系统管的是提示词里的<strong>表演层</strong>：无论你用哪种提示词模板，表演内容都写进运动 / 人物行为 / 表演那一段。它有一条统领一切的公理——</p>
+<div class="note"><p><strong>表演是压力之下的行为，不是对情绪的展示。</strong>人物想要某样东西，有什么东西挡着路，他为得到它而行动。情绪是这场斗争的副产品，永远不是你直接去写的对象。</p></div>
+
+<h3>3.1 什么是好表演</h3>
+<div class="tbl-wrap"><table>
+<tr><th>坏表演</th><th>好表演</th></tr>
+<tr><td>展示情绪（「我很生气」）</td><td>追求目标（「我要逼你还钱」）——愤怒自己会出现</td></tr>
+<tr><td>等自己的台词提示才动</td><td>每一秒都在听、在对搭档作出反应</td></tr>
+<tr><td>身体图解台词（手势 = 词义）</td><td>身体过自己的生活，有时与台词矛盾</td></tr>
+<tr><td>所有台词一个节奏一个调</td><td>节奏随策略的每次改变而改变</td></tr>
+<tr><td>情绪在台词处开、在台词后关</td><td>状态是连续的——台词之前有「之前的生活」，之后有余波</td></tr>
+<tr><td>脸在「演」——挑眉、做鬼脸</td><td>脸在思考——想法先于台词从眼里读出来</td></tr>
+</table></div>
+
+<h3>3.2 每场戏的五根支柱</h3>
+<div class="grid2">
+<div class="card"><b class="t">2.1 目标 Objective</b><p>人物在<strong>这一场、此刻、向某个具体的人</strong>想要什么。永远是冲着搭档的动词：「逼他招供」「求一周宽限」「让她相信我不怕」。永远不是状态（「生气」「内疚」）——状态没法直接演。场景目标背后是贯穿全剧的超级目标，每个场景目标都是朝它迈的一步。</p></div>
+<div class="card"><b class="t">2.2 障碍与 stakes</b><p>什么挡着他：外部的（对方要的正相反、屋里有证人、离截止只剩两小时）或内部的（骄傲不许他求人、他自己都不信自己的话）。赌注：失败的代价越高，戏越紧。永远要回答「如果我得不到，会发生什么」——答案必须让人物害怕。</p></div>
+<div class="card"><b class="t">2.3 策略 Tactics</b><p>此刻追求目标的具体方法，全是动作动词：施压、讨好、羞辱、哀求、挑衅、讨价还价、威胁、拖延。策略失败了，活人会<strong>换</strong>。一整场只有一个策略，就是死表演。</p></div>
+<div class="card"><b class="t">2.4 节拍 Beats</b><p>最小行动单位：人物用一种方式追求一个目标的这一段。节拍在以下时刻结束：目标达成、策略失败、新信息到达、力量平衡 shifting。<strong>每次节拍变化必须在行为上看得见</strong>：一次停顿、姿势变化、语速变化、视线转移。一场好戏有 2–4 次节拍变化；全程行为不变，戏就是平的。</p></div>
+<div class="card"><b class="t">2.5 潜台词 Subtext</b><p>人物真正想的、真正要的，与他说出口的相对照。潜台词不是「演」出来的——当人物一边演真实目标、一边说假台词时，它自己会漏出来。可搭建的标记：不是问句的问句；重复（同一个问题问两遍 = 不信答案）；突然换话题；不合时宜的玩笑（脆弱的盾）；过短的回答（「Fine.」「Sure.」——一扇关上的门）。</p></div>
+<div class="card"><b class="t">一句话收束</b><p>五根支柱缺任何一根，表演都会散架。写表演段落之前，先把这五样在脑子里（或 CineDance 的诊断阶段）过一遍。</p></div>
+</div>
+
+<h3>3.3 倾听与反应 — 质量的主考场</h3>
+<p>表演活在台词<strong>之间</strong>，不在台词里。四个可观察的真倾听标记，写进场景里：</p>
+<ol class="tight">
+<li><strong>反应在搭档台词结束前就开始。</strong>人听到一半就懂了——脸和身体已经在回答。搭档说完之前一张中性脸、说完才「开机」，是死表演。</li>
+<li><strong>词之前先有想。</strong>回答难题之前有微停顿——人明显在决定说什么。匀速秒答 = 背课文，没命。</li>
+<li><strong>评估时刻。</strong>重要事情发生时（消息、威胁、侮辱），人物需要消化时间——从零点几秒到长停顿。电影就活在这些评估的特写上：一张脸、失焦的眼神、世界在游移。</li>
+<li><strong>被搭档传染。</strong>节奏、音量、能量随搭档而变：一声吼要么换来回吼、要么换来刻意的安静——但必须是「回应」，不是各说各的。</li>
+</ol>
+
+<h3>3.4 身体：人物的物理生活</h3>
+<div class="grid2">
+<div class="card"><b class="t">4.1 物理状态先于心理</b><ul>
+<li><strong>重心</strong>：高（胸、颏——自信、攻击性、地位）或低（塌肩、佝偻——疲惫、恐惧、臣服）。</li>
+<li><strong>节奏</strong>：快而碎（紧张、亢奋）或慢而省（控制、威胁——最危险的人动得最少）。</li>
+<li><strong>开放度</strong>：挺肩摊掌 vs 抱臂、低头、封闭姿势。</li>
+<li><strong>呼吸</strong>：高而急（恐慌）vs 低而缓（控制）。呼吸是最诚实的状态指标；呼吸锁死 = 表演锁死。声画必须一致：刚跑完的人不可能用平稳的声音说话。</li></ul></div>
+<div class="card"><b class="t">4.2 营生 Business — 手上的活</b><p>人物几乎总要有一件在做的事：他不是「在谈话」，他是修引擎、数钱、做饭、擦杯子——边做边说。营生杀死假戏剧腔（手忙于真实）、造出场景节奏（停顿被动作填满）、生出潜台词（一个人<strong>怎么</strong>数钱比台词说的多）。<strong>中断动作规则</strong>：最强的重音是人物<strong>停下</strong>手里的活——切着面包的人在一句话处停住，那句话就成了事件。把「停」当标点用。</p></div>
+<div class="card"><b class="t">4.3 距离即戏剧 Proxemics</b><p>人物间的距离是关系的可见图表：亲密区（&lt;0.5 m）——爱或暴力，不请自入即是侵犯，贴脸 10 cm 的耳语式威胁比隔屋喊更可怕；个人区（0.5–1.2 m）——信任；社交区（1.2–3.5 m）——公事、戒备；公共区（3.5 m+）——疏离、等级。场景的戏常常就是距离的故事：谁拉近、谁打破、谁僵住。<strong>距离一变 = 节拍一变。</strong></p></div>
+<div class="card"><b class="t">4.4 地位 Status — 无形的等级</b><p>地位是你<strong>做</strong>出来的，不是你「是」什么。高地位：头不动、动作慢、凝视长、回答前停顿、占地盘、碰别人的东西。低地位：手忙脚乱、频繁摸自己（脸、头发）、话说得断断续续、陪笑、用眼神请示。表演里最有意思的是<strong>地位翻转</strong>：老板露出一秒的怯；下属突然不笑了。有力的场景形状：高位入场然后崩塌，或低位入场然后翻盘。</p></div>
+</div>
+
+<h3>3.5 声音：好表演听起来什么样</h3>
+<ul class="tight">
+<li>节奏写在文本里——精确交付；快 ≠ 含糊。台词可以抢尾（overlap 是常态），但关键词保持干净。</li>
+<li><strong>音量对比：最可怕的话说得最轻。</strong>喊叫是弱者的货币；掌控全场的人压低音量，所有人都会凑近听。</li>
+<li>停顿是事件，不是窟窿：停顿合法的前提是里面有事发生（一次评估、一个决定、一次拒绝回答）。</li>
+<li>真人说话有垃圾：打断、没听清的词、重复、没说完的句子。句句工整的台词杀死街头真实感。</li>
+</ul>
+
+<h3>3.6 人物表演主档案（Master Profile）</h3>
+<p>每个常驻角色写<strong>一份</strong>主档案——他「怎么演」的永久真相源。写一次，之后每场按第 8 节改写适配。目标长度：<strong>150–220 词、一个流动段落</strong>、全英文、全部可观察可拍摄。块顺序固定：</p>
+<pre><button class="copy">复制</button><code>Character acting as [NAME]. [Age, build, physique, posture — the body as a document of their biography]. [The psychological engine in one clause — the inner drive that explains the physicality]. Vocal profile: [pitch/timbre, accent/origin, pace and delivery manner, and how the voice breaks or shifts under emotion]. Key physical habits and tics: [signature tic with its trigger; stress tic with its trigger; concealment behavior — what they do to hide what they feel; the facial mask and the exact condition under which it cracks]. Walking style: [the gait as characterization — named and specific, with weight, rhythm and foot placement]. However, when [emotional trigger], [the transformation — how the posture, gait and face change]. [Optional: the softening target — the one person or thing that makes the face genuinely soften].</code></pre>
+<h4>写每个块的八条规则</h4>
+<ol class="tight">
+<li><strong>只写可观察行为。</strong>每个内在状态都必须有身体标记。不写「he is nervous」，写下唇的颤、重重的吞咽、张口长吸气再撅唇急吐气。</li>
+<li><strong>每个小动作都有触发器。</strong>不是「他掰手指节」，而是「他在日常闲聊时掰手指节来装自信」。格式：[tic] + [何时/为何]。没触发器的小动作是装饰；有触发器的才是戏剧。</li>
+<li><strong>给步态起名。</strong>引号里一个好记的自造名能锚住生物力学："power-walk"、"peacock strut"、"gallery walk"、"battering-ram stride"、"dreadnought pace"。然后拆开写：重量、步幅、躯干和手臂做什么、头做什么。</li>
+<li><strong>面具和裂口都要建。</strong>档案里最电影的装置就是条件式转变：外壳 + 压垮它的确切触发器。张扬的 swagger 在被拒绝时塌成孩子气的佝偻；大嗓门在提到家人时闪过一秒的慌。 <strong>每份档案至少一条 “However, when X — …” 句。</strong>同时演两件真相，是木偶和人的分界线。</li>
+<li><strong>一个软化对象。</strong>给脸恰好一个能让它真正柔和下来的人、动物或物。一个——不是两个。人味而不稀释。</li>
+<li><strong>不写服装。</strong>服饰归场景/造型块，永不进表演档案——档案必须挺过任何换装。</li>
+<li><strong>不写机位与颜色。</strong>表演只管表演、脸、声音、动作；机位、调色、光在提示词别处。</li>
+<li><strong>体格即传记。</strong>年龄、体型、姿势要能讲出身世：被过往磨旧的体格、永远紧绷的肩、过度纠正来撑权威的姿态——职业、旧伤、自我形象都必须能从身体上读出来。</li>
+</ol>
+
+<h3>3.7 眼睛的生命 — 每份档案、每场戏都强制</h3>
+<p>死眼是 AI 表演的第一破绽。给每个角色持续、自然主义的眼部生活：</p>
+<ul class="tight">
+<li><strong>微扫视与视线目标</strong>：视线一直在动——游移、思考时 flick 开、扫到一个细节再落回来，永不冻结在一个点上。</li>
+<li><strong>真实的眨眼频率与质地</strong>，且随状态走：压力下快速连眨；掌控时眼睑慢而稳；抽离瞬间眨眼后眼神发空。</li>
+<li><strong>活的眼神光（catchlights）</strong>：眼睛必须读起来是湿的、有光的、活的。</li>
+<li><strong>受控的静止是选择，不是死。</strong>角色的register 是近乎不眨眼的掠食者式平静时，眨眼保持稀少、缓慢、刻意——是决定不是冻结——且视线仍带意图地缓慢移动。</li>
+<li><strong>眼睛领跑想法</strong>：眼睛比头转先一步到达目标；想法在台词之前先从眼里读出。</li>
+<li><strong>眼部生活随节拍变</strong>：眨眼率、视线稳定性、眼神光的温度，都在节拍变化时跟着变。</li>
+</ul>
+
+<h3>3.8 场景适配：主档案是重写，不是粘贴</h3>
+<ol class="tight">
+<li><strong>只写入镜角色。</strong>不在画面里的角色不写表演段落。</li>
+<li><strong>保留恒定核心。</strong>身份、声音档案、标志性小动作、眼部生活和情绪贯穿线每场不变——这是跨剪辑保持角色一致的东西，永不与主档案矛盾。</li>
+<li><strong>为本场重新表达。</strong>按本场的姿势（坐/站/跑/藏）、动作与节拍、情绪状态、时段，选取、强调、修改或舍弃具体行为。</li>
+<li><strong>转化而非删除。</strong>本场物理上做不了的行为要换个出口：瘫在沙发上的焦躁踱步者，同样的神经能量转成坐立不安的微晃、抖腕、撕纸。能量恒定，出口可变。</li>
+<li><strong>一个流动段落。</strong>用角色的 register 写成散文，不用项目符号、不用标题、不用「旋钮」式标注行。</li>
+<li><strong>段首带参考 tag</strong>（管线若用资产引用的话），让模型把表演绑到正确的人身上。</li>
+</ol>
+
+<h3>3.9 声音：固定身份，永不适配</h3>
+<p>表演逐场重写；<strong>声音是锁死的</strong>。每个角色一份 Voice prompt——永久的声学身份。角色有台词时，把它<strong>逐字</strong>粘进提示词的音频/声音字段，永不逐场修改；角色在场但不说话时，就省略它。档案段落里的 vocal profile 写的是声音在戏剧上怎么表现（语速变化、 register 破裂、耳语），音频字段的 Voice prompt 锁的是声音本身——两者必须互相一致。</p>
+<pre><button class="copy">复制</button><code>"A [age]-year-old [origin / accent descriptor]. [Timbre and register]; [pace and delivery manner]; [emotional character — and how it shifts under pressure]."</code></pre>
+
+<h3>3.10 状态，而非过渡（States, not transitions）</h3>
+<p>视频模型败在过渡、赢在状态。写人物<strong>已经身处</strong>动作状态之中——mid-throw、mid-punch、mid-pace、mid-argument——而不是抵达它的过程（「伸手进包、掏出、抡起」会崩；「mid-throw, arm extended」能落地）。用状态逐节拍串联，代替叙述连续过程。这条与 LIRA、CineDance 的口径完全一致：模型拍的是「是什么」，不是「如何变成」。</p>
+
+<h3>3.11 群戏与空间</h3>
+<ul class="tight">
+<li><strong>群体反应走波浪，永不同步。</strong>一个人先懂笑点，第二人慢半拍，第三个根本没懂。整齐划一的同步反应一看就假（除非刻意编排的喜剧同步就是那个点）。</li>
+<li><strong>反应比动作值钱。</strong>每个事件之后，最宝贵的画面是看见它的人的那张脸。</li>
+<li><strong>威胁处冻结。</strong>群像保持持续微动——移重心、做手势、倾身——关键威胁一到，全部<strong>停住</strong>。熙攘 → 静止的反差就是标点。</li>
+<li><strong>运动 = 动机。</strong>没人无缘无故穿过房间：要么朝向某物，要么逃离某物。强动机事件：逼近（升级）、转身背对（打发或藏脸）、对方坐着时站起（夺势）、冲突中坐下（反常的权力）、停在门口（门槛 = 决定点）、开始收拾东西（以身体下最后通牒）。</li>
+<li><strong>强者静而轻声，弱者躁而喊叫。</strong>危险不由危险的人来演，由他周围所有人的紧绷来演。威胁无有起势：没有故作凶狠的停顿、没有慢动作转身——真实世界里暴力不打招呼就到。</li>
+<li><strong>损耗要累积。</strong>人物在故事里被磨损，磨损要累计地写进身体——更灰、更沉、反应更慢——场与场之间永不重置。</li>
+</ul>
+
+<h3>3.12 坏表演图鉴：15 种症状与提示词层面的修法</h3>
+<div class="tbl-wrap"><table>
+<tr><th>#</th><th>症状</th><th>长什么样</th><th>提示词层面的修法</th></tr>
+<tr><td>1</td><td>指示式表演（做脸）</td><td>脸在「描绘」情绪：挑眉、做鬼脸</td><td>把脸从任务里拿掉；写目标、给手营生</td></tr>
+<tr><td>2</td><td>演结果</td><td>从第一秒就演这场戏的结局</td><td>只写人物此刻知道的东西</td></tr>
+<tr><td>3</td><td>等提示</td><td>搭档说话时一张空脸</td><td>把反应写在搭档台词的中段就开始</td></tr>
+<tr><td>4</td><td>单策略</td><td>全场一个颜色（全程吼/全程哭诉）</td><td>标出节拍，每个节拍一个新策略动词</td></tr>
+<tr><td>5</td><td>手势图解</td><td>手势复制词义（说「大」就张臂）</td><td>手势要么先于想法、要么与词矛盾、要么没有</td></tr>
+<tr><td>6</td><td>免费的情绪</td><td>眼泪/暴怒没有铺垫、没有触发事件</td><td>搭梯子：克制 → 决堤；情绪必须有代价</td></tr>
+<tr><td>7</td><td>身体不合传记</td><td>混混有舞者的姿态；瘾君子有新鲜的可塑性</td><td>定身体档案：重心、节奏、磨损</td></tr>
+<tr><td>8</td><td>台词不合阶层</td><td>街头人物说文学长句</td><td>给台词加垃圾：打断、吞尾、重复</td></tr>
+<tr><td>9</td><td>威胁摆信号</td><td>暴力前「凶狠」的停顿、眯眼、慢转身</td><td>威胁是日常的；暴力无起势</td></tr>
+<tr><td>10</td><td>群像同步</td><td>所有人同一时刻同一反应</td><td>反应错开成波浪，强度各异</td></tr>
+<tr><td>11</td><td>死停顿</td><td>静默里什么都没发生</td><td>用评估或营生填满——或者剪掉</td></tr>
+<tr><td>12</td><td>情绪重置</td><td>强事件后人物瞬间「恢复」</td><td>状态有惯性；余波带进下一节拍</td></tr>
+<tr><td>13</td><td>评论角色</td><td>表演对观众挤眼（「咱俩都知道这好笑」）</td><td>完全相信情境；喜剧也要一本正经地演</td></tr>
+<tr><td>14</td><td>特写过载</td><td>特写上还在大幅做表情</td><td>景别越紧动越少：只剩眼睛和想法</td></tr>
+<tr><td>15</td><td>死眼</td><td>冻结的瞪视、不眨眼、无扫视、眼神光发玻璃</td><td>完整执行 3.7——眼部生活永不选修</td></tr>
+</table></div>
+
+<h3>3.13 表演标尺（自检用）</h3>
+<div class="scale">
+<div><b>0</b>人体模特<br>台词念了，行为缺席</div>
+<div><b>1</b>朗诵者<br>「有表现力」的文本、被指示的情绪、图解式身体</div>
+<div><b>2</b>勤勉者<br>目标猜得出来，但单策略、反应迟、停顿空</div>
+<div><b>3</b>匠人<br>目标与节拍在、听搭档、身体合理；缺潜台词、意外策略、状态惯性</div>
+<div><b>4</b>活人<br>持续行为、对比策略、潜台词与台词分岔、地位在身体里、反应先于台词、至少一个意外但真实的选择</div>
+<div><b>5</b>磁石<br>4 的全部 + 悖论：同时演两件真相（帮他——又恨这件事；道歉——又在自卫；爱——却已经离开了）</div>
+</div>
+<p>每个主角镜头都瞄准 4+；自检 ≤2 的段落，出货前重写。第 5 级的<strong>双真相规则</strong>：干净单一的情绪在特写上读起来就是合成的。</p>
+
+<h3>3.14 完整范例：VIKTOR 的主档案与场景适配</h3>
+<pre><button class="copy">复制</button><code>Character acting as VIKTOR. Early 60s male, a retired night-shift taxi driver and former amateur boxer; heavy, thick-necked build gone soft at the middle, with a flat-nosed face and old scar tissue over both eyebrows; sits and stands with a low, grounded center of gravity, weight always on the whole foot. Runs on a single engine: decades of waiting — for fares, for rounds, for trouble — have made patience his weapon. Vocal profile: low, hoarse, unhurried baritone with a working-class rasp, short sentences delivered flat and economical, dropping to a slower, quieter register the more serious things get — he never speeds up. Key physical habits and tics: rolls an old coin across his knuckles when sizing a situation up; a slow, audible nose-breath before he says no; when lying is happening in front of him, he goes completely still and lets a long silence do the pressing; his default face is a heavy-lidded, bored mask that conceals total attention. Eye life: sleepy, hooded eyes with slow deliberate blinks and constant quiet scanning — mirrors, hands, exits — the gaze settling on a speaker a beat before his head turns; catchlights low but alive. Walking style: a heavy, rolling "old boxer's walk," short economical steps, shoulders level, hands loose and ready, never hurrying. However, when someone raises a hand near him, the sleepy mask vanishes in a half-second: the chin drops, the hands rise halfway, the feet find their old stance — then he catches himself and folds it away, embarrassed. His face only truly softens for stray dogs, which he feeds from his coat pocket.</code></pre>
+<p><strong>Voice（VIKTOR 说话时逐字粘贴）：</strong></p>
+<pre><button class="copy">复制</button><code>"A 60-year-old ex-boxer and night-cab driver, working-class city accent. Low, hoarse, unhurried baritone; short flat economical sentences with long comfortable pauses; calm and faintly amused, going quieter — never louder — as things get serious."</code></pre>
+<p><strong>场景适配示例</strong>——场景：深夜，VIKTOR 坐在停着的出租车里；后座一个紧张的年轻乘客在车费上撒谎。</p>
+<pre><button class="copy">复制</button><code>VIKTOR sits motionless in the driver's seat, heavy and grounded, watching the passenger in the rear-view mirror instead of turning around — his hooded eyes flick between the mirror, the passenger's hands and the door lock in slow, quiet scans, blinks rare and deliberate, the gaze settling on the mirror a beat before his head ever moves. The old coin walks across his knuckles on the seat-rest, unhurried; as the passenger's story falls apart, the coin stops mid-roll — he lets the silence sit, takes one slow, audible breath through the nose, and answers in his low, hoarse baritone, flatter and quieter than before, never speeding up. Only when the kid's voice cracks does the sleepy mask ease a fraction: a long exhale, a slow blink, the coin resuming its roll — patience choosing, for now, to be kind.</code></pre>
+<p>这段适配做了什么：步态与坐姿无关，它的能量转进了静止和硬币里；标志性小动作都保住了触发器（转硬币 = 掂量局势；硬币停住 = 中断动作作标点；鼻息 = 拒绝；静止 + 沉默 = 对撒谎者施压）；眼部生活服从主档案，但目标重定向到后视镜、手、门锁；节拍变化全可见（硬币停 → 沉默 → 声音更低更平 → 软化）；声音本身没动——它会被逐字粘进音频字段。</p>
+
+<h3>3.15 发送前清单与十条终极公理</h3>
+<ul class="check">
+<li>每个在镜角色都有「冲着搭档的动词」式目标；障碍与赌注在，失败代价真实</li>
+<li>2–4 次节拍变化，每次在行为上可见（停顿 / 姿势 / 语速 / 视线）</li>
+<li>反应在搭档台词结束前开始；评估时刻在场</li>
+<li>每个角色都有营生；中断动作的重音是刻意用的</li>
+<li>距离有变化且有动机；地位在身体里，不只在台词里</li>
+<li>所有小动作都带触发器；面具有裂口（However, when X…）</li>
+<li>眼部生活写明确：扫视、眨眼质地、眼神光、眼睛领跑想法</li>
+<li>角色说话时 Voice prompt 逐字粘贴；不说话时省略</li>
+<li>状态而非过渡；表演里没有服装、机位、颜色</li>
+<li>群像反应错开；强者静、弱者躁；标尺自检能到 4+</li>
+</ul>
+<div class="grid2">
+<div class="card"><b class="t">十条终极公理</b><ol style="margin:6px 0 0;padding-left:20px;font-size:14.5px;color:var(--ink2)">
+<li>表演是压力下的行为，不是感受的演示。</li>
+<li>听比说重要；反应比朗诵重要。</li>
+<li>情绪是赢或输掉一场斗争的结果，而且它很贵。</li>
+<li>身体比台词聪明：文身冲突时，观众信身体。</li>
+<li>强者静而轻声，弱者躁而喊叫；例外即是事件。</li>
+<li>每个小动作要一个触发器；每张面具要一道裂口。</li>
+<li>每场戏都是某个人的败北——没人输，就没有戏。</li>
+<li>潜台词不是被展示的——它是没藏住而漏出来的。</li>
+<li>状态，而非过渡；模型拍的是「是」，不是「变成」。</li>
+<li>拿不准就剪。表演越少，真实越多。</li>
+</ol></div>
+<div class="card"><b class="t">表演层在合用时的位置</b><p>表演段落不自成一份提示词——它嵌进 CineDance 成稿的角色锚点 / 动作时序部分：CineDance 管「人在哪、朝哪看、镜头怎么拍」，表演系统管「人为什么动、怎么动、动里藏着什么」。声音则单独走 AUDIO 段：Voice prompt 逐字粘贴，永不改写。</p></div>
+</div>
+</section>
+
+<!-- ================= TOGETHER ================= -->
+<section id="together">
+<span class="mod-tag">WORKFLOW</span>
+<h2>四、三套系统合用：一条完整的生产流程</h2>
+<ol class="tight">
+<li><strong>定人（LIRA）。</strong>目标是参考拼版且不需精细控制 → AI Cast 自动出；要完全控制 → Soul 2.0 手写三格模板（16:9 / 2k / Soul ID）。记住禁用词：不说 character reference sheet、不说 painterly。角色一旦定妆，Soul ID 就是之后一切一致性的根。</li>
+<li><strong>定景（LIRA）。</strong>Soul Cinema 出场景图：机位锚点写简单直白，光写技术语言，色板按 60/30/10 从剧本语境推导；宽银幕用 21:9。这张图将成为视频阶段的地点参考，以及把角色放进场景的底图（Soul ID 角色可置入 Soul Cinema 场景）。</li>
+<li><strong>定道具（LIRA）。</strong>NBP / GPT Image 2 出道具图（1:1、产品风、中性无品牌）；多状态分开出。这张图成为视频阶段的道具参考。</li>
+<li><strong>建表演（表演系统）。</strong>每个常驻角色先写一份 150–220 词主档案（体格传记 + 心理引擎 + 声音档案 + 带触发器的小动作 + 带命名的步态 + However 裂口 + 一个软化对象 + 完整眼部生活），外加一句逐字锁定的 Voice prompt。开拍每场戏前，再按五支柱（目标/障碍/策略/节拍/潜台词）把档案重写成本场的一个流动段落。</li>
+<li><strong>导镜头（CineDance）。</strong>把上面所有资产作为 @tag 参考喂入：先 D1 只留本镜资产、D2 逐项查翻车风险，再按十二段骨架成稿——首帧先占位、站位用量化语言锁死、视线与身体朝向分开写、镜头性格按内容类别用视场角选定、光作优先锁、表演段落嵌入角色锚点/动作时序、Voice prompt 逐字进 AUDIO。</li>
+<li><strong>改帧（三套各就其位）。</strong>视频关键帧或成图要改：回 LIRA 的编辑通道——NBP 先行外科编辑（最小 CHANGE + 穷尽 PRESERVE），质感糊走 Seedream，精细局部兜底 GPT Image 2；要重建就回 Soul 重新生成，不用编辑硬凑。</li>
+<li><strong>三道自检。</strong>出货前依次过：LIRA 发送前清单（路由、参数位置、正向表述、色板来源）→ 表演发送前清单（五支柱、眼部生活、标尺 4+）→ CineDance 静默 QA（@tag、首帧、视线、镜头防漂移、光不平、对白干净、无上下文泄漏）。</li>
+</ol>
+<div class="note"><p>三套系统有一条共享的暗线，合用时最值得记住：<strong>它们都不相信形容词，只相信可观察、可测量、可复现的描述。</strong>LIRA 的百分比色板、CineDance 的「within 1 meter」与视场角、表演系统的「触发器 + 身体标记」，是同一种思维的三个切面。</p></div>
+</section>
+
+<!-- ================= CHEAT ================= -->
+<section id="cheat">
+<span class="mod-tag">QUICK REFERENCE</span>
+<h2>五、速查卡</h2>
+<div class="grid3">
+<div class="card"><b class="t">CineDance 一句话</b><p>先诊断再落笔：首帧有人、站位量化、视线与朝向分写、镜头用度数不用毫米、光是锁不是装饰、成稿只留本镜、只输出成稿。</p></div>
+<div class="card"><b class="t">LIRA 一句话</b><p>先路由再写作：角色 Soul、场景 Cinema、道具 NBP/GPT、改图 NBP 先行；正向表述、参数进 UI、色板 60/30/10、不膨胀。</p></div>
+<div class="card"><b class="t">表演系统一句话</b><p>先目标后情绪：写动词不写状态，小动作带触发器，面具带裂口，眼睛必须活，声音逐字锁定，状态而非过渡。</p></div>
+</div>
+<div class="tbl-wrap"><table>
+<tr><th>你想做的事</th><th>去哪套系统</th><th>关键动作</th></tr>
+<tr><td>生成角色定妆拼版</td><td>LIRA</td><td>AI Cast 自动，或 Soul 2.0 三格模板 + Soul ID</td></tr>
+<tr><td>生成场景 / 电影剧照</td><td>LIRA</td><td>Soul Cinema；机位锚点写直白；21:9 在这里</td></tr>
+<tr><td>改一张现成的图</td><td>LIRA</td><td>NBP 外科模板：最小 CHANGE、穷尽 PRESERVE</td></tr>
+<tr><td>救糊掉的质感</td><td>LIRA</td><td>Seedream 4.5 质感 pass，仅此一职</td></tr>
+<tr><td>写一镜视频提示词</td><td>CineDance</td><td>4-D 静默流程 → 十二段骨架 → 静默 QA</td></tr>
+<tr><td>选镜头 / 防镜头漂移</td><td>CineDance</td><td>按内容类别选视场角 + 结果句式 + LENS LOCK</td></tr>
+<tr><td>让人物「像活人」</td><td>表演系统</td><td>五支柱 + 主档案 + 眼部生活 + 标尺自检 4+</td></tr>
+<tr><td>锁定角色声音</td><td>表演系统</td><td>Voice prompt 一句，逐字粘贴，永不改写</td></tr>
+<tr><td>跨镜保持同一个人</td><td>三套合力</td><td>Soul ID（图）+ 主档案核心（演）+ @tag 纪律（视频）</td></tr>
+</table></div>
+</section>
+
+<footer>
+<p>本教程由三份 skill 原文件整理而成：CINEDANCE_HIGGSFIELD_SKILL.md（CineDance V4 — Seedance 2.0 Prompt Director System）、LIRA_SKILL.md（Lira — Image Prompt Optimization）、ACTING_SKILL.md（Acting System — Character Performance for AI Video Generation）。英文模板与范例均为原文照录，可直接复制使用。</p>
+</footer>
+</div>
+<script>
+document.querySelectorAll('pre .copy').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var pre=btn.closest('pre'); var code=pre.querySelector('code');
+    var text=code?code.innerText:pre.innerText;
+    function done(){btn.textContent='已复制';setTimeout(function(){btn.textContent='复制';},1600);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(function(){fallback();});}
+    else{fallback();}
+    function fallback(){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}document.body.removeChild(ta);}
+  });
+});
+var links=document.querySelectorAll('.topnav a');
+var secs=['pipeline','cinedance','lira','acting','together','cheat'].map(function(id){return document.getElementById(id);});
+function spy(){var y=window.scrollY+120;var cur=0;secs.forEach(function(s,i){if(s&&s.offsetTop<=y)cur=i;});links.forEach(function(a,i){a.classList.toggle('on',i===cur);});}
+window.addEventListener('scroll',spy,{passive:true});spy();
+</script>
+</body>
+</html>
